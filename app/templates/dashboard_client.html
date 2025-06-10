@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Mi Dashboard - YASTA{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', path='/css/dashboard.css') }}">{% endblock %}
+
+{% block content %}
+<main class="container py-8 md:py-16">
+    <div class="mb-8">
+        <h1 class="section-title !text-left !mb-2 !text-3xl">Dashboard del Cliente</h1>
+        <p class="section-subtitle !text-left !m-0 !max-w-full">
+            ¡Bienvenido, <strong>{{ current_user.contact_name or current_user.business_name }}</strong>!
+        </p>
+    </div>
+
+    <!-- (2) SECCIÓN FREEMIUM vs VIP -->
+    <details class="upgrade-card mb-8">
+        <summary class="upgrade-summary">
+            <span>Eres un usuario <strong>Freemium</strong>. ¡Descubre los beneficios de ser VIP!</span>
+            <svg class="dropdown-arrow" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </summary>
+        <div class="upgrade-details">
+            <p>Con tu plan VIP por solo <strong>S/ 20 mensuales</strong>, obtienes declaraciones ilimitadas (pago cero). Si hay impuesto por pagar, gestionamos el pago por solo S/ 10 adicionales (previa transferencia del monto total).</p>
+            <button class="btn btn-accent mt-4">¡Quiero ser VIP!</button>
+        </div>
+    </details>
+
+    <!-- (3.c) GRÁFICAS -->
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
+        <div class="dashboard-card">
+            <h3 class="card-title mb-4">Resumen del Periodo (Junio 2024)</h3>
+            <canvas id="salesPieChart"></canvas>
+        </div>
+        <div class="dashboard-card">
+            <h3 class="card-title mb-4">Tendencia de Ingresos vs. Gastos</h3>
+            <canvas id="trendsLineChart"></canvas>
+        </div>
+    </div>
+
+    <!-- (3.a y 3.b) PESTAÑAS CON TABLAS -->
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-link active" data-tab="tab-comprobantes">Comprobantes</button>
+            <button class="tab-link" data-tab="tab-declaraciones">Declaraciones</button>
+        </div>
+        <div class="tab-content active" id="tab-comprobantes">
+            <!-- (3.a) Tabla de Ventas/Gastos -->
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Tipo</th><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead>
+                    <tbody>
+                        <!-- Ejemplo, esto se llenaría con un for loop -->
+                        <tr><td>Venta</td><td>2024-06-05</td><td>Factura F001-123</td><td>S/ 1,200.00</td></tr>
+                        <tr><td>Gasto</td><td>2024-06-04</td><td>Compra de útiles</td><td>S/ -150.00</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-content" id="tab-declaraciones">
+            <!-- (3.b) Tabla de Declaraciones -->
+             <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Periodo</th><th>Imp. Declarado</th><th>Monto Pagado</th><th>Fecha Decl.</th><th>Pagado Por</th><th>Acciones</th></tr></thead>
+                    <tbody>
+                         <!-- Ejemplo -->
+                        <tr><td>2024-05</td><td>IGV, Renta</td><td>S/ 250.00</td><td>2024-06-15</td><td>YASTA</td><td><a href="#" class="card-link">Descargar</a></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block page_scripts_body %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    // JS para los tabs y las gráficas
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lógica de Tabs
+        const tabLinks = document.querySelectorAll('.tab-link');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                tabLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                const targetId = link.dataset.tab;
+                tabContents.forEach(content => {
+                    content.classList.toggle('active', content.id === targetId);
+                });
+            });
+        });
+
+        // (3.c) Gráfica de Pastel
+        new Chart(document.getElementById('salesPieChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Ingresos', 'Gastos', 'Devoluciones'],
+                datasets: [{ data: [5200, 1100, 250], backgroundColor: ['#38bdf8', '#f97316', '#ef4444'] }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'top' } } }
+        });
+
+        // (3.c) Gráfica de Líneas
+        new Chart(document.getElementById('trendsLineChart'), {
+            type: 'line',
+            data: {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                datasets: [
+                    { label: 'Ingresos', data: [3200, 4100, 3800, 5000, 4500, 5200], borderColor: '#38bdf8', tension: 0.1 },
+                    { label: 'Gastos', data: [1000, 1200, 900, 1500, 1300, 1100], borderColor: '#f97316', tension: 0.1 }
+                ]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'top' } } }
+        });
+    });
+    </script>
+{% endblock %}

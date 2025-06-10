@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Interno - YASTA{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Dashboard Interno de YASTA</h1>
+        <p>Bienvenido, {{ current_user.staff_full_name or current_user.email }} (Rol: {{ current_user.role.value }}).</p>
+
+        <nav>
+            <ul>
+                <li><a href="#pending_services">Servicios Pendientes</a></li>
+                <li><a href="#assigned_services">Mis Servicios Asignados</a></li>
+                <li><a href="#client_management">Gestión de Clientes</a></li>
+                <li><a href="#payment_verification">Verificación de Pagos</a></li>
+                {% if current_user.role.value == "admin" or current_user.role.value == "staff_ceo" %}
+                <li><a href="#reports">Reportes Internos</a></li>
+                <li><a href="#user_management">Gestión de Usuarios Staff</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <section id="pending_services">
+            <h2>Servicios Pendientes de Asignación</h2>
+            <p>[Aquí se listarían los servicios solicitados por clientes que aún no tienen un colaborador asignado. Un administrador o manager podría asignarlos desde aquí.]</p>
+            <!-- Ejemplo de cómo podría verse un item con HTMX -->
+            <!-- 
+            <div class="service-item" hx-get="/api/v1/staff/services/pending" hx-trigger="load" hx-swap="innerHTML">
+                Cargando servicios pendientes...
+            </div>
+            -->
+        </section>
+
+        <section id="assigned_services">
+            <h2>Mis Servicios Asignados</h2>
+            <p>[Aquí se listarían los servicios que este colaborador tiene asignados para procesar.]</p>
+            <p>Cada servicio tendría opciones para: Ver detalles, solicitar Clave SOL (auditado), ingresar datos de declaración, subir constancias, marcar como completado, etc.</p>
+        </section>
+
+        <section id="client_management">
+            <h2>Gestión de Clientes</h2>
+            <p>[Buscador de clientes, ver detalles de clientes, historial de servicios. Acceso a credenciales SOL (auditado y con justificación).]</p>
+        </section>
+
+        <section id="payment_verification">
+            <h2>Verificación de Pagos</h2>
+            <p>[Lista de pagos reportados por clientes (FeePayment con estado pendiente) para verificar con las capturas Yape/Plin y marcar como pagados.]</p>
+        </section>
+
+        {% if current_user.role.value == "admin" or current_user.role.value == "staff_ceo" %}
+        <section id="reports">
+            <h2>Reportes Internos</h2>
+            <p>[Reportes sobre la operación de YASTA: ingresos, costos, número de declaraciones, etc., basados en CompanyTransaction y CompanyTaxDeclaration.]</p>
+        </section>
+
+        <section id="user_management">
+            <h2>Gestión de Usuarios Staff</h2>
+            <p>[Crear nuevos usuarios staff, asignar roles, activar/desactivar cuentas de colaboradores.]</p>
+        </section>
+        {% endif %}
+
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .container {
+        max-width: 960px;
+        margin: 20px auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+    }
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    nav ul li {
+        display: inline-block;
+        margin-right: 15px;
+    }
+    section {
+        margin-top: 30px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+    }
+    /* Estilos para modo oscuro podrían ir aquí o en tu CSS global */
+</style>
+{% endblock %}

@@ -1,0 +1,49 @@
+/* app/static/css/dashboard.css */
+.dashboard-card {
+    background-color: var(--bg-muted-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem; /* rounded-lg */
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease-in-out;
+}
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+.card-header { display: flex; align-items: flex-start; margin-bottom: 1rem; }
+.card-icon { width: 1.75rem; height: 1.75rem; color: var(--primary-color); margin-right: 0.75rem; flex-shrink: 0; }
+.card-title { font-size: 1.125rem; font-weight: 600; line-height: 1.4; color: var(--text-color); }
+.card-body { flex-grow: 1; }
+.card-description { color: var(--text-muted-color); font-size: 0.9rem; }
+.card-footer { margin-top: 1.5rem; }
+.card-link { font-weight: 500; color: var(--primary-color); }
+.card-link:hover { text-decoration: underline; }
+.card-status-text { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+.status-card.status-in-progress .card-status-text { color: #3b82f6; } /* Azul */
+.status-card.status-completed .card-status-text { color: #22c55e; } /* Verde */
+.status-card.status-pending .card-status-text { color: #f97316; } /* Naranja */
+.status-card.status-error .card-status-text { color: #ef4444; } /* Rojo */
+.card-body.action-buttons { display: flex; flex-direction: column; gap: 0.75rem; }
+.w-full { width: 100%; }
+
+
+/* para onboarding creo*/
+/* Añadir a app/static/css/dashboard.css */
+.upgrade-card { background-color: var(--color-primary-900); border: 1px solid var(--primary-color); border-radius: 0.5rem; padding: 1rem; }
+.upgrade-summary { display: flex; justify-content: space-between; align-items: center; font-weight: 500; cursor: pointer; color: var(--color-text-light); }
+.upgrade-details { padding-top: 1rem; color: var(--color-text-muted-light); }
+.upgrade-card[open] .dropdown-arrow { transform: rotate(180deg); }
+
+.tabs-nav { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem; }
+.tab-link { padding: 0.75rem 1.5rem; background: none; border: none; font-weight: 500; color: var(--text-muted-color); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.tab-link.active { color: var(--primary-color); border-color: var(--primary-color); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.table-wrapper { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+thead { background-color: var(--bg-muted-color); }
+th { font-weight: 600; font-size: 0.875rem; color: var(--text-muted-color); }

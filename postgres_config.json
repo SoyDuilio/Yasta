@@ -1,0 +1,20 @@
+[
+  {
+    "label": "localhost-RUCFACIL",
+    "host": "localhost",
+    "user": "postgres",
+    "port": 5432,
+    "ssl": false,
+    "database": "RUCFACIL",
+    "password": "duilia"
+  },
+  {
+    "label": "localhost-PORTFOLIO",
+    "host": "localhost",
+    "user": "postgres",
+    "port": 5432,
+    "ssl": false,
+    "database": "PORTFOLIO",
+    "password": "duilia"
+  }
+]

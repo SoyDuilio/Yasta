@@ -1,0 +1,166 @@
+/* app/static/css/index.css */
+
+/* Hero Section */
+.hero-section {
+    /* El gradiente se define inline en el HTML, o podrías moverlo aquí */
+    /* background-image: linear-gradient(to bottom right, var(--primary-color), var(--color-secondary-500)); */
+    color: var(--color-text-light); /* Texto principal del hero */
+}
+/* Animaciones (ya definidas en tu versión anterior, mantenerlas) */
+.animate-fade-in-down { animation: fadeInDown 0.8s ease-out; }
+.animate-fade-in-up { animation: fadeInUp 0.8s ease-out 0.2s; animation-fill-mode: backwards; }
+.animate-fade-in { animation: fadeIn 0.8s ease-out 0.4s; animation-fill-mode: backwards; }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Placeholder para Lottie en Hero */
+#hero .lazy-lottie {
+    background-color: rgba(255,255,255,0.1); /* Fondo sutil sobre el gradiente */
+    border-radius: 0.5rem;
+    display: flex; align-items: center; justify-content: center;
+    font-style: italic; color: rgba(255,255,255,0.7); /* Texto claro para el placeholder */
+    width: 16rem; /* w-64 */ height: 16rem; /* h-64 */
+    margin-left: auto; margin-right: auto; margin-bottom: 2rem; /* mb-8 */
+}
+
+/* Cómo Funciona - Steps */
+#how-it-works { background-color: var(--bg-muted-color); } /* Fondo de la sección */
+.step-card {
+    background-color: var(--bg-color); /* Fondo de la tarjeta, diferente al de la sección */
+    color: var(--text-color);
+    padding: 2rem; /* p-8 */
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); /* shadow-md */
+    transition: transform 0.2s ease-in-out;
+    text-align: center;
+}
+.step-card:hover { transform: translateY(-5px); }
+.step-card img { /* Placeholder o Lottie */
+    color: var(--text-muted-color);
+    background-color: var(--bg-muted-color); /* Fondo para el placeholder de imagen */
+    width: 12rem; height: 12rem; /* w-48 h-48 */
+    margin-left: auto; margin-right: auto; margin-bottom: 1.5rem; /* mb-6 */
+    border-radius: 0.375rem; /* rounded-md */
+    display: flex; align-items: center; justify-content: center;
+}
+.step-card h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color); }
+.step-card p { color: var(--text-muted-color); }
+
+
+/* Videos */
+.video-placeholder {
+    background-color: var(--bg-muted-color);
+    color: var(--text-muted-color);
+    font-weight: 600;
+    border-radius: 0.5rem; /* rounded-lg */
+    aspect-ratio: 16 / 9; /* aspect-video */
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* Testimonios */
+#testimonials { background-color: var(--bg-muted-color); }
+.testimonial-card {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 2rem; border-radius: 0.5rem; text-align: center;
+    border: 1px solid var(--border-color);
+}
+.testimonial-card img {
+    width: 5rem; height: 5rem; border-radius: 9999px;
+    margin-left: auto; margin-right: auto; margin-bottom: 1rem;
+    object-fit: cover; border: 2px solid var(--border-color);
+}
+.testimonial-card p.italic { color: var(--text-muted-color); margin-bottom: 1rem; }
+.testimonial-card p.font-semibold { color: var(--text-color); font-weight: 600; }
+
+/* Equipo */
+.team-member-card { text-align: center; }
+.team-member-card img {
+    border-radius: 0.5rem; /* rounded-lg */
+    margin-bottom: 1rem; /* mb-4 */
+    object-fit: cover; aspect-ratio: 1 / 1; /* aspect-square */
+    border: 4px solid var(--border-color);
+}
+.team-member-card h3 { font-size: 1.125rem; font-weight: 600; color: var(--text-color); }
+.team-member-card p { color: var(--primary-color); }
+
+/* Oficinas */
+#office { background-color: var(--bg-muted-color); }
+#office img { border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1); }
+#office .quote-text { /* Para el texto "Tú atiende tu negocio..." */
+    font-weight: 600; /* font-semibold */
+    color: var(--primary-color);
+    font-size: 1.25rem; /* text-xl */
+    padding: 1rem; /* p-4 */
+    background-color: var(--bg-color); /* bg-gray-200 dark:bg-gray-700 */
+    border-radius: 0.25rem; /* rounded */
+    border-left: 4px solid var(--accent-color); /* O --primary-color */
+}
+html.dark #office .quote-text { background-color: var(--color-bg-muted-dark); }
+
+
+/* FAQs */
+.faq-item {
+    background-color: var(--bg-muted-color);
+    padding: 1rem; border-radius: 0.375rem;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+.faq-item summary { /* Estilos ya en base.css, aquí se pueden refinar */
+    font-weight: 600; font-size: 1.125rem; color: var(--text-color);
+}
+.faq-item p { margin-top: 0.5rem; color: var(--text-muted-color); }
+
+
+/* Contacto */
+#contact { background-color: var(--primary-color); color: var(--color-text-light); }
+#contact h2 { color: var(--color-text-light); } /* Sobrescribir color de .section-title */
+#contact p { color: rgba(255,255,255,0.9); }
+#contact a.btn-accent { /* Para que el botón de acento se vea bien sobre fondo primario */
+    background-color: var(--color-text-light);
+    color: var(--primary-color);
+    border-color: var(--color-text-light);
+}
+#contact a.btn-accent:hover {
+    background-color: rgba(255,255,255,0.9);
+}
+#contact a.underline { color: var(--color-text-light); }
+
+
+/* Barra Inferior CTA (Mobile/Tablet) */
+#bottom-cta-bar {
+    background-color: var(--bg-muted-color);
+    border-top: 1px solid var(--border-color);
+}
+html.dark #bottom-cta-bar { background-color: var(--color-bg-dark); }
+
+.bottom-bar-btn, .bottom-bar-btn-accent {
+    padding: 0.5rem 0.65rem; font-size: 0.8rem; border-radius: 0.25rem;
+    color: var(--primary-color); background-color: transparent;
+    border: 1px solid var(--primary-color); flex-grow: 1; margin: 0 0.25rem;
+    text-align: center; font-weight: 500; white-space: nowrap;
+}
+html.dark .bottom-bar-btn { color: var(--color-primary-400); border-color: var(--color-primary-400); }
+
+.bottom-bar-btn-accent {
+    background-color: var(--primary-color); color: var(--color-text-light);
+    border-color: var(--primary-color); font-weight: 600; flex-grow: 0.8;
+}
+html.dark .bottom-bar-btn-accent { background-color: var(--color-primary-400); border-color: var(--color-primary-400); }
+
+/* Modal de Registro/Login (invocado por botón ENTRAR) */
+#modalRegistro .btn-google { width: 100%; margin-bottom: 0.5rem; }
+#modalRegistro .btn-secondary, #modalRegistro .btn-outline-primary { /* Asumiendo que defines estas clases de botón */
+    width: 100%;
+    margin-top: 0.5rem;
+}
+.btn-secondary { /* Ejemplo */
+    background-color: var(--text-muted-color); color: var(--bg-color);
+}
+.btn-outline-primary {
+    color: var(--primary-color); border-color: var(--primary-color);
+}
+.btn-outline-primary:hover {
+    background-color: var(--primary-color); color: var(--color-text-light);
+}

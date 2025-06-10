@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Registro de Cliente - YASTA{% endblock %}
+
+{% block content %}
+    <h2>Registro de Nuevo Cliente</h2>
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+    {% if success_message %}
+        <p style="color: green;">{{ success_message }}</p>
+    {% endif %}
+
+    <p>
+        Regístrate con Google (más rápido):
+        <br>
+        <a href="{{ settings.API_V1_STR }}/auth/login/google" role="button" style="background-color: #DB4437; color: white; padding: 10px; text-decoration: none;">
+            Continuar con Google
+        </a>
+    </p>
+    <hr>
+    <p>O completa el siguiente formulario:</p>
+
+    <!-- Este formulario podría usar HTMX para un registro más dinámico sin recarga de página -->
+    <form method="post" 
+          hx-post="{{ settings.API_V1_STR }}/auth/register/client" 
+          hx-target="#registrationResult" 
+          hx-swap="innerHTML">
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="password">Contraseña (mínimo 8 caracteres):</label>
+            <input type="password" id="password" name="password" required minlength="8">
+        </div>
+        <div>
+            <label for="client_ruc">RUC (11 dígitos):</label>
+            <input type="text" id="client_ruc" name="client_ruc" required minlength="11" maxlength="11" pattern="^(10|20)\d{9}$">
+        </div>
+        <div>
+            <label for="business_name">Razón Social:</label>
+            <input type="text" id="business_name" name="business_name" required>
+        </div>
+        <div>
+            <label for="contact_name">Nombre de Contacto (Opcional):</label>
+            <input type="text" id="contact_name" name="contact_name">
+        </div>
+        <div>
+            <label for="phone_number">Teléfono (Opcional):</label>
+            <input type="tel" id="phone_number" name="phone_number">
+        </div>
+        <div>
+            <input type="checkbox" id="terms_accepted" name="terms_accepted" value="true" required>
+            <label for="terms_accepted">Acepto los <a href="/terms" target="_blank">Términos y Condiciones</a></label>
+        </div>
+        <button type="submit">Registrarme</button>
+    </form>
+    <div id="registrationResult"></div> {# Área para mensajes de HTMX #}
+
+    <p>¿Ya tienes cuenta? <a href="{{ url_for('login_page') }}">Inicia sesión</a>.</p>
+{% endblock %}

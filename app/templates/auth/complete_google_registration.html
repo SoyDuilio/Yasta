@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Completar Registro - YASTA{% endblock %}
+
+{% block content %}
+<main class="container py-8 md:py-16 flex justify-center items-center">
+    <div class="modal-content !static !max-w-lg !transform-none !opacity-100">
+        <h3 class="section-title !text-2xl !mb-2">¡Un último paso!</h3>
+        <p class="text-center text-muted-color mb-6">Hola {{ name_google }}! Completa los datos de tu empresa para empezar.</p>
+
+        {% if error_message %}
+            <div class="alert alert-danger">{{ error_message }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ request.url_for('finalize_google_registration') }}">
+            <input type="hidden" name="email_google" value="{{ email_google }}">
+            <input type="hidden" name="name_google" value="{{ name_google }}">
+            <input type="hidden" name="picture_google" value="{{ picture_google }}">
+            
+            <div class="space-y-4">
+                <div class="form-group">
+                    <label for="client_ruc" class="form-label">RUC (11 dígitos)</label>
+                    <input type="text" id="client_ruc" name="client_ruc" value="{{ client_ruc_value or '' }}" class="form-input" required pattern="^(10|20)\d{9}$">
+                </div>
+                <div class="form-group">
+                    <label for="business_name" class="form-label">Razón Social</label>
+                    <input type="text" id="business_name" name="business_name" value="{{ business_name_value or '' }}" class="form-input" required>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="terms_accepted" name="terms_accepted" value="true" class="form-checkbox" required>
+                    <label for="terms_accepted" class="form-check-label">Acepto los <a href="{{ url_for('terms_page') }}" target="_blank" class="link">Términos y Condiciones</a></label>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Finalizar y Entrar</button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

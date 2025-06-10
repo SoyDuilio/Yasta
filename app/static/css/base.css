@@ -1,0 +1,448 @@
+/* app/static/css/base.css */
+
+/* Reset muy básico */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden !important; /* Prevenir scroll horizontal */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+img, svg, video { max-width: 100%; height: auto; display: block; }
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+
+/* Variables de Color y Tema */
+:root {
+    --color-primary-50: #f0f9ff; --color-primary-100: #e0f2fe; --color-primary-200: #bae6fd;
+    --color-primary-300: #7dd3fc; --color-primary-400: #38bdf8; --color-primary-500: #0ea5e9;
+    --color-primary-600: #0284c7; --color-primary-700: #0369a1; --color-primary-800: #075985;
+    --color-primary-900: #0c4a6e;
+
+    --color-secondary-500: #8b5cf6; --color-secondary-600: #7c3aed;
+
+    --color-text-light: #f8fafc; --color-text-dark: #0f172a;
+    --color-text-muted-light: #cbd5e1; /* Aclarado para mejor contraste en modo oscuro */
+    --color-text-muted-dark: #4b5563;
+
+    --color-bg-light: #ffffff; --color-bg-muted-light: #f3f4f6;
+    --color-bg-dark: #111827; --color-bg-muted-dark: #1f2937;
+
+    --color-border-light: #e5e7eb; --color-border-dark: #374151;
+
+    --text-color: var(--color-text-dark); --text-muted-color: var(--color-text-muted-dark);
+    --bg-color: var(--color-bg-light); --bg-muted-color: var(--color-bg-muted-light);
+    --border-color: var(--color-border-light); --primary-color: var(--color-primary-500);
+    --accent-color: var(--color-secondary-500); --link-color: var(--color-primary-600);
+}
+
+html.dark {
+    --text-color: var(--color-text-light); --text-muted-color: var(--color-text-muted-light);
+    --bg-color: var(--color-bg-dark); --bg-muted-color: var(--color-bg-muted-dark);
+    --border-color: var(--color-border-dark); --primary-color: var(--color-primary-400);
+    --link-color: var(--color-primary-400);
+}
+
+body { background-color: var(--bg-color); color: var(--text-color); }
+
+/* Utilidades de Layout (Replicando algunas de Tailwind) */
+.container { width: 90%; max-width: 1140px; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.p-3 { padding: 0.75rem; }
+.p-8 { padding: 2rem; } /* Para .step-card */
+.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+.py-16 { padding-top: 4rem; padding-bottom: 4rem; }
+.py-20 { padding-top: 5rem; padding-bottom: 5rem; }
+.py-24 { padding-top: 6rem; padding-bottom: 6rem; }
+.py-32 { padding-top: 8rem; padding-bottom: 8rem; }
+
+.mb-2 { margin-bottom: 0.5rem; } .mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; } .mb-8 { margin-bottom: 2rem; }
+.mt-2 { margin-top: 0.5rem; } .mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; } .mt-8 { margin-top: 2rem; }
+.ml-2 { margin-left: 0.5rem; }
+.mr-2 { margin-right: 0.5rem; }
+
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.justify-around { justify-content: space-around; }
+.flex-col { flex-direction: column; }
+.space-x-4 > * + * { margin-left: 1rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+
+.text-center { text-align: center; }
+.text-lg { font-size: 1.125rem; } .text-xl { font-size: 1.25rem; }
+.text-3xl { font-size: 1.875rem; } .text-4xl { font-size: 2.25rem; }
+.text-6xl { font-size: 3.75rem; }
+.font-bold { font-weight: 700; } .font-semibold { font-weight: 600; }
+.italic { font-style: italic; }
+
+.rounded-md { border-radius: 0.375rem; } .rounded-lg { border-radius: 0.5rem; }
+.rounded-full { border-radius: 9999px; }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1); }
+.shadow-top-lg { box-shadow: 0 -10px 15px -3px rgba(0,0,0,0.1), 0 -4px 6px -4px rgba(0,0,0,0.1); }
+
+
+.sticky { position: sticky; } .top-0 { top: 0; }
+.fixed { position: fixed; } .bottom-0 { bottom: 0; } .left-0 { left: 0; } .right-0 { right: 0; }
+.z-20 { z-index: 20; } .z-40 { z-index: 40; } .z-50 { z-index: 50; }
+
+.hidden { display: none !important; }
+.block { display: block !important; }
+.inline-block { display: inline-block !important; }
+
+/* Grid utilities */
+.grid { display: grid; }
+.gap-8 { gap: 2rem; } /* Tailwind gap-8 */
+.object-cover { object-fit: cover; }
+.aspect-square { aspect-ratio: 1 / 1; }
+.aspect-video { aspect-ratio: 16 / 9; }
+
+/* Media Queries para clases responsivas */
+@media (min-width: 768px) { /* md */
+    .md\:flex { display: flex !important; }
+    .md\:hidden { display: none !important; }
+    .md\:inline-block { display: inline-block !important; }
+    .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .md\:py-32 { padding-top: 8rem; padding-bottom: 8rem; }
+    .md\:py-24 { padding-top: 6rem; padding-bottom: 6rem; }
+    .md\:text-6xl { font-size: 3.75rem; }
+    .md\:text-xl { font-size: 1.25rem; }
+    .md\:space-y-0 > * + * { margin-top: 0; }
+    .md\:space-x-4 > * + * { margin-left: 1rem; }
+}
+@media (min-width: 1024px) { /* lg */
+    .lg\:inline { display: inline !important; }
+    .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+
+/* Header Estilos */
+#main-header {
+    background-color: var(--bg-muted-color);
+    padding: 0.75rem 0; /* Ajustar padding vertical */
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+#main-header .header-container { /* Usa el .container general + esta clase específica */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#main-header .logo-container img {
+    color: var(--primary-color); /* Color para el ALT text */
+}
+
+#main-header .logo-container img.logo-light,
+#main-header .logo-container img.logo-dark {
+    /* ... tus otros estilos de logo ... */
+    color: var(--primary-color); /* Color para el ALT text si la imagen no carga */
+}
+
+/* Estilos para el logo y su contenedor */
+.logo-area {
+    display: inline-flex; /* Para que los elementos internos se alineen */
+    align-items: center;
+    color: var(--primary-color); /* Color para el alt text y el span sr-only */
+    text-decoration: none;
+}
+.logo-area:hover {
+    opacity: 0.85;
+}
+
+.actual-logo { /* Para ambas imágenes de logo */
+    height: 2.5rem; /* 40px */
+    /* display es manejado por JS (añadiendo/quitando .hidden) */
+    vertical-align: middle;
+}
+
+.logo-area .actual-logo { /* Para las imágenes de logo */
+    height: 2.5rem; /* 40px */
+    display: inline-block; /* Importante */
+}
+.sr-only { /* Para accesibilidad, texto que solo leen screen readers */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Lógica de logo light/dark ya está en main.js y base.html */
+
+/* Nav links */
+.nav-link { /* Ya definidos en base.html, aquí solo estilos de tema */
+    color: var(--text-muted-color);
+}
+.nav-link:hover, .nav-link:focus {
+    color: var(--primary-color);
+}
+
+
+/* Navegación de Escritorio */
+#desktop-nav {
+    display: none; /* Oculto por defecto (mobile first) */
+    align-items: center;
+}
+#desktop-nav .nav-link {
+    margin-left: 1.5rem; /* Espacio entre enlaces */
+    color: var(--text-muted-color);
+    padding: 0.25rem 0;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+#desktop-nav .nav-link:hover,
+#desktop-nav .nav-link:focus {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+#desktop-nav .nav-btn-register { /* Para el botón "Registrarse" en el nav */
+    margin-left: 1.5rem;
+}
+
+/* User Menu */
+/* Menú de Usuario Desktop */
+.user-menu-container {
+    position: relative;
+    margin-left: 1.5rem;
+}
+.user-menu-trigger {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+.user-avatar {
+    width: 2.25rem; /* Más pequeño que antes */
+    height: 2.25rem;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+.user-name-desktop {
+    color: var(--text-color);
+    font-weight: 500;
+    display: none; /* Se muestra en LG en el HTML, o puedes usar media query */
+}
+.dropdown-arrow {
+    width: 1em; height: 1em;
+    margin-left: 0.25rem;
+    color: var(--text-muted-color);
+    transition: transform 0.2s ease;
+}
+.user-menu-trigger[aria-expanded="true"] .dropdown-arrow { /* Si usas JS para aria-expanded */
+    transform: rotate(180deg);
+}
+.dropdown-menu { /* #user-dropdown */
+    position: absolute;
+    right: 0;
+    margin-top: 0.75rem; 
+    width: 12rem; /* w-48 */
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem; /* rounded-md */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* shadow-lg más pronunciada */
+    padding: 0.25rem 0; /* py-1 */
+    z-index: 50; /* Más alto que el header si es necesario */
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none; /* Para que no interfiera cuando está oculto */
+}
+.dropdown-menu.active, /* Si JS añade clase 'active' en lugar de quitar 'hidden' */
+#user-dropdown:not(.hidden) { /* O si solo quitas .hidden */
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.dropdown-link {
+    display: block;
+    padding: 0.65rem 1rem;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.dropdown-link:hover {
+    background-color: var(--bg-muted-color);
+}
+
+
+
+#user-menu-button img { border: 1px solid var(--border-color); }
+#user-menu-button span { color: var(--text-color); }
+#user-dropdown {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+}
+
+/* Mobile Menu Buttons */
+#mobile-menu-button, #theme-toggle-mobile {
+    color: var(--text-muted-color);
+}
+#mobile-menu-button:hover, #theme-toggle-mobile:hover {
+    background-color: var(--bg-muted-color); /* Ligeramente diferente al fondo del header */
+    color: var(--primary-color);
+}
+
+/* Mobile Menu */
+#mobile-menu { background-color: var(--bg-muted-color); }
+#mobile-menu .mobile-nav-link {
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+}
+#mobile-menu .mobile-nav-link:hover {
+    background-color: var(--primary-color);
+    color: var(--color-text-light);
+}
+html.dark #mobile-menu .mobile-nav-link:hover {
+    background-color: var(--color-primary-700);
+}
+
+
+/* Menú Móvil Desplegable */
+#mobile-menu {
+    background-color: var(--bg-color); /* Fondo del tema */
+    border-top: 1px solid var(--border-color);
+    /* 'hidden' y 'md:hidden' (para ocultarlo en desktop) se manejan con JS y media query */
+}
+.mobile-nav-link {
+    display: block;
+    padding: 0.85rem 1rem;
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 500;
+}
+#mobile-menu .mobile-nav-link:last-child {
+    border-bottom: none;
+}
+#mobile-menu .mobile-nav-link:hover {
+    background-color: var(--primary-color);
+    color: var(--color-text-light);
+}
+.mobile-register-btn { /* Para el botón Registrarse dentro del menú móvil */
+    margin: 1rem; /* Espaciado */
+    text-align: center;
+}
+
+
+
+/* Botones Móviles (Tema y Menú Hamburguesa) */
+#mobile-nav-buttons {
+    display: flex; /* Por defecto para mobile */
+    align-items: center;
+}
+.icon-button {
+    background: none;
+    border: none;
+    padding: 0.5rem; /* p-2 */
+    margin-left: 0.25rem; /* Espacio entre ellos */
+    border-radius: 0.375rem;
+    color: var(--text-muted-color);
+    cursor: pointer;
+    line-height: 0; /* Para que el SVG no cause altura extra */
+}
+.icon-button:hover {
+    background-color: var(--bg-muted-color);
+    color: var(--primary-color);
+}
+.icon-svg {
+    width: 1.5rem; /* w-6 */
+    height: 1.5rem; /* h-6 */
+    stroke-width: 2; /* Grosor de línea para SVGs de outline */
+}
+
+
+/* Secciones Generales */
+section { padding-top: 4rem; padding-bottom: 4rem; }
+@media (min-width: 768px) { section { padding-top: 6rem; padding-bottom: 6rem; } }
+
+.section-title {
+    font-size: 1.875rem; /* text-3xl */
+    line-height: 2.25rem;
+    font-weight: 700; /* font-bold */
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--primary-color);
+}
+@media (min-width: 768px) { .section-title { font-size: 2.25rem; /* text-4xl */ }}
+html.dark .section-title { color: var(--color-primary-400); }
+
+
+.section-subtitle {
+    font-size: 1.125rem; /* text-lg */
+    text-align: center;
+    color: var(--text-muted-color);
+    margin-top: -2rem; /* Para acercarlo al título */
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Media Queries para mostrar/ocultar elementos de navegación */
+@media (min-width: 768px) { /* md */
+    #desktop-nav {
+        display: flex !important; /* Mostrar nav de escritorio */
+    }
+    #mobile-nav-buttons {
+        display: none !important; /* Ocultar botones de icono móvil */
+    }
+    #mobile-menu { /* Asegurarse que el menú móvil desplegable esté oculto en desktop */
+        display: none !important;
+    }
+    .user-name-desktop {
+        display: inline; /* Mostrar nombre de usuario en desktop */
+    }
+}
+
+
+/* Footer */
+footer {
+    background-color: var(--bg-muted-color);
+    color: var(--text-muted-color);
+    border-top: 1px solid var(--border-color); /* Siempre una línea sutil */
+}
+footer a { color: var(--link-color); text-decoration: underline; }
+footer a:hover { text-decoration: none; }
+
+/* Theme Toggle Button (general) */
+.theme-toggle-button {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted-color);
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+}
+.theme-toggle-button:hover {
+    background-color: var(--bg-muted-color); /* Ligeramente diferente al fondo */
+}
+html.dark .theme-toggle-button:hover {
+    background-color: var(--color-bg-dark); /* Un poco más oscuro que bg-muted-dark */
+}
+
+/* Para Lazy Loading de Secciones */
+.lazy-section { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+.lazy-section.visible { opacity: 1; transform: translateY(0); }

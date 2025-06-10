@@ -1,0 +1,23 @@
+import os
+
+# Directorios
+input_folder = "app/models-copia"  # Cambia esto a la ruta de tu carpeta
+output_file = "combina_models.py"
+
+# Lista para almacenar el contenido de todos los scripts
+combined_content = []
+
+# Recorre la carpeta y lee los archivos .py
+for filename in os.listdir(input_folder):
+    if filename.endswith(".py"):
+        file_path = os.path.join(input_folder, filename)
+        with open(file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+            # Agrega un comentario con el nombre del archivo y su contenido
+            combined_content.append(f"# Contenido de {filename}\n{content}\n\n")
+
+# Escribe todo el contenido combinado en un nuevo archivo
+with open(output_file, "w", encoding="utf-8") as output:
+    output.write("".join(combined_content))
+
+print(f"Se han combinado los scripts en {output_file}")

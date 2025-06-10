@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar Sesión - YASTA{% endblock %}
+
+{% block content %}
+    <h2>Iniciar Sesión</h2>
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <!-- Formulario de login tradicional que envía a /auth/login/token -->
+    <!-- Con HTMX, podrías hacer esto más dinámico, pero para un login de página completa: -->
+    <form method="post" action="{{ settings.API_V1_STR }}/auth/login/token" id="loginForm">
+        <div>
+            <label for="username">Email, RUC o DNI:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Entrar</button>
+    </form>
+    <p>¿No tienes cuenta? <a href="{{ url_for('register_client_page') }}">Regístrate aquí</a>.</p>
+    <p>O inicia sesión con: 
+        <a href="{{ settings.API_V1_STR }}/auth/login/google" role="button" style="background-color: #DB4437; color: white; padding: 5px; text-decoration: none;">
+            Google
+        </a>
+    </p>
+
+    {# Script para manejar la respuesta del token si el form NO usa HTMX y redirige #}
+    {# Esto es más complejo si no hay redirección automática post-login del token endpoint #}
+    {# Si /auth/login/token devuelve el token y el frontend es el que guarda y redirige: #}
+    <script>
+        // Este script asume que el endpoint /auth/login/token NO redirige,
+        // sino que devuelve JSON y el frontend debe manejarlo.
+        // Si usas un <form action="..."> estándar sin JS, el navegador intentará
+        // mostrar el JSON como una página.
+        // Para que esto funcione bien sin HTMX/JS-Framework, el endpoint de token
+        // debería redirigir tras el éxito o mostrar esta página con error.
+
+        // Si el endpoint /auth/login/token devuelve una redirección o una página,
+        // no necesitas este script. Si devuelve JSON, necesitas JS para manejarlo.
+        // Por ahora, asumamos que el endpoint /auth/login/token es llamado vía HTMX o un fetch JS.
+        // O, si el login es exitoso, el endpoint /auth/login/token podría directamente
+        // redirigir al dashboard seteando una cookie HttpOnly (más seguro).
+
+        // Para MVP y si el endpoint /auth/login/token DEVUELVE EL TOKEN EN JSON:
+        // document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        //     event.preventDefault();
+        //     const formData = new FormData(this);
+        //     const response = await fetch(this.action, {
+        //         method: 'POST',
+        //         body: new URLSearchParams(formData) // FastAPI espera x-www-form-urlencoded para OAuth2PasswordRequestForm
+        //     });
+        //     const data = await response.json();
+        //     if (response.ok) {
+        //         localStorage.setItem('access_token', data.access_token);
+        //         localStorage.setItem('token_type', data.token_type);
+        //         localStorage.setItem('user', JSON.stringify(data.user));
+        //         window.location.href = "{{ url_for('client_dashboard_page') }}"; // O a donde deba ir
+        //     } else {
+        //         alert(data.detail || "Error en el login");
+        //     }
+        // });
+    </script>
+{% endblock %}

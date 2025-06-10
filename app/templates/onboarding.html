@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Completa tu Perfil - YASTA{% endblock %}
+
+{% block content %}
+{# Contenedor simple para centrar el formulario en la página #}
+<div class="w-full max-w-2xl mx-auto">
+    
+    {# Estilo de "tarjeta" para el formulario, con fondo, padding, bordes redondeados y sombra #}
+    <div class="bg-gray-800 p-6 md:p-8 rounded-lg shadow-xl border border-gray-700">
+        <h3 class="text-3xl font-bold text-center mb-2">¡Un último paso!</h3>
+        <p class="text-center text-gray-400 mb-8">
+            Hola <strong>{{ current_user.contact_name or current_user.email }}</strong>! Completa los datos de tu empresa para empezar.
+        </p>
+        
+        <form method="POST" action="{{ url_for('onboarding_finalize') }}">
+            <div class="space-y-6">
+                
+                <div class="form-group">
+                    <label for="client_ruc" class="form-label">Tu RUC</label>
+                    <input type="text" id="client_ruc" name="client_ruc" class="form-input" required pattern="^(10|20)\d{9}$" placeholder="Ej: 20123456789">
+                </div>
+                
+                <!-- Contenedor para campos que aparecen después de validar RUC -->
+                <div id="ruc-details" class="hidden space-y-6">
+                    <div class="form-group">
+                        <label class="form-label">Razón Social / Nombre</label>
+                        <input type="text" id="business_name" name="business_name" class="form-input bg-gray-700" readonly> {# Un color de fondo diferente para campos de solo lectura #}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sol_username" class="form-label">Usuario SOL</label>
+                    <input type="text" id="sol_username" name="sol_username" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="sol_password" class="form-label">Clave SOL</label>
+                    <input type="password" id="sol_password" name="sol_password" class="form-input" required>
+                </div>
+
+                <!-- Lógica condicional para Persona Natural vs Jurídica -->
+                <div id="contact-person-details" class="hidden space-y-6 p-4 bg-gray-900/50 rounded-md border border-gray-700">
+                    <p class="text-sm font-semibold text-center">Datos de la Persona de Contacto</p>
+                     <div class="form-group">
+                        <label for="contact_dni" class="form-label">Tu DNI</label>
+                        <input type="text" id="contact_dni" name="contact_dni" class="form-input">
+                    </div>
+                     <div class="form-group">
+                        <label for="contact_name" class="form-label">Tus Nombres y Apellidos</label>
+                        <input type="text" id="contact_name" name="contact_name" class="form-input">
+                    </div>
+                     <div class="form-group">
+                        <label for="contact_phone" class="form-label">Tu N° de WhatsApp</label>
+                        <input type="tel" id="contact_phone" name="contact_phone" class="form-input">
+                    </div>
+                     <div class="form-group hidden" id="contact-role-container">
+                        <label for="contact_role" class="form-label">Tu cargo en la empresa</label>
+                        <input type="text" id="contact_role" name="contact_role" class="form-input">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-full text-lg py-3 mt-4">Guardar y ir a mi Dashboard</button>
+                <p class="text-xs text-center text-gray-500 mt-2">Tu información está protegida con encriptación de grado militar.</p>
+
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts_body %}
+    {# Tu script JS para la lógica del RUC puede ir aquí sin cambios #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rucInput = document.getElementById('client_ruc');
+            const rucDetails = document.getElementById('ruc-details');
+            const businessNameInput = document.getElementById('business_name');
+            const contactDetails = document.getElementById('contact-person-details');
+            const contactRoleContainer = document.getElementById('contact-role-container');
+
+            if (rucInput) {
+                rucInput.addEventListener('blur', async function() {
+                    const ruc = this.value.trim();
+                    
+                    rucDetails.classList.add('hidden');
+                    contactDetails.classList.add('hidden');
+                    contactRoleContainer.classList.add('hidden');
+
+                    if (ruc.length === 11 && (ruc.startsWith('10') || ruc.startsWith('20'))) {
+                        const data = { 
+                            success: true, 
+                            business_name: ruc.startsWith('20') ? `EMPRESA DE PRUEBA SAC` : `{{ current_user.contact_name or "PERSONA NATURAL" }}`
+                        }; 
+
+                        if (data.success) {
+                            businessNameInput.value = data.business_name;
+                            rucDetails.classList.remove('hidden');
+                            contactDetails.classList.remove('hidden');
+
+                            if (ruc.startsWith('20')) {
+                                contactRoleContainer.classList.remove('hidden');
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}YASTA - Declaraciones de Impuestos Simples y Seguras{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/index.css') }}">
+{% endblock %}
+
+{% block content %}
+
+    <!-- Sección Hero -->
+    <section id="hero" class="hero-section bg-gradient-to-br from-primary-600 to-secondary-500 text-white text-center py-20 md:py-32">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <img src="{{ url_for('static', path='/img/lottie_hero_placeholder.json') }}" alt="Animación Simplificando Impuestos" class="mx-auto mb-8 w-64 h-64 lazy-lottie">
+                {# Reemplazar con tu Lottie real o una imagen estática #}
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-down">
+                    Impuestos en Perú, ¡Finalmente Sencillos!
+                </h1>
+                <p class="text-lg md:text-xl mb-8 animate-fade-in-up">
+                    Con YASTA, tú te enfocas en tu negocio, nosotros nos encargamos de SUNAT. Rápido, seguro y confiable.
+                </p>
+                <div id="hero-cta-buttons" class="space-y-4 md:space-y-0 md:space-x-4 animate-fade-in">
+                    <a href="{{ url_for('register_client_page') }}" class="btn btn-accent btn-lg">Empieza Gratis Ahora</a>
+                    <a href="#how-it-works" class="btn btn-outline-white btn-lg">Cómo Funciona</a>
+                    <button id="listen-hero-explanation" class="btn btn-outline-white btn-lg inline-flex items-center"> {# inline-flex y items-center #}
+                        <svg class="w-5 h-5 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7 3.5A1.5 1.5 0 018.5 2h3A1.5 1.5 0 0113 3.5v2.714l4.163 2.429a1.5 1.5 0 010 2.714L13 13.786V16.5A1.5 1.5 0 0111.5 18h-3A1.5 1.5 0 017 16.5v-2.714L2.837 11.357a1.5 1.5 0 010-2.714L7 6.214V3.5zm1.5.571V6.25a.5.5 0 01-.224.414L4.98 8.857a.5.5 0 000 .886l3.296 1.929A.5.5 0 018.5 12.086v2.178a.5.5 0 00.75.433l4.5-2.625a.5.5 0 000-.866l-4.5-2.625A.5.5 0 008.5 8.143V5.571a.5.5 0 00-.75-.433L4.5 6.964a.5.5 0 000 .866l3.25 1.896" clip-rule="evenodd"></path></svg>
+                        Escucha Cómo (1 min) {# Corregido "Cómo" #}
+                    </button>
+                    {# Aquí el audio se activaría con JS #}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección "Escucha, si no quieres leer" (Integrada o separada) -->
+    {# Ya tenemos un botón en el Hero, pero podría ser una sección más detallada #}
+
+    <!-- Sección Cómo Funciona / Simplicidad del Servicio (con Lotties) -->
+    <section id="how-it-works" class="py-16 md:py-24 bg-gray-100 dark:bg-gray-800 lazy-section">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title">Declarar tus Impuestos en 3 Simples Pasos</h2>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="step-card">
+                    <img src="{{ url_for('static', path='/img/lottie_step1_placeholder.json') }}" alt="Paso 1: Regístrate" class="mx-auto mb-6 w-48 h-48 lazy-lottie">
+                    <h3 class="text-xl font-semibold mb-2">1. Regístrate y Conecta</h3>
+                    <p class="text-gray-700 dark:text-gray-300">Crea tu cuenta en minutos y comparte tus credenciales SOL de forma segura.</p>
+                </div>
+                <div class="step-card">
+                    <img src="{{ url_for('static', path='/img/lottie_step2_placeholder.json') }}" alt="Paso 2: Nosotros Declaramos" class="mx-auto mb-6 w-48 h-48 lazy-lottie">
+                    <h3 class="text-xl font-semibold mb-2">2. Nosotros nos Encargamos</h3>
+                    <p class="text-gray-700 dark:text-gray-300">Nuestro equipo experto procesa tu declaración mensual ante SUNAT.</p>
+                </div>
+                <div class="step-card">
+                    <img src="{{ url_for('static', path='/img/lottie_step3_placeholder.json') }}" alt="Paso 3: Recibe tus Constancias" class="mx-auto mb-6 w-48 h-48 lazy-lottie">
+                    <h3 class="text-xl font-semibold mb-2">3. Recibe y Descansa</h3>
+                    <p class="text-gray-700 dark:text-gray-300">Obtén tus constancias y accede a tus reportes desde tu chatbot o dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Videos (Explicativos, Publicitario, Testimonio) -->
+    <section id="videos" class="py-16 md:py-24 lazy-section">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title">Descubre Más Sobre YASTA</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="video-placeholder bg-gray-200 dark:bg-gray-700 rounded-lg aspect-video flex items-center justify-center"><span>Video Explicativo</span></div>
+                <div class="video-placeholder bg-gray-200 dark:bg-gray-700 rounded-lg aspect-video flex items-center justify-center"><span>Video Publicitario</span></div>
+                <div class="video-placeholder bg-gray-200 dark:bg-gray-700 rounded-lg aspect-video flex items-center justify-center"><span>Video Testimonio</span></div>
+                {# Reemplazar con iframes de YouTube/Vimeo o players HTML5 #}
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Testimonios -->
+    <section id="testimonials" class="py-16 md:py-24 bg-gray-100 dark:bg-gray-800 lazy-section">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title">Lo que Dicen Nuestros Clientes</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Ejemplo de Testimonio (repetir 2-3 veces) -->
+                <div class="testimonial-card">
+                    <img src="{{ url_for('static', path='/img/testimonio1_placeholder.jpg') }}" alt="Cliente Satisfecho 1" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
+                    <p class="text-gray-700 dark:text-gray-300 italic mb-4">"YASTA me quitó un peso de encima. Ahora puedo enfocarme 100% en mi taller. ¡Totalmente recomendado!"</p>
+                    <p class="font-semibold">Ana P. - Dueña de Taller Mecánico</p>
+                </div>
+                 <div class="testimonial-card">
+                    <img src="{{ url_for('static', path='/img/testimonio2_placeholder.jpg') }}" alt="Cliente Satisfecho 2" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
+                    <p class="text-gray-700 dark:text-gray-300 italic mb-4">"El servicio es rápido, seguro y el precio es justo. El chatbot es genial para consultar mis pagos."</p>
+                    <p class="font-semibold">Carlos M. - Consultor Freelance</p>
+                </div>
+                <div class="testimonial-card">
+                    <img src="{{ url_for('static', path='/img/testimonio3_placeholder.jpg') }}" alt="Cliente Satisfecho 3" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
+                    <p class="text-gray-700 dark:text-gray-300 italic mb-4">"Por fin alguien que entiende a los pequeños empresarios. Declarar ya no es un dolor de cabeza."</p>
+                    <p class="font-semibold">Luisa R. - Propietaria de Bodega</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Sección "Nuestro Equipo" (Opcional, para generar confianza) -->
+    <section id="team" class="py-16 md:py-24 lazy-section">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title">Conoce al Equipo Detrás de YASTA</h2>
+            <p class="section-subtitle">Jóvenes, experimentados, y apasionados por ayudarte.</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <!-- Ejemplo de Miembro del Equipo (repetir) -->
+                <div class="team-member-card">
+                    <img src="{{ url_for('static', path='/img/equipo1_placeholder.jpg') }}" alt="Miembro del Equipo 1" class="w-full h-auto rounded-lg mb-4 object-cover aspect-square">
+                    <h3 class="text-lg font-semibold">Nombre Apellido</h3>
+                    <p class="text-primary-400">Rol (Ej: Líder de Declaraciones)</p>
+                </div>
+                <!-- Añadir más miembros -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección "Nuestras Oficinas" (Imágenes Corporativas) -->
+    <section id="office" class="py-16 md:py-24 bg-gray-100 dark:bg-gray-800 lazy-section">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title">Donde la Magia Sucede</h2>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <img src="{{ url_for('static', path='/img/oficina1_placeholder.jpg') }}" alt="Oficinas YASTA" class="rounded-lg shadow-lg w-full">
+                </div>
+                <div class="text-lg">
+                    <p class="mb-4">En YASTA, combinamos tecnología de punta con un equipo humano dedicado.</p>
+                    <p class="font-semibold text-primary-500 text-xl p-4 bg-gray-200 dark:bg-gray-700 rounded">"Tú atiende tu negocio, nosotros nos entendemos con SUNAT."</p>
+                    {# Aquí podrías tener un carrusel de imágenes si tienes varias #}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Preguntas Frecuentes (FAQs) -->
+    <section id="faq" class="py-16 md:py-24 lazy-section">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title">Preguntas Frecuentes</h2>
+            <div class="max-w-3xl mx-auto space-y-4">
+                <!-- Ejemplo de FAQ (repetir) -->
+                <details class="faq-item">
+                    <summary class="font-semibold text-lg cursor-pointer">¿Es seguro compartir mi Clave SOL?</summary>
+                    <p class="mt-2 text-gray-700 dark:text-gray-300">Entendemos tu preocupación. Utilizamos encriptación avanzada para proteger tus credenciales y solo las usamos para los trámites que autorices. Nuestro personal firma acuerdos de confidencialidad estrictos.</p>
+                </details>
+                <details class="faq-item">
+                    <summary class="font-semibold text-lg cursor-pointer">¿Qué pasa si tengo impuesto a pagar?</summary>
+                    <p class="mt-2 text-gray-700 dark:text-gray-300">Te comunicaremos el monto exacto. Puedes enviarnos el impuesto más nuestra tarifa de servicio (S/. 10 adicionales por este trámite extra) vía Yape o Plin, y nosotros realizaremos el pago a SUNAT por ti.</p>
+                </details>
+                <!-- Añadir más FAQs -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Contacto (Simple) -->
+    <section id="contact" class="py-16 md:py-24 bg-primary-600 text-white lazy-section">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">¿Listo para Simplificar tus Impuestos?</h2>
+            <p class="text-lg mb-8">Contáctanos hoy mismo o regístrate para empezar.</p>
+            <a href="{{ url_for('register_client_page') }}" class="btn btn-accent btn-lg">Registrarme Ahora</a>
+            <p class="mt-6">O escríbenos a: <a href="mailto:hola@YASTA.pe" class="underline">hola@YASTA.pe</a></p>
+        </div>
+    </section>
+
+    <!-- Barra Fija Inferior (Solo Mobile/Tablet) -->
+    <div id="bottom-cta-bar" class="fixed bottom-0 left-0 right-0 bg-gray-800 dark:bg-gray-700 p-3 shadow-top-lg md:hidden z-40">
+        <div class="flex justify-around items-center">
+            <button data-modal-target="modalPaso1" class="bottom-bar-btn">Paso 1</button>
+            <button data-modal-target="modalPaso2" class="bottom-bar-btn">Paso 2</button>
+            <button data-modal-target="modalPaso3" class="bottom-bar-btn">Paso 3</button>
+            <button data-modal-target="auth-modal" class="bottom-bar-btn-accent">ENTRAR</button>
+        </div>
+    </div>
+
+    <!-- Modales (Ocultos por defecto) -->
+    <!-- Modal Paso 1 -->
+    <div id="modalPaso1" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal-close="modalPaso1">×</span>
+            <h3 class="text-xl font-semibold mb-2">Paso 1: Regístrate y Conecta</h3>
+            <p>Crea tu cuenta en YASTA en menos de 2 minutos. Luego, comparte de forma segura tus credenciales de acceso a SUNAT Operaciones en Línea (Clave SOL). ¡Tu información está protegida!</p>
+            <button class="btn-listen-modal mt-4">Escuchar Explicación</button>
+        </div>
+    </div>
+    <!-- Modal Paso 2 -->
+    <div id="modalPaso2" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal-close="modalPaso2">×</span>
+            <h3 class="text-xl font-semibold mb-2">Paso 2: Nosotros nos Encargamos</h3>
+            <p>Una vez tengamos acceso, nuestro equipo de expertos contables procesará tu declaración mensual de IGV-Renta directamente en el portal de SUNAT. Verificamos todo para asegurar precisión.</p>
+            <button class="btn-listen-modal mt-4">Escuchar Explicación</button>
+        </div>
+    </div>
+    <!-- Modal Paso 3 -->
+    <div id="modalPaso3" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal-close="modalPaso3">×</span>
+            <h3 class="text-xl font-semibold mb-2">Paso 3: Recibe y Descansa</h3>
+            <p>Te notificaremos apenas tu declaración esté lista. Tendrás acceso a tus constancias de declaración y/o pago. Además, podrás ver un resumen de tus operaciones y estadísticas útiles a través de nuestro innovador chatbot o tu dashboard personal.</p>
+            <button class="btn-listen-modal mt-4">Escuchar Explicación</button>
+        </div>
+    </div>
+
+    <!-- Modal Registro/Login (invocado por ENTRAR y botón en cabecera) -->
+    <div id="modalRegistro" class="modal">
+        <div class="modal-content text-center"> {# Añadido text-center para el título y "o usa tu email" #}
+            <span class="modal-close" data-modal-close="modalRegistro">×</span>
+            <h3 class="text-xl font-semibold mb-6">Ingresa o Regístrate</h3> {# mb-6 para más espacio #}
+            
+            <div class="flex flex-col items-center space-y-3"> {# space-y-3 para botones #}
+                <a href="{{ settings.API_V1_STR }}/auth/login/google" class="btn btn-google w-full">
+                    {# SVG de Google - Asegúrate que el path fill sea blanco o contraste #}
+                    <svg aria-hidden="true" class="w-5 h-5 mr-2" viewBox="0 0 18 18">
+                        <path d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6c1.52-1.38 2.39-3.47 2.39-5.88c0-.57-.05-.66-.15-1.18z" fill="#4285F4"></path>
+                        <path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z" fill="#34A853"></path>
+                        <path d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z" fill="#FBBC05"></path>
+                        <path d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.8 4.8 0 0 1 4.48-3.3z" fill="#EA4335"></path>
+                    </svg>
+                    Continuar con Google
+                </a>
+
+                <p class="text-sm text-muted-color py-2">o usa tu email</p> {# py-2 para espaciado #}
+                
+                <a href="{{ url_for('login_page') }}" class="btn btn-secondary w-full">Ya tengo cuenta (Email)</a>
+                <a href="{{ url_for('register_client_page') }}" class="btn btn-outline-primary w-full">Crear cuenta nueva (Email)</a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_scripts_body %}
+    <script src="{{ url_for('static', path='/js/index.js') }}"></script>
+    {# Si usas una librería para Lottie: #}
+    {# <script src="https_unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script> #}
+    {# O una librería para lazy loading de imágenes/Lotties como Intersection Observer #}
+{% endblock %}
