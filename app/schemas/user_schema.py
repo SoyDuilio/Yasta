@@ -115,6 +115,10 @@ class UserInDBBase(UserBase):
         # json_encoders = {
         #     datetime: lambda dt: dt.isoformat()
         # }
+        # --- ESTA ES LA LÍNEA MÁGICA ---
+        # Le dice a Pydantic que al convertir a JSON o dict,
+        # use los valores del Enum (ej: "client_freemium") en lugar del objeto Enum.
+        use_enum_values = True
 
 class ClientUserResponse(ClientUserBase, UserInDBBase):
     terms_accepted_at: Optional[datetime] = None
@@ -132,8 +136,8 @@ class UserGeneralResponse(UserInDBBase):
     staff_ruc_personal: Optional[RucStr] = None
 
     class Config:
-        # orm_mode = True # Para Pydantic V1
-        from_attributes = True # Para Pydantic V2
+        from_attributes = True
+        use_enum_values = True
 
 class UserLoginSchema(BaseModel):
     identifier: str

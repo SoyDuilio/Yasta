@@ -1,4 +1,6 @@
 # app/models/user.py
+from sqlalchemy import func # Necesitamos 'func'
+from sqlalchemy.sql import func # A veces es redundante, pero no hace daño
 import enum
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, text
 from sqlalchemy.dialects.postgresql import ENUM as PGEnum
@@ -7,7 +9,7 @@ from sqlalchemy.orm import relationship
 # Importamos la Base ÚNICA desde su nueva ubicación.
 from app.db.base import Base
 
-class UserRole(str, enum.Enum):
+class UserRole(enum.Enum):
     AUTHENTICATED = "authenticated"
     CLIENT_FREEMIUM = "client_freemium"
     CLIENT_PAID = "client_paid"
@@ -21,6 +23,9 @@ class User(Base):
     # No es necesario declararlo aquí a menos que queramos un nombre específico.
     # Por consistencia y claridad, lo declaramos explícitamente.
     __tablename__ = "users"
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     email = Column(String(255), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)

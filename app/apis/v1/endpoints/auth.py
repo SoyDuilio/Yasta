@@ -42,7 +42,7 @@ def get_post_auth_redirect_url(request: Request, user: User, db: Session) -> str
 
     if user_has_client_profile:
         # Si ya está vinculado a un cliente, va a su dashboard correspondiente.
-        if user.role.startswith("staff_") or user.role == "admin":
+        if user.role.value.startswith("staff_") or user.role == "admin":
             return str(request.url_for("staff_dashboard_page"))
         else:
             return str(request.url_for("client_dashboard_page"))
@@ -71,6 +71,9 @@ async def register_via_email(request: Request, db: Session = Depends(deps.get_db
         return RedirectResponse(url=error_redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
     user = crud_user.create_user_authenticated(db=db, email=email, password=password)
+
+    db.flush()
+    db.refresh(user)
     
     final_redirect_url = get_post_auth_redirect_url(request, user, db) # Lo mandará a onboarding
     response = RedirectResponse(url=final_redirect_url, status_code=status.HTTP_303_SEE_OTHER)
@@ -85,32 +88,70 @@ async def login_via_google(request: Request):
 @router.get("/google/callback", name="auth_google_callback")
 async def auth_google_callback(request: Request, db: Session = Depends(deps.get_db)):
     try:
-        token_data = await oauth.google.authorize_access_token(request)
-    except Exception as e:
-        print(f"--- ERROR EN GOOGLE CALLBACK: {e} ---") # Mantenemos el print para depurar
-        error_redirect_url = str(request.url_for("home_page")) + "#auth-google-error"
-        return RedirectResponse(url=error_redirect_url)
-    
-    user_info_google = token_data.get('userinfo')
-    if not user_info_google or not user_info_google.get('email'):
-        error_redirect_url = str(request.url_for("home_page")) + "#auth-google-error"
-        return RedirectResponse(url=error_redirect_url)
+        # 1. AUTENTICACIÓN CON GOOGLE
+        try:
+            token_data = await oauth.google.authorize_access_token(request)
+        except Exception as e:
+            print(f"--- ERROR AL OBTENER TOKEN DE GOOGLE: {e} ---")
+            # Si Google falla, no podemos continuar.
+            raise e  # Relanzamos para que el bloque exterior lo capture
 
-    email_google = user_info_google.get('email')
-    user = crud_user.get_by_email(db, email=email_google)
+        user_info_google = token_data.get('userinfo')
+        if not user_info_google or not user_info_google.get('email'):
+            raise ValueError("La información del usuario de Google es incompleta.")
 
-    if not user:
-        user = crud_user.create_user_from_google(
-            db=db,
-            email=email_google,
-            full_name=user_info_google.get('name', ''),
-            picture_url=user_info_google.get('picture', '')
-        )
-    
-    if not user.is_active:
-        error_redirect_url = str(request.url_for("home_page")) + "#auth-inactive-error"
-        return RedirectResponse(url=error_redirect_url)
+        email_google = user_info_google.get('email')
         
-    final_redirect_url = get_post_auth_redirect_url(request, user, db)
-    response = RedirectResponse(url=final_redirect_url, status_code=status.HTTP_303_SEE_OTHER)
-    return _set_auth_cookie_and_redirect(response, user.id, request)
+        # 2. BUSCAR O CREAR USUARIO EN NUESTRA BD
+        user = crud_user.get_by_email(db, email=email_google)
+
+        if not user:
+            # El usuario es nuevo, lo creamos y lo guardamos INMEDIATAMENTE.
+            user = crud_user.create_user_from_google(
+                db=db,
+                email=email_google,
+                full_name=user_info_google.get('name', ''),
+                picture_url=user_info_google.get('picture', '')
+            )
+            try:
+                db.commit()
+                db.refresh(user)
+            except Exception as db_error:
+                print(f"--- ERROR DE BASE DE DATOS AL GUARDAR NUEVO USUARIO: {db_error} ---")
+                db.rollback()
+                # Este es un error crítico del servidor, lo relanzamos.
+                raise db_error
+
+        # 3. VERIFICACIONES DE ESTADO DEL USUARIO
+        if not user.is_active:
+            # Si el usuario existe pero está inactivo, lo redirigimos con un error específico.
+            error_url = str(request.url_for("home_page")) + "#auth-inactive-error"
+            return RedirectResponse(url=error_url)
+            
+        # 4. CREAR SESIÓN (COOKIE) Y REDIRIGIR
+        # Si llegamos aquí, tenemos un usuario válido y activo.
+        
+        final_redirect_url = get_post_auth_redirect_url(request, user, db)
+        response = RedirectResponse(url=final_redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+        
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = security.create_access_token(subject=str(user.id), expires_delta=access_token_expires)
+        
+        is_secure_connection = request.url.scheme == "https"
+        response.set_cookie(
+            key=settings.ACCESS_TOKEN_COOKIE_NAME, 
+            value=access_token, 
+            httponly=True, 
+            max_age=int(access_token_expires.total_seconds()), 
+            samesite="Lax",
+            secure=is_secure_connection, 
+            path="/"
+        )
+        
+        return response
+
+    except Exception as e:
+        # Bloque de captura general para cualquier error no manejado en los pasos anteriores.
+        print(f"--- ERROR GENERAL NO MANEJADO EN GOOGLE CALLBACK: {e} ---")
+        error_redirect_url = str(request.url_for("home_page")) + "#auth-general-error"
+        return RedirectResponse(url=error_redirect_url)

@@ -25,14 +25,18 @@ def get_current_user_from_cookie(
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
-        user_id = payload.get("sub")
-        if user_id is None:
+        user_id_str = payload.get("sub") # Lo nombramos _str para ser claros
+        if user_id_str is None:
             return None
-    except JWTError:
+        
+        # Movemos la consulta DENTRO del try. Si user_id_str no es un número,
+        # lanzará un ValueError que será capturado por el except.
+        user = crud_user.get(db, id=int(user_id_str))
+        return user
+
+    except (JWTError, ValueError): # Capturamos ambos tipos de error
+        # Si el token es inválido o el user_id no es un entero, devolvemos None.
         return None
-    
-    user = crud_user.get(db, id=int(user_id))
-    return user
 
 # --- DEPENDENCIA DE PROTECCIÓN BÁSICA PARA PÁGINAS WEB (Sin cambios) ---
 async def require_login_for_pages(
@@ -59,11 +63,10 @@ def get_current_active_user(
         raise HTTPException(status_code=401, detail="Could not validate credentials")
     return current_user
 
-def get_current_active_client(
-    current_user: User = Depends(get_current_active_user)
-) -> User:
-    """Dependencia para APIs que requiere un usuario con rol de cliente."""
-    if not current_user.role.value.startswith("client_"):
+def get_current_active_client(current_user: User = Depends(get_current_active_user)) -> User:
+    # Comparamos si el rol está en el grupo de roles de cliente
+    client_roles = {UserRole.CLIENT_FREEMIUM, UserRole.CLIENT_PAID}
+    if current_user.role not in client_roles: # <-- LÍNEA CORREGIDA
         raise HTTPException(status_code=403, detail="The user doesn't have enough privileges")
     return current_user
 
@@ -71,6 +74,7 @@ def get_current_active_staff(
     current_user: User = Depends(get_current_active_user)
 ) -> User:
     """Dependencia para APIs que requiere un usuario con rol de staff."""
-    if not (current_user.role.value.startswith("staff_") or current_user.role == UserRole.ADMIN):
+    staff_roles = {UserRole.STAFF_COLLABORATOR, UserRole.STAFF_MANAGER, UserRole.STAFF_CEO, UserRole.ADMIN}
+    if current_user.role not in staff_roles:
         raise HTTPException(status_code=403, detail="The user doesn't have enough privileges")
     return current_user

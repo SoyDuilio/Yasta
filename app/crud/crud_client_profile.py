@@ -26,14 +26,33 @@ class CRUDClientProfile:
     def link_user_to_profile(
         self, db: Session, *, user: User, profile: ClientProfile, relationship: RelationshipType
     ) -> UserClientAccess:
-        access_link = UserClientAccess(
+        """
+        Vincula un usuario a un perfil de cliente.
+        Si el vínculo ya existe, lo devuelve. Si no, lo crea.
+        Esto hace que la operación sea idempotente.
+        """
+        # 1. Buscar si el vínculo ya existe
+        existing_access = db.query(UserClientAccess).filter_by(
+            user_id=user.id,
+            client_profile_id=profile.id
+        ).first()
+        
+        # 2. Si ya existe, lo devolvemos y no hacemos nada más.
+        if existing_access:
+            # Opcional: podrías decidir actualizar el 'relationship_type' si ha cambiado.
+            # existing_access.relationship_type = relationship
+            # db.add(existing_access)
+            return existing_access
+            
+        # 3. Si no existe, creamos el nuevo vínculo.
+        new_access_link = UserClientAccess(
             user_id=user.id,
             client_profile_id=profile.id,
             relationship_type=relationship
         )
-        db.add(access_link)
-        # Dejamos que el endpoint haga el commit
-        return access_link
+        db.add(new_access_link)
+        
+        return new_access_link
 
     def has_any_access(self, db: Session, *, user_id: int) -> bool:
         return db.query(UserClientAccess).filter(UserClientAccess.user_id == user_id).first() is not None

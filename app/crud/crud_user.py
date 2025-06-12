@@ -1,4 +1,6 @@
 # app/crud/crud_user.py
+# Al principio de app/crud/crud_user.py
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from typing import Optional
 from datetime import datetime, timezone
@@ -46,10 +48,46 @@ class CRUDUser:
             return None
         return user
 
-    def update_user_role(self, db: Session, *, user: User, new_role: UserRole) -> User:
+    """def update_user_role(self, db: Session, *, user: User, new_role: UserRole) -> User:
         user.role = new_role
         db.add(user)
         # Dejamos que el endpoint haga el commit
+        return user"""
+    
+    # En app/crud/crud_user.py
+
+    def update_user_role(self, db: Session, *, user: User, new_role: UserRole) -> User:
+        """
+        Actualiza el rol de un usuario usando SQL crudo para evitar problemas
+        de casteo de tipo con el ENUM de PostgreSQL.
+        """
+        try:
+            # 1. Obtenemos el valor del Enum como un string (ej: "client_freemium")
+            role_value_str = new_role.value
+
+            # 2. Creamos la consulta SQL cruda. 
+            #    Usamos :role_value y :user_id para prevenir inyección SQL.
+            #    Hacemos un CAST explícito a 'userrole' en la propia consulta.
+            sql_query = text(
+                """
+                UPDATE users
+                SET role = CAST(:role_value AS userrole)
+                WHERE id = :user_id
+                """
+            )
+            
+            # 3. Ejecutamos la consulta con los parámetros
+            db.execute(sql_query, {"role_value": role_value_str, "user_id": user.id})
+            
+            # 4. No necesitamos hacer commit aquí si el endpoint lo hace.
+            #    Pero sí necesitamos actualizar nuestro objeto de Python.
+            user.role = new_role
+            
+        except Exception as e:
+            # Si algo sale mal, hacemos rollback para no dejar la sesión en un estado inconsistente.
+            db.rollback()
+            raise e # Relanzamos la excepción para que el endpoint la maneje.
+            
         return user
 
 # Instancia para exportar
