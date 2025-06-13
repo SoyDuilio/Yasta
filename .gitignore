@@ -14,7 +14,7 @@ env/
 # Archivos de configuración con secretos
 # ¡Añade aquí el nombre de tu archivo de configuración si es diferente!
 # Por ejemplo, si tus claves están en config.py, añade 'config.py'
-app/core/config.py
+#app/core/config.py
 
 # Archivos de caché de Python
 __pycache__/
