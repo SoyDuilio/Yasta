@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # Ejemplo para PostgreSQL asíncrono (si usas asyncpg)
         # Ejemplo para PostgreSQL síncrono (si usas psycopg2)
     BACKEND_CORS_ORIGINS: List[str] = [] # Default a lista vacía si no se define en .env
-    DATABASE_URL: str = os.getenv("DATA_BASE_URL", "")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
     
 
     ACCESS_TOKEN_COOKIE_NAME: str = "rucfacil_access_token" # Nombre de la cookie para el token
