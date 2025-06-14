@@ -1,5 +1,6 @@
 # app/main.py
 from fastapi import FastAPI
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -23,6 +24,7 @@ app = FastAPI(
 
 # --- MIDDLEWARES (Session, CORS) ---
 app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
