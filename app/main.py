@@ -23,7 +23,14 @@ app = FastAPI(
 )
 
 # --- MIDDLEWARES (Session, CORS) ---
-app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
+# Versión corregida y segura para producción
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.SECRET_KEY,
+    https_only=True,  # Solo envía la cookie sobre HTTPS (esencial en producción)
+    same_site="lax",  # Buena protección contra ataques CSRF
+    max_age=60 * 60 * 24 * 14 # La cookie expira en 14 días
+)
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 if settings.BACKEND_CORS_ORIGINS:
