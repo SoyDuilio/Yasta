@@ -1,0 +1,32 @@
+<!-- templates/partials/_app_header.html -->
+<header id="app-header" class="bg-gray-900 border-b border-gray-700/50 sticky top-0 z-80">
+    <div class="container mx-auto px-4 flex items-center justify-between h-16">
+        <!-- Logo -->
+        <div class="flex-shrink-0">
+            <a href="{{ url_for('home_page') }}">
+                <img src="{{ url_for('static', path='img/logo_dark.png') }}" alt="YASTA Logo" class="h-7 w-auto">
+            </a>
+        </div>
+
+        <!-- Menú de Usuario (Siempre visible y responsive) -->
+        <div class="flex-shrink-0">
+            {% if current_user %}
+                <div class="user-menu-container">
+                    <button id="user-menu-button" class="user-menu-trigger">
+                        <img src="{{ current_user.profile_image_url or url_for('static', path='img/default_avatar.png') }}" alt="Avatar de {{ current_user.contact_name }}" class="user-avatar">
+                        <span class="hidden md:inline-block ml-2">{{ current_user.contact_name or current_user.email.split('@')[0] }}</span>
+                        <svg class="hidden md:inline-block dropdown-arrow" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                    <div id="user-dropdown" class="dropdown-menu hidden">
+                        {% if current_user.role.value.startswith("client_") %}
+                            <a href="{{ url_for('client_dashboard_page') }}" class="dropdown-link">Mi Dashboard</a>
+                        {% elif current_user.role.value.startswith("staff_") or current_user.role.value == "admin" %}
+                            <a href="{{ url_for('staff_dashboard_page') }}" class="dropdown-link">Dashboard Interno</a>
+                        {% endif %}
+                        <a href="{{ url_for('logout') }}" class="dropdown-link">Cerrar Sesión</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</header>

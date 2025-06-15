@@ -1,116 +1,84 @@
-{% extends "base.html" %}
+{% extends 'layouts/_app_base.html' %}
+
 {% block title %}Mi Dashboard - YASTA{% endblock %}
-{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', path='/css/dashboard.css') }}">{% endblock %}
 
-{% block content %}
-<main class="container py-8 md:py-16">
-    <div class="mb-8">
-        <h1 class="section-title !text-left !mb-2 !text-3xl">Dashboard del Cliente</h1>
-        <p class="section-subtitle !text-left !m-0 !max-w-full">
-            ¡Bienvenido, <strong>{{ current_user.contact_name or current_user.business_name }}</strong>!
-        </p>
-    </div>
-
-    <!-- (2) SECCIÓN FREEMIUM vs VIP -->
-    <details class="upgrade-card mb-8">
-        <summary class="upgrade-summary">
-            <span>Eres un usuario <strong>Freemium</strong>. ¡Descubre los beneficios de ser VIP!</span>
-            <svg class="dropdown-arrow" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-        </summary>
-        <div class="upgrade-details">
-            <p>Con tu plan VIP por solo <strong>S/ 20 mensuales</strong>, obtienes declaraciones ilimitadas (pago cero). Si hay impuesto por pagar, gestionamos el pago por solo S/ 10 adicionales (previa transferencia del monto total).</p>
-            <button class="btn btn-accent mt-4">¡Quiero ser VIP!</button>
-        </div>
-    </details>
-
-    <!-- (3.c) GRÁFICAS -->
-    <div class="grid md:grid-cols-2 gap-8 mb-8">
-        <div class="dashboard-card">
-            <h3 class="card-title mb-4">Resumen del Periodo (Junio 2024)</h3>
-            <canvas id="salesPieChart"></canvas>
-        </div>
-        <div class="dashboard-card">
-            <h3 class="card-title mb-4">Tendencia de Ingresos vs. Gastos</h3>
-            <canvas id="trendsLineChart"></canvas>
-        </div>
-    </div>
-
-    <!-- (3.a y 3.b) PESTAÑAS CON TABLAS -->
-    <div class="tabs-container">
-        <div class="tabs-nav">
-            <button class="tab-link active" data-tab="tab-comprobantes">Comprobantes</button>
-            <button class="tab-link" data-tab="tab-declaraciones">Declaraciones</button>
-        </div>
-        <div class="tab-content active" id="tab-comprobantes">
-            <!-- (3.a) Tabla de Ventas/Gastos -->
-            <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>Tipo</th><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead>
-                    <tbody>
-                        <!-- Ejemplo, esto se llenaría con un for loop -->
-                        <tr><td>Venta</td><td>2024-06-05</td><td>Factura F001-123</td><td>S/ 1,200.00</td></tr>
-                        <tr><td>Gasto</td><td>2024-06-04</td><td>Compra de útiles</td><td>S/ -150.00</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="tab-content" id="tab-declaraciones">
-            <!-- (3.b) Tabla de Declaraciones -->
-             <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>Periodo</th><th>Imp. Declarado</th><th>Monto Pagado</th><th>Fecha Decl.</th><th>Pagado Por</th><th>Acciones</th></tr></thead>
-                    <tbody>
-                         <!-- Ejemplo -->
-                        <tr><td>2024-05</td><td>IGV, Renta</td><td>S/ 250.00</td><td>2024-06-15</td><td>YASTA</td><td><a href="#" class="card-link">Descargar</a></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</main>
+{% block page_css %}
+    <style>
+        .dashboard-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; }
+        @media (min-width: 768px) { .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (min-width: 1280px) { .dashboard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        .dashboard-widget { background-color: #1f2937; border-radius: 0.75rem; padding: 1.5rem; border: 1px solid #374151; }
+        .widget-title { font-size: 1.125rem; font-weight: 600; color: #f9fafb; margin-bottom: 1rem; }
+        .kpi-value { font-size: 2.25rem; font-weight: 800; color: #ffffff; }
+        .kpi-label { font-size: 0.875rem; color: #9ca3af; }
+        .chart-container-widget { height: 250px; }
+    </style>
 {% endblock %}
 
-{% block page_scripts_body %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-    // JS para los tabs y las gráficas
-    document.addEventListener('DOMContentLoaded', function() {
-        // Lógica de Tabs
-        const tabLinks = document.querySelectorAll('.tab-link');
-        const tabContents = document.querySelectorAll('.tab-content');
-        tabLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                tabLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                const targetId = link.dataset.tab;
-                tabContents.forEach(content => {
-                    content.classList.toggle('active', content.id === targetId);
-                });
-            });
-        });
+{% block sub_nav_content %}
+    {# La barra de navegación del cliente solo se muestra si el estado es válido. #}
+    {% if current_user.sol_validation_status.value == 'valid' %}
+        <a href="#" class="px-3 py-2 text-sm font-medium rounded-md text-white bg-gray-900">Resumen</a>
+        <a href="#" class="px-3 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white">Declaraciones</a>
+        <a href="#" class="px-3 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white">Pagos</a>
+        <a href="#" class="px-3 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white">Configuración</a>
+    {% endif %}
+{% endblock %}
 
-        // (3.c) Gráfica de Pastel
-        new Chart(document.getElementById('salesPieChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Ingresos', 'Gastos', 'Devoluciones'],
-                datasets: [{ data: [5200, 1100, 250], backgroundColor: ['#38bdf8', '#f97316', '#ef4444'] }]
-            },
-            options: { responsive: true, plugins: { legend: { position: 'top' } } }
-        });
+{% block main_content %}
+<div class="container mx-auto px-4">
 
-        // (3.c) Gráfica de Líneas
-        new Chart(document.getElementById('trendsLineChart'), {
-            type: 'line',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-                datasets: [
-                    { label: 'Ingresos', data: [3200, 4100, 3800, 5000, 4500, 5200], borderColor: '#38bdf8', tension: 0.1 },
-                    { label: 'Gastos', data: [1000, 1200, 900, 1500, 1300, 1100], borderColor: '#f97316', tension: 0.1 }
-                ]
-            },
-            options: { responsive: true, plugins: { legend: { position: 'top' } } }
+    {# --- LÓGICA PRINCIPAL: Muestra contenido basado en el estado de validación SOL --- #}
+    {% if current_user.sol_validation_status.value != 'valid' %}
+
+        <!-- VISTA 1: BANNER DE ACCIÓN REQUERIDA (ONBOARDING INCOMPLETO) -->
+        <div class="bg-gray-800 border-2 border-dashed border-indigo-400/50 rounded-lg p-8 md:p-12 text-center max-w-4xl mx-auto mt-8">
+            <svg class="mx-auto h-12 w-12 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 class="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">¡Estás a un paso de activar tu cuenta!</h2>
+            <p class="mt-3 max-w-2xl mx-auto text-base text-gray-300">Para que podamos automatizar tus impuestos y darte visibilidad total, necesitamos que conectes tu Clave SOL de forma segura.</p>
+            <div class="mt-8">
+                <a href="{{ url_for('onboarding_start_page') }}" class="btn-primary inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Completar mi registro ahora
+                </a>
+            </div>
+            <p class="mt-4 text-xs text-gray-500">Este proceso es seguro y tus datos están encriptados.</p>
+        </div>
+
+    {% else %}
+
+        <!-- VISTA 2: DASHBOARD COMPLETO Y FUNCIONAL (ONBOARDING COMPLETO) -->
+        <div>
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-white">Resumen del Periodo</h1>
+                <p class="text-gray-400 mt-1">Hola {{ current_user.contact_name }}, aquí tienes un vistazo rápido de tu situación fiscal.</p>
+            </header>
+            <div class="dashboard-grid">
+                <div class="dashboard-widget"><h3 class="widget-title">Impuesto por Pagar (Junio)</h3><p class="kpi-value">S/ 1,250.00</p><p class="kpi-label">IGV + Renta</p></div>
+                <div class="dashboard-widget"><h3 class="widget-title">Próximo Vencimiento</h3><p class="kpi-value text-yellow-400">En 5 días</p><p class="kpi-label">Declaración PLAME</p></div>
+                <div class="dashboard-widget"><h3 class="widget-title">Alertas Activas</h3><p class="kpi-value text-red-500">1</p><p class="kpi-label">Orden de Pago pendiente</p></div>
+                <div class="dashboard-widget xl:col-span-2"><h3 class="widget-title">Historial de Impuestos Pagados</h3><div class="chart-container-widget"><canvas id="clientLineChart"></canvas></div></div>
+                <div class="dashboard-widget"><h3 class="widget-title">Distribución de Gastos</h3><div class="chart-container-widget"><canvas id="clientPieChart"></canvas></div></div>
+            </div>
+        </div>
+
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+    {% if current_user.sol_validation_status.value == 'valid' %}
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Chart !== 'undefined') {
+                const lineChartElement = document.getElementById('clientLineChart');
+                const pieChartElement = document.getElementById('clientPieChart');
+                if (lineChartElement) { new Chart(lineChartElement, { type: 'line', data: { labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'], datasets: [{ label: 'Impuestos', data: [650, 590, 800, 810, 560, 1250], borderColor: '#818cf8', tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } } } }); }
+                if(pieChartElement) { new Chart(pieChartElement, { type: 'doughnut', data: { labels: ['Planillas', 'Servicios', 'Compras', 'Otros'], datasets: [{ data: [300, 150, 200, 50], backgroundColor: ['#c084fc', '#f87171', '#fbbf24', '#60a5fa'], borderColor: '#1f2937', borderWidth: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#d1d5db', padding: 10 } } } } }); }
+            }
         });
-    });
-    </script>
+        </script>
+    {% endif %}
 {% endblock %}

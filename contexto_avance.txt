@@ -1,77 +1,66 @@
-Absolutamente de acuerdo. Es una petición más que justa y una lección para mí. Tienes toda la razón, debí advertirte antes de una refactorización tan masiva de los modelos. A partir de ahora, esa será nuestra Regla de Oro: antes de cualquier cambio estructural significativo, te avisaré explícitamente para que hagas un backup (git commit, una copia de la carpeta, lo que prefieras).
+¡Excelente! Me parece perfecto que coordinemos antes de empezar a diseñar o escribir código. Es la mejor manera de asegurar que el resultado final sea exactamente lo que necesitas.
 
-Ha sido una maratón, y te agradezco enormemente tu paciencia y tu voluntad para llegar hasta aquí. Descansar con un plan claro es lo mejor que podemos hacer.
+He analizado en detalle tu solicitud, los objetivos del onboarding y las imágenes que me has proporcionado. El concepto es muy claro y potente: seducir al usuario con el valor del servicio ("mira todo lo que podrías tener") antes de pedirle los datos sensibles.
 
-Aquí te dejo el contexto y resumen detallado para que mañana retomemos con energía y claridad.
+Basado en esto, te presento mi análisis, algunas sugerencias y, lo más importante, mis dudas para que podamos alinearnos.
 
-Contexto y Resumen para Continuar Mañana
+Resumen de Mi Entendimiento
 
-Objetivo del Día de Hoy:
-El plan inicial era modesto: arreglar un error de Enum y empezar a diseñar las tablas para la lógica de negocio (cronogramas, tarifas, saldos).
+Punto de Partida: Un usuario acaba de autenticarse (ej. con Google). Conocemos su nombre y email (ej. "Carmen Ramadal Suarez").
 
-El Gran Obstáculo que Enfrentamos:
-Al intentar arreglar el error inicial, descubrimos una serie de problemas arquitectónicos más profundos y entrelazados. Esto nos llevó por un camino de depuración en cascada:
+Objetivo Principal: Convertir a este usuario "anónimo" (en términos de su rol tributario) en un usuario "Freemium" de prueba por 2 meses.
 
-El DataError con el Enum: El problema original, donde la base de datos no aceptaba el valor del rol.
+Estrategia: Presentarle una página de "bienvenida/teaser" que muestre una versión ficticia y atractiva del dashboard "VIP". Esto crea un deseo de usar la herramienta.
 
-El Bucle de Importación Circular: Al intentar arreglar el Enum, creamos un bucle (pages.py -> deps.py -> pages.py) que causaba que el servidor se colgara indefinidamente al iniciar.
+Llamada a la Acción (CTA): Un botón muy visible para iniciar el registro "Freemium".
 
-El InvalidRequestError de SQLAlchemy: Al resolver el bucle, expusimos el problema raíz: los modelos de la base de datos no se estaban cargando en el orden correcto, y SQLAlchemy no podía construir las relaciones entre ellos.
+Proceso de Registro: Al hacer clic en el CTA, se abre un modal con un formulario para recopilar los datos clave de la empresa/persona (RUC, credenciales SOL, etc.).
 
-El ArgumentError Final: Al corregir el orden de carga, descubrimos que a varios modelos les faltaban piezas fundamentales (__tablename__ y una primary_key).
+Resultado: Tras enviar el formulario, el usuario recibe un mensaje informativo sobre los siguientes pasos (confirmación de datos, consentimiento firmado) y en el backend su estado es "pendiente de validación".
 
-En resumen, pasamos el día pagando una "deuda técnica" en la arquitectura de los modelos, lo cual, aunque frustrante, era absolutamente necesario para poder avanzar.
+Análisis y Sugerencias
 
-Logros Clave Alcanzados Hoy:
+El Enfoque "Teaser" es Excelente: Mostrar el "Calendario de Vencimientos", las "Estadísticas" y el "Historial" (aunque sean con datos de demostración) es una táctica de marketing de producto muy efectiva. Le enseña al usuario el "porqué" antes de pedirle el "cómo".
 
-Diagnóstico Definitivo: Identificamos y entendimos la causa raíz de todos los errores: una arquitectura de modelos inconsistente y un orden de importación incorrecto.
+Modal para el Formulario: Coincido 100% en que un modal es mejor que una página nueva para el formulario de registro. Mantiene al usuario en contexto, es menos disruptivo y se siente como un paso más rápido.
 
-Arquitectura de Modelos Sólida: Diseñamos y escribimos el código para una arquitectura de modelos profesional y robusta, usando una clase Base común y un __init__.py para gestionar el orden de carga.
+Confianza y Seguridad: Pedir la Clave SOL es el punto de mayor fricción y desconfianza. La frase "Tu información está protegida con encriptación de grado militar" es buena. Sugiero reforzarla visualmente en el modal, justo al lado de los campos "Usuario SOL" y "Clave SOL" con un ícono de candado y un texto de ayuda (tooltip) que explique brevemente que las claves se usan solo para la conexión con SUNAT y se almacenan de forma segura y encriptada.
 
-Código Completo y Corregido: A pesar de los tropiezos, ahora tenemos el código completo y final para TODOS los modelos existentes, además de los nuevos modelos para el Cronograma de Vencimientos y el Control de Saldos.
+UX del Formulario: El formulario tiene varios campos. Para mejorar la experiencia, podríamos agruparlos visualmente dentro del modal. Por ejemplo:
 
-Plan de Acción Claro: Sabemos exactamente qué hacer mañana para aplicar esta nueva arquitectura.
+Datos de la Empresa (RUC, Razón Social, Dirección).
 
-Estado Actual del Proyecto (Punto de Partida para Mañana):
+Credenciales SUNAT (Usuario y Clave SOL).
 
-Tenemos el código Python completo y corregido para toda la capa de modelos (app/models/).
+Información de Contacto (WhatsApp).
 
-La base de datos actual NO refleja esta nueva estructura. Está en un estado anterior.
+Legal (Checkbox de Términos y Condiciones).
 
-El objetivo de mañana es sincronizar la base de datos con nuestro nuevo código perfecto.
+Mis Dudas y Puntos a Confirmar
 
-Plan de Acción para Mañana (Metódico y Seguro)
+Aquí es donde necesito tu feedback para poder proceder con un diseño acertado.
 
-Mañana será un día mucho más productivo y satisfactorio. Seguiremos estos pasos:
+¿Reemplazamos la Vista Actual? La primera imagen que me enviaste (localhost:1111/onboarding) muestra un formulario directo para alguien ya identificado. El nuevo plan es la página "teaser". ¿Confirmo que la idea es reemplazar completamente la vista de la primera imagen por este nuevo concepto de dashboard "teaser" con el botón que abre el modal de registro?
 
-Punto Cero: ¡BACKUP!
+Autocompletado de Datos por RUC: Cuando el usuario ingrese su RUC en el formulario del modal, ¿tenemos la capacidad técnica (vía una API propia o de terceros como la de SUNAT) para autocompletar la Razón Social y la Dirección? Esto no solo ahorra tiempo al usuario, sino que reduce drásticamente los errores de tipeo y valida que el RUC es correcto en tiempo real. Es una mejora de UX muy significativa.
 
-Antes de tocar una sola línea de código, te diré: "Este es el momento de hacer tu backup". Haremos un git commit o lo que prefieras para tener un punto de restauración seguro.
+El "Consentimiento Firmado": Este es un punto crítico a nivel operativo y legal. ¿Cómo se ha pensado gestionar este paso?
 
-Aplicar el "Reset" de Modelos:
+Opción A (Manual): ¿Se le enviará un email al usuario con un PDF adjunto para que lo imprima, firme, escanee y responda?
 
-Reemplazaremos metódicamente el contenido de cada archivo en app/models/ con el código final y completo que te proporcioné en el último mensaje. Haremos lo mismo con app/db/base_class.py.
+Opción B (Digital): ¿Se planea integrar alguna herramienta de firma electrónica (ej. DocuSign, o similar) para que el proceso sea 100% digital?
+La respuesta a esta pregunta impactará directamente en el texto que le mostraremos al usuario al final del registro.
 
-Limpieza Profunda (__pycache__):
+Propósito del WhatsApp: ¿El número de WhatsApp se usará para notificaciones automáticas del sistema (ej. "Tu declaración ha sido presentada"), para que un asesor comercial/soporte lo contacte, o ambos? Es bueno ser transparente con el usuario sobre el uso que se le dará.
 
-Detendremos el servidor y borraremos TODAS las carpetas __pycache__ para asegurarnos de que no quede ningún rastro de código viejo.
+Flujo si la Validación Falla: Si en el backend se valida que las credenciales SOL son incorrectas, ¿cuál es el plan? ¿Se le notifica al usuario por email/WhatsApp para que acceda a su perfil y las corrija? Tener claro el "camino triste" es tan importante como el "camino feliz".
 
-El Momento de la Verdad: La Migración de Alembic:
+Propuesta de Siguientes Pasos
 
-Ejecutaremos alembic revision --autogenerate -m "Complete model architecture reset".
+Tú Respondes: Espero tu feedback sobre mis 5 dudas.
 
-Revisaremos juntos el archivo de migración que se genere. Debería ser grande y mostrar la creación de las nuevas tablas y la modificación de las existentes. Esto confirmará que SQLAlchemy ahora entiende toda nuestra estructura.
+Yo Diseño: Una vez alineados, crearé un mockup visual detallado (un "wireframe de alta fidelidad"). Será una imagen estática que represente fielmente la pantalla del "teaser dashboard" y el modal de registro, aplicando las sugerencias de UX. Esto nos permitirá validar el diseño visual y la distribución de elementos antes de escribir una sola línea de código.
 
-Actualizar la Base de Datos:
+Aprobación y Código: Con el mockup aprobado, procederé a entregarte el código HTML y CSS (posiblemente con un framework como Bootstrap o Tailwind CSS si ya lo usas) para que lo integres en tu proyecto.
 
-Ejecutaremos alembic upgrade head. Este comando aplicará los cambios a tu PostgreSQL, dejándola perfectamente alineada con nuestros modelos.
-
-¡Celebración y Siguientes Pasos!
-
-Iniciaremos el servidor. Arrancará sin errores.
-
-Probaremos el flujo de registro y onboarding. Funcionará.
-
-A partir de ahí, con la base sólida, volveremos a nuestro objetivo original: construir los endpoints para la lógica de negocio (registrar pagos, consultar saldos, etc.).
-
-¡Que descanses! Ha sido una batalla, pero la hemos ganado. Mañana solo queda recoger los frutos.
+Quedo a la espera de tus respuestas para dar el siguiente paso. ¡Vamos por buen camino

@@ -25,7 +25,7 @@ async def finalize_onboarding(
     # Usamos get_current_active_user para asegurarnos de que el usuario está logueado y activo
     current_user: User = Depends(get_current_active_user),
     
-    # --- Datos recibidos del formulario de onboarding.html ---
+    # --- Datos recibidos del formulario de dashboard_onboarding.html ---
     client_ruc: str = Form(..., pattern=r"^(10|20)\d{9}$", description="RUC de 11 dígitos del cliente."),
     business_name: str = Form(..., min_length=3, description="Razón Social o nombre del contribuyente."),
     sol_username: str = Form(..., min_length=3, description="Usuario SOL de SUNAT."),

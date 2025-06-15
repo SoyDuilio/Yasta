@@ -19,47 +19,70 @@ async def user_flow_guardian(
     current_user: Optional[User] = Depends(get_current_user_from_cookie)
 ):
     """
-    Dependencia de flujo de usuario SIMPLIFICADA Y CORRECTA.
-    Su única misión es enviar a cada rol a su página de inicio designada.
+    Dependencia inteligente que redirige al usuario a la ZONA correcta
+    del sitio web según su rol Y ESTADO. Versión final y robusta.
     """
-    if not current_user or request.url.path.endswith("/logout"):
+    if not current_user or request.url.path == str(request.url_for("logout")):
         return
 
     current_path = request.url.path
-    user_role = current_user.role
-
-    # --- Páginas de destino ---
-    onboarding_dest = str(request.url_for("onboarding_start_page"))
-    client_dest = str(request.url_for("client_dashboard_page"))
-    staff_dest = str(request.url_for("staff_dashboard_page"))
-
-    # --- Lógica de redirección por ROL ---
-
-    # Regla 1: Un usuario recién autenticado que no está en la página de onboarding, es enviado allí.
-    if user_role == UserRole.AUTHENTICATED and current_path != onboarding_dest:
-        raise HTTPException(
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-            headers={"Location": onboarding_dest},
-        )
-
-    # Regla 2: Un usuario cliente que no está en su dashboard, es enviado allí.
-    # Esta regla ahora maneja a TODOS los clientes, incluyendo 'client_freemium'.
-    elif user_role in {UserRole.CLIENT_FREEMIUM, UserRole.CLIENT_PAID} and current_path != client_dest:
-        # Excepción: Si el cliente está intentando ir a /onboarding (por un link), se le permite.
-        if current_path == onboarding_dest:
-            return
-        # Para cualquier otra página, se le envía a su dashboard.
-        raise HTTPException(
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-            headers={"Location": client_dest},
-        )
     
-    # Regla 3: Un usuario staff que no está en su dashboard, es enviado allí.
-    elif user_role in {UserRole.STAFF_COLLABORATOR, UserRole.STAFF_MANAGER, UserRole.STAFF_CEO, UserRole.ADMIN} and current_path != staff_dest:
-        raise HTTPException(
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-            headers={"Location": staff_dest},
-        )
+    client_roles = {UserRole.CLIENT_FREEMIUM, UserRole.CLIENT_PAID}
+    staff_roles = {UserRole.STAFF_COLLABORATOR, UserRole.STAFF_MANAGER, UserRole.STAFF_CEO, UserRole.ADMIN}
+
+    # Extraemos los valores para facilitar la lectura
+    user_role = current_user.role
+    sol_status = current_user.sol_validation_status.value
+    
+    onboarding_path = str(request.url_for("onboarding_start_page"))
+    client_dashboard_path = str(request.url_for("client_dashboard_page"))
+    staff_dashboard_path = str(request.url_for("staff_dashboard_page"))
+
+    # ***** INICIO DE LA LÓGICA CORREGIDA *****
+
+    # 1. Usuario recién autenticado O CUALQUIER USUARIO SIN DATOS VALIDADOS
+    #    -> DEBE ir a la página de onboarding.
+    #    Esta regla ahora cubre al 'client_freemium' que aún no ha validado.
+    if sol_status != "valid":
+        if current_path != onboarding_path:
+            # Si el estado no es 'valid', su único destino permitido es /onboarding.
+            raise HTTPException(
+                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+                headers={"Location": onboarding_path},
+            )
+        # Si ya está en /onboarding y su estado no es 'valid', lo dejamos en paz.
+        return 
+
+    # --- A PARTIR DE AQUÍ, PODEMOS ASUMIR QUE sol_status ES 'valid' ---
+
+    # 2. Usuario Cliente (con estado 'valid') -> DEBE estar en la ZONA de cliente.
+    if user_role in client_roles:
+        client_zone_prefix = "/dashboard/client"
+        if not current_path.startswith(client_zone_prefix):
+            # Si es un cliente válido y no está en su zona, lo mandamos a ella.
+            raise HTTPException(
+                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+                headers={"Location": client_dashboard_path},
+            )
+
+    # 3. Usuario Staff/Admin (con estado 'valid', aunque no les afecte) 
+    #    -> DEBE estar en la ZONA de staff.
+    elif user_role in staff_roles:
+        staff_zone_prefix = "/dashboard/staff"
+        if not current_path.startswith(staff_zone_prefix):
+            raise HTTPException(
+                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+                headers={"Location": staff_dashboard_path},
+            )
+
+    # 4. Caso raro: Rol 'authenticated' con estado 'valid'. 
+    #    No debería pasar si el rol se actualiza, pero por si acaso, lo mandamos a onboarding.
+    elif user_role == UserRole.AUTHENTICATED:
+         if current_path != onboarding_path:
+            raise HTTPException(
+                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+                headers={"Location": onboarding_path},
+            )
 
     # Si ninguna regla de redirección se aplicó, el flujo continúa normalmente.
 

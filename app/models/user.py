@@ -4,6 +4,7 @@ from sqlalchemy.sql import func # A veces es redundante, pero no hace daño
 import enum
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, text
 from sqlalchemy.dialects.postgresql import ENUM as PGEnum
+from enum import Enum # Usamos el Enum nativo de Python para los valores
 from sqlalchemy.orm import relationship
 
 # Importamos la Base ÚNICA desde su nueva ubicación.
@@ -18,10 +19,13 @@ class UserRole(enum.Enum):
     STAFF_CEO = "staff_ceo"
     ADMIN = "admin"
 
+class SOLValidationStatus(str, Enum):
+    NOT_SUBMITTED = "not_submitted"
+    PENDING = "pending"
+    VALID = "valid"
+    INVALID = "invalid"
+
 class User(Base):
-    # __tablename__ es generado automáticamente por la clase Base.
-    # No es necesario declararlo aquí a menos que queramos un nombre específico.
-    # Por consistencia y claridad, lo declaramos explícitamente.
     __tablename__ = "users"
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -29,12 +33,25 @@ class User(Base):
 
     email = Column(String(255), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
+    
+    # La definición de 'role' no se toca, permanece como la tienes.
     role = Column(
         PGEnum(UserRole, name="userrole", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         server_default=text("'authenticated'::userrole"),
         default=UserRole.AUTHENTICATED
     )
+
+    # ***** INICIO DE LA CORRECCIÓN *****
+    # Aplicamos exactamente el mismo patrón que usaste para 'role'.
+    sol_validation_status = Column(
+        PGEnum(SOLValidationStatus, name="solvalidationstatus", create_type=False, values_callable=lambda x: [e.value for e in x]),
+        nullable=False,
+        # 'NOT_SUBMITTED' es el valor por defecto del Enum
+        server_default=text("'not_submitted'::solvalidationstatus"), 
+        default=SOLValidationStatus.NOT_SUBMITTED
+    )
+    # ***** FIN DE LA CORRECCIÓN *****
     is_active = Column(Boolean(), default=True)
     last_platform_login_at = Column(DateTime(timezone=True), nullable=True)
     contact_name = Column(String(255), nullable=True)

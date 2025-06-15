@@ -1,0 +1,15 @@
+{%- if user_status == 'pending' or user_status == 'invalid' -%}
+<div id="onboarding-status-container" class="flex flex-col md:flex-row items-end md:items-center gap-x-4 text-sm">
+    <span class="font-semibold text-white">Datos - SOL</span>
+    
+    {% if user_status == 'pending' %}
+        <span id="status-badge" class="px-3 py-1 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-full">
+            Pendiente de verificar
+        </span>
+    {% elif user_status == 'invalid' %}
+        <span id="status-badge" class="px-3 py-1 bg-red-500/20 text-red-300 border border-red-500/30 rounded-full">
+            No son válidos
+        </span>
+    {% endif %}
+</div>
+{%- endif -%}

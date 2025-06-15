@@ -5,6 +5,7 @@
 *.zip
 *.rar
 *.tar.gz
+*-old*
 
 # Entorno virtual
 venv/
