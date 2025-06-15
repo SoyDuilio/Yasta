@@ -1,10 +1,23 @@
 # app/main.py
+from app.core.config import settings
+print("--- INICIANDO VERIFICACIÓN DE SECRET_KEY ---")
+try:
+    # Usamos str() para asegurarnos de que funciona aunque Pydantic use un tipo SecretStr
+    key_str = str(settings.SECRET_KEY)
+    if len(key_str) > 8:
+        print(f"SECRET_KEY cargada correctamente. Fragmento: {key_str[:4]}...{key_str[-4:]}")
+    else:
+        print("ADVERTENCIA: SECRET_KEY es demasiado corta o no se cargó.")
+    print(f"ENVIRONMENT: {settings.ENVIRONMENT}")
+except Exception as e:
+    print(f"ERROR al leer la SECRET_KEY de la configuración: {e}")
+print("------------------------------------------")
+
 from fastapi import FastAPI
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.core.config import settings
 from app.core.templating import mount_static_files
 
 # --- ¡LA SOLUCIÓN DEFINITIVA ESTÁ AQUÍ! ---
@@ -24,12 +37,17 @@ app = FastAPI(
 
 # --- MIDDLEWARES (Session, CORS) ---
 # Versión corregida y segura para producción
+# Leemos una variable de entorno. Si no existe, asumimos que no es producción.
+# El '0' al final es el valor por defecto si la variable no se encuentra.
+IS_PRODUCTION = settings.ENVIRONMENT == "production"
+
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.SECRET_KEY,
-    https_only=True,  # Solo envía la cookie sobre HTTPS (esencial en producción)
-    same_site="lax",  # Buena protección contra ataques CSRF
-    max_age=60 * 60 * 24 * 14 # La cookie expira en 14 días
+    # El valor de https_only ahora depende del entorno
+    https_only=IS_PRODUCTION,
+    same_site="lax",
+    max_age=14 * 24 * 60 * 60  # 14 días
 )
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 

@@ -1,66 +1,37 @@
-¡Excelente! Me parece perfecto que coordinemos antes de empezar a diseñar o escribir código. Es la mejor manera de asegurar que el resultado final sea exactamente lo que necesitas.
+Claro que sí. Aquí tienes un resumen conciso y completo para que podamos retomar el proyecto mañana sin perder el hilo.
 
-He analizado en detalle tu solicitud, los objetivos del onboarding y las imágenes que me has proporcionado. El concepto es muy claro y potente: seducir al usuario con el valor del servicio ("mira todo lo que podrías tener") antes de pedirle los datos sensibles.
+Resumen del Estado del Proyecto YASTA
 
-Basado en esto, te presento mi análisis, algunas sugerencias y, lo más importante, mis dudas para que podamos alinearnos.
+Objetivo Principal:
+Estábamos solucionando un problema de flujo de usuario y de renderizado en el dashboard del cliente (dashboard_client.html) y en la página de onboarding (dashboard_onboarding.html).
 
-Resumen de Mi Entendimiento
+Arquitectura Implementada:
 
-Punto de Partida: Un usuario acaba de autenticarse (ej. con Google). Conocemos su nombre y email (ej. "Carmen Ramadal Suarez").
+Se ha establecido una arquitectura de plantillas robusta con una base para la aplicación (layouts/_app_base.html) que todos los dashboards extienden.
 
-Objetivo Principal: Convertir a este usuario "anónimo" (en términos de su rol tributario) en un usuario "Freemium" de prueba por 2 meses.
+Esta base incluye un header universal (partials/_app_header.html) y una barra de sub-navegación contextual y condicional.
 
-Estrategia: Presentarle una página de "bienvenida/teaser" que muestre una versión ficticia y atractiva del dashboard "VIP". Esto crea un deseo de usar la herramienta.
+Las migraciones de la base de datos se manejan con Alembic y se ejecutan automáticamente en producción (Railway) a través de un pre-deploy step (alembic upgrade head).
 
-Llamada a la Acción (CTA): Un botón muy visible para iniciar el registro "Freemium".
+Problema Actual:
 
-Proceso de Registro: Al hacer clic en el CTA, se abre un modal con un formulario para recopilar los datos clave de la empresa/persona (RUC, credenciales SOL, etc.).
+En el entorno local, todo funciona correctamente.
 
-Resultado: Tras enviar el formulario, el usuario recibe un mensaje informativo sobre los siguientes pasos (confirmación de datos, consentimiento firmado) y en el backend su estado es "pendiente de validación".
+En producción (yasta.cloud en Railway), la autenticación de usuarios está fallando. A pesar de un inicio de sesión aparentemente exitoso, las peticiones posteriores no reconocen al usuario.
 
-Análisis y Sugerencias
+Evidencia: Los logs de producción muestran repetidamente el mensaje [Guardian] No user found, exiting., lo que confirma que get_current_user_from_cookie está devolviendo None. Esto provoca que el usuario siempre vea la página de inicio y, al final, un error de redirección (/#auth-general-error) probablemente causado por el frontend.
 
-El Enfoque "Teaser" es Excelente: Mostrar el "Calendario de Vencimientos", las "Estadísticas" y el "Historial" (aunque sean con datos de demostración) es una táctica de marketing de producto muy efectiva. Le enseña al usuario el "porqué" antes de pedirle el "cómo".
+Últimas Acciones Realizadas:
 
-Modal para el Formulario: Coincido 100% en que un modal es mejor que una página nueva para el formulario de registro. Mantiene al usuario en contexto, es menos disruptivo y se siente como un paso más rápido.
+Modelo y Migraciones: Se corrigió el modelo User para incluir los campos role y sol_validation_status con tipos PGEnum y valores por defecto. La base de datos de producción fue "sellada" (alembic stamp head) y ahora está sincronizada.
 
-Confianza y Seguridad: Pedir la Clave SOL es el punto de mayor fricción y desconfianza. La frase "Tu información está protegida con encriptación de grado militar" es buena. Sugiero reforzarla visualmente en el modal, justo al lado de los campos "Usuario SOL" y "Clave SOL" con un ícono de candado y un texto de ayuda (tooltip) que explique brevemente que las claves se usan solo para la conexión con SUNAT y se almacenan de forma segura y encriptada.
+Lógica del Guardián (user_flow_guardian): Se simplificó la lógica para evitar bucles de redirección. La responsabilidad de mostrar contenido diferente (banner de onboarding vs. dashboard completo) recae ahora en las plantillas.
 
-UX del Formulario: El formulario tiene varios campos. Para mejorar la experiencia, podríamos agruparlos visualmente dentro del modal. Por ejemplo:
+Configuración de Cookies: Se ajustó el SessionMiddleware para que sea dinámico: en producción usa https_only=True y en desarrollo https_only=False, controlado por una variable de entorno ENVIRONMENT.
 
-Datos de la Empresa (RUC, Razón Social, Dirección).
+SECRET_KEY: Se confirmó que el problema principal parece ser la validación de la cookie de sesión en producción, probablemente debido a una mala configuración o lectura de la SECRET_KEY en Railway.
 
-Credenciales SUNAT (Usuario y Clave SOL).
+Siguiente Paso Pendiente:
+La última acción recomendada fue regenerar una nueva SECRET_KEY, configurarla cuidadosamente en las variables de entorno de Railway y probar el inicio de sesión en una ventana de incógnito para descartar cualquier problema con la clave o cookies antiguas.
 
-Información de Contacto (WhatsApp).
-
-Legal (Checkbox de Términos y Condiciones).
-
-Mis Dudas y Puntos a Confirmar
-
-Aquí es donde necesito tu feedback para poder proceder con un diseño acertado.
-
-¿Reemplazamos la Vista Actual? La primera imagen que me enviaste (localhost:1111/onboarding) muestra un formulario directo para alguien ya identificado. El nuevo plan es la página "teaser". ¿Confirmo que la idea es reemplazar completamente la vista de la primera imagen por este nuevo concepto de dashboard "teaser" con el botón que abre el modal de registro?
-
-Autocompletado de Datos por RUC: Cuando el usuario ingrese su RUC en el formulario del modal, ¿tenemos la capacidad técnica (vía una API propia o de terceros como la de SUNAT) para autocompletar la Razón Social y la Dirección? Esto no solo ahorra tiempo al usuario, sino que reduce drásticamente los errores de tipeo y valida que el RUC es correcto en tiempo real. Es una mejora de UX muy significativa.
-
-El "Consentimiento Firmado": Este es un punto crítico a nivel operativo y legal. ¿Cómo se ha pensado gestionar este paso?
-
-Opción A (Manual): ¿Se le enviará un email al usuario con un PDF adjunto para que lo imprima, firme, escanee y responda?
-
-Opción B (Digital): ¿Se planea integrar alguna herramienta de firma electrónica (ej. DocuSign, o similar) para que el proceso sea 100% digital?
-La respuesta a esta pregunta impactará directamente en el texto que le mostraremos al usuario al final del registro.
-
-Propósito del WhatsApp: ¿El número de WhatsApp se usará para notificaciones automáticas del sistema (ej. "Tu declaración ha sido presentada"), para que un asesor comercial/soporte lo contacte, o ambos? Es bueno ser transparente con el usuario sobre el uso que se le dará.
-
-Flujo si la Validación Falla: Si en el backend se valida que las credenciales SOL son incorrectas, ¿cuál es el plan? ¿Se le notifica al usuario por email/WhatsApp para que acceda a su perfil y las corrija? Tener claro el "camino triste" es tan importante como el "camino feliz".
-
-Propuesta de Siguientes Pasos
-
-Tú Respondes: Espero tu feedback sobre mis 5 dudas.
-
-Yo Diseño: Una vez alineados, crearé un mockup visual detallado (un "wireframe de alta fidelidad"). Será una imagen estática que represente fielmente la pantalla del "teaser dashboard" y el modal de registro, aplicando las sugerencias de UX. Esto nos permitirá validar el diseño visual y la distribución de elementos antes de escribir una sola línea de código.
-
-Aprobación y Código: Con el mockup aprobado, procederé a entregarte el código HTML y CSS (posiblemente con un framework como Bootstrap o Tailwind CSS si ya lo usas) para que lo integres en tu proyecto.
-
-Quedo a la espera de tus respuestas para dar el siguiente paso. ¡Vamos por buen camino
+Con este contexto, mañana podremos retomar directamente desde la depuración del problema de la sesión en producción.
