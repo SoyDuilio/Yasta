@@ -18,61 +18,47 @@ async def user_flow_guardian(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_from_cookie)
 ):
-    """
-    Dependencia de flujo de usuario final.
-    Envía a cada rol a su zona, pero permite explícitamente a los clientes
-    visitar la página de onboarding.
-    """
-    if not current_user or request.url.path.endswith("/logout"):
+    if not current_user:
+        print("[Guardian] No user found, exiting.")
         return
 
     current_path = request.url.path
     user_role = current_user.role
 
-    # --- Definimos las rutas de destino y las rutas permitidas ---
+    print(f"\n--- [Guardian Debug] ---")
+    print(f"User: {current_user.email}, Role: {user_role.value}")
+    print(f"Requested Path: {current_path}")
+
+    # Definimos las rutas de destino y las rutas permitidas
     onboarding_path = str(request.url_for("onboarding_start_page"))
     client_dashboard_path = str(request.url_for("client_dashboard_page"))
-    staff_dashboard_path = str(request.url_for("staff_dashboard_page"))
+    # ... otros destinos
 
     # Roles
     client_roles = {UserRole.CLIENT_FREEMIUM, UserRole.CLIENT_PAID}
-    staff_roles = {UserRole.STAFF_COLLABORATOR, UserRole.STAFF_MANAGER, UserRole.STAFF_CEO, UserRole.ADMIN}
-
-    # --- LÓGICA DE REDIRECCIÓN POR ZONAS ---
-
+    
     # Regla 1: Un usuario recién autenticado siempre debe ir a onboarding.
     if user_role == UserRole.AUTHENTICATED:
         if current_path != onboarding_path:
-            raise HTTPException(
-                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-                headers={"Location": onboarding_path},
-            )
-        return # Si ya está en onboarding, no hacemos nada más.
+            print(f"[Guardian] REDIRECTING 'authenticated' user to onboarding.")
+            raise HTTPException(status_code=307, headers={"Location": onboarding_path})
+        print(f"[Guardian] 'authenticated' user is already on onboarding. Allowing.")
+        return
 
     # Regla 2: Un usuario Cliente.
     elif user_role in client_roles:
         client_zone_prefix = "/dashboard/client"
-        # Si el cliente está intentando acceder a una página FUERA de su zona...
         if not current_path.startswith(client_zone_prefix):
-            # ...PERMITIMOS explícitamente que visite la página de onboarding.
+            print(f"[Guardian] Client is outside client zone.")
             if current_path == onboarding_path:
-                return  # Lo dejamos en paz, rompiendo el bucle.
+                print(f"[Guardian] Client is on onboarding page. Allowing.")
+                return
             
-            # Para cualquier otra página fuera de su zona, lo mandamos a su dashboard.
-            raise HTTPException(
-                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-                headers={"Location": client_dashboard_path},
-            )
-
-    # Regla 3: Un usuario Staff.
-    elif user_role in staff_roles:
-        staff_zone_prefix = "/dashboard/staff"
-        if not current_path.startswith(staff_zone_prefix):
-            raise HTTPException(
-                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-                headers={"Location": staff_dashboard_path},
-            )
-
+            print(f"[Guardian] REDIRECTING client to client dashboard.")
+            raise HTTPException(status_code=307, headers={"Location": client_dashboard_path})
+    
+    print(f"[Guardian] No redirection rules matched. Allowing access to {current_path}.")
+    # ... resto de las reglas para staff ...
     # Si ninguna regla de redirección se aplicó, significa que el usuario está
     # en una página permitida para su rol. El flujo continúa.
 
