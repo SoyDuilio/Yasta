@@ -36,20 +36,32 @@ def _set_auth_cookie_and_redirect(response: RedirectResponse, user_id: int, requ
 
 # --- FUNCIÓN HELPER PARA REDIRECCIÓN POST-AUTH (CORREGIDA) ---
 def get_post_auth_redirect_url(request: Request, user: User, db: Session) -> str:
-    """Decide a dónde redirigir al usuario después de una autenticación exitosa."""
+    """
+    Decide a dónde redirigir al usuario después de una autenticación exitosa,
+    basándose PRIMERO en su rol.
+    """
     
-    # Comprobamos si el usuario ya está vinculado a algún perfil de cliente.
-    user_has_client_profile = crud_client_profile.has_any_access(db=db, user_id=user.id)
+    # REGLA 1: Si el rol ya es de un cliente (freemium, vip, etc.), SIEMPRE va al dashboard.
+    if user.role in [UserRole.client_freemium, UserRole.client_paid]: # Asegúrate de que los nombres de enum sean correctos
+        # Para roles de staff, podrías añadir una lógica similar aquí si la tienes.
+        # if user.role.value.startswith("staff_") or user.role == "admin":
+        #     return str(request.url_for("staff_dashboard_page"))
+        return str(request.url_for("client_dashboard_page"))
 
-    if user_has_client_profile:
-        # Si ya está vinculado a un cliente, va a su dashboard correspondiente.
-        if user.role.value.startswith("staff_") or user.role == "admin":
-            return str(request.url_for("staff_dashboard_page"))
-        else:
+    # REGLA 2: Si el rol es 'authenticated', su destino depende de si ha completado el onboarding.
+    # Usamos el chequeo del perfil de cliente como indicador de que el onboarding está completo.
+    if user.role == UserRole.authenticated: # Asegúrate de que el nombre de enum sea correcto
+        user_has_completed_onboarding = crud_client_profile.has_any_access(db=db, user_id=user.id)
+        if user_has_completed_onboarding:
+            # Caso raro: un usuario 'authenticated' que ya tiene perfil. Lo mandamos al dashboard.
             return str(request.url_for("client_dashboard_page"))
-    else:
-        # Si no está vinculado a ningún perfil, DEBE completar el onboarding.
-        return str(request.url_for("onboarding_start_page"))
+        else:
+            # Caso normal: usuario 'authenticated' nuevo, necesita onboarding.
+            return str(request.url_for("onboarding_start_page"))
+            
+    # REGLA 3 (POR DEFECTO): Si hay algún otro rol no contemplado, por seguridad, lo mandamos al onboarding.
+    # O podrías mandarlo a una página de error o a la home.
+    return str(request.url_for("onboarding_start_page"))
 
 # --- RUTAS DE AUTENTICACIÓN ---
 
