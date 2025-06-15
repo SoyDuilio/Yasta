@@ -1,4 +1,5 @@
 # app/apis/v1/endpoints/auth.py
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Form
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -87,18 +88,23 @@ async def login_via_google(request: Request):
 
 @router.get("/google/callback", name="auth_google_callback")
 async def auth_google_callback(request: Request, db: Session = Depends(deps.get_db)):
+    logging.info("--- [1] ENTRANDO EN CALLBACK DE GOOGLE ---") # <-- NUEVA LÍNEA
     try:
         # 1. AUTENTICACIÓN CON GOOGLE
         try:
+            logging.info("--- [2] INTENTANDO OBTENER TOKEN DE ACCESO DE GOOGLE ---") # <-- NUEVA LÍNEA
             token_data = await oauth.google.authorize_access_token(request)
+            logging.info("--- [3] TOKEN DE ACCESO OBTENIDO EXITOSAMENTE ---") # <-- NUEVA LÍNEA
         except Exception as e:
-            print(f"--- ERROR AL OBTENER TOKEN DE GOOGLE: {e} ---")
+            logging.error(f"--- ERROR AL OBTENER TOKEN DE GOOGLE: {e} ---", exc_info=True)
             # Si Google falla, no podemos continuar.
             raise e  # Relanzamos para que el bloque exterior lo capture
 
         user_info_google = token_data.get('userinfo')
         if not user_info_google or not user_info_google.get('email'):
             raise ValueError("La información del usuario de Google es incompleta.")
+        
+        logging.info(f"--- [4] PROCESANDO USUARIO: {user_info_google.get('email')} ---") # <-- NUEVA LÍNEA
 
         email_google = user_info_google.get('email')
         
@@ -117,7 +123,7 @@ async def auth_google_callback(request: Request, db: Session = Depends(deps.get_
                 db.commit()
                 db.refresh(user)
             except Exception as db_error:
-                print(f"--- ERROR DE BASE DE DATOS AL GUARDAR NUEVO USUARIO: {db_error} ---")
+                logging.error(f"--- ERROR GENERAL NO MANEJADO EN GOOGLE CALLBACK: {e} ---", exc_info=True)
                 db.rollback()
                 # Este es un error crítico del servidor, lo relanzamos.
                 raise db_error
