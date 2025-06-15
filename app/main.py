@@ -35,6 +35,8 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
 )
 
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+
 # --- MIDDLEWARES (Session, CORS) ---
 # Versión corregida y segura para producción
 # Leemos una variable de entorno. Si no existe, asumimos que no es producción.
@@ -49,7 +51,6 @@ app.add_middleware(
     same_site="lax",
     max_age=14 * 24 * 60 * 60  # 14 días
 )
-app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
