@@ -1,8 +1,8 @@
 import os
 
 # Directorios
-input_folder = "app/models-copia"  # Cambia esto a la ruta de tu carpeta
-output_file = "combina_models.py"
+input_folder = "app/models"  # Cambia esto a la ruta de tu carpeta
+output_file = "combina_models_16_junio.py"
 
 # Lista para almacenar el contenido de todos los scripts
 combined_content = []

@@ -42,7 +42,7 @@ class AttachedDocument(Base):
 import enum
 from sqlalchemy import Column, String, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
+from app.db.base import Base
 
 class ClientType(str, enum.Enum):
     NATURAL = "NATURAL"
@@ -63,7 +63,7 @@ class ClientProfile(Base):
 import enum
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum as SQLAlchemyEnum, Text
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
+from app.db.base import Base
 
 class CommunicationChannel(str, enum.Enum):
     EMAIL = "email"
@@ -170,7 +170,7 @@ class CompanyTransaction(Base):
 # app/models/credential_access_audit.py
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Text
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
+from app.db.base import Base
 
 class CredentialAccessAudit(Base):
     __tablename__ = "credential_access_audits"
@@ -243,7 +243,7 @@ class FeePayment(Base):
 # app/models/monthly_client_summary.py
 from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, UniqueConstraint
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
+from app.db.base import Base
 
 class MonthlyClientSummary(Base):
     __tablename__ = "monthly_client_summaries"
@@ -460,7 +460,7 @@ class ServiceType(Base):
 # app/models/sunat_credential.py
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
+from app.db.base import Base
 
 class SunatCredential(Base):
     __tablename__ = "sunat_credentials"
@@ -608,7 +608,7 @@ class User(Base):
 import enum
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, text, Enum as PGEnum
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
+from app.db.base import Base
 
 class UserRole(enum.Enum):
     AUTHENTICATED = "authenticated"
@@ -650,7 +650,7 @@ class User(Base):
 import enum
 from sqlalchemy import Column, Integer, ForeignKey, Enum as SQLAlchemyEnum, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
+from app.db.base import Base
 
 class RelationshipType(str, enum.Enum):
     TITULAR = "TITULAR"

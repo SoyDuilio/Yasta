@@ -1,0 +1,33 @@
+Parte 1: Visión Integral de la Base de Datos
+Analizando tus modelos, la arquitectura de datos es robusta y está bien pensada para escalar. Se puede dividir en los siguientes dominios lógicos:
+A. Dominio: Usuarios y Clientes (El Núcleo de la Identidad)
+Este es el corazón de quién usa tu plataforma. Has hecho una excelente separación entre la identidad de la persona que se loguea y la entidad contribuyente a la que se le da el servicio.
+User: Representa a la persona física que interactúa con la plataforma. Tiene un email, contraseña, rol (client_freemium, staff_manager, etc.) y datos de contacto. Es el "quién".
+ClientProfile: Representa a la entidad tributaria (el contribuyente). Su identificador único es el ruc. Contiene la razón social. Es el "para quién".
+UserClientAccess: La tabla de asociación que une a los dos anteriores. Responde a la pregunta: ¿Qué User tiene acceso a qué ClientProfile y con qué tipo de relación (TITULAR, CONTADOR, etc.)? Esto es clave para el futuro, permitiendo que un contador (User) gestione varios RUCs (ClientProfile) o que un RUC (ClientProfile) tenga varios User con acceso (el dueño, el asistente).
+B. Dominio: Credenciales y Auditoría (Seguridad y Trazabilidad)
+Este grupo maneja la información más sensible y registra su uso.
+SunatCredential: Almacena de forma segura el usuario y la contraseña SOL. Está directamente vinculada al ClientProfile (un RUC tiene un solo juego de credenciales SOL). La relación uno a uno aquí es perfecta.
+CredentialAccessAudit: Una bitácora fundamental. Cada vez que un User (probablemente un staff) usa las credenciales de un ClientProfile, se debería registrar aquí. Anota quién, cuándo, por qué y si tuvo éxito. Es tu seguro de transparencia y tu herramienta de depuración.
+C. Dominio: Gestión del Servicio (El "Core Business")
+Aquí es donde se materializa el servicio que ofreces.
+ServiceType: Es tu catálogo de servicios (Declaración Mensual, Emisión RxH, etc.). Define qué ofreces, si requiere un periodo tributario y cuánto cuesta la base.
+ServiceContract: Es la instancia de un servicio para un cliente en un periodo determinado. Es la tabla central de operaciones. Un User (cliente) solicita un servicio (ServiceType) para un tax_period, se le asigna a un staff, y tiene un status que traza todo su ciclo de vida (requested, in_progress, completed_paid, etc.).
+MonthlyDeclaration y PayrollReceipt: Son los "entregables" o "productos" específicos que nacen de un ServiceContract. Un contrato de declaración mensual resultará en un registro en MonthlyDeclaration. Un contrato de emisión de RxH, en un PayrollReceipt. Están vinculados uno a uno con ServiceContract, lo cual es correcto.
+D. Dominio: Reglas de Negocio (Configuración)
+Estas tablas definen las reglas con las que opera tu sistema.
+SunatSchedule (o SunatDueDate): Tabla Crítica y Nueva. Define el calendario de vencimientos de SUNAT. Es la fuente de la verdad para calcular los periodos a declarar, enviar recordatorios y planificar el trabajo del staff. La distinción por contributor_group (General vs. Buen Contribuyente) es un acierto fundamental.
+ServiceTariff: Te permite gestionar tus precios a lo largo del tiempo. Podrías tener una tarifa de S/20 para 2024 y cambiarla a S/25 para 2025 sin alterar los registros históricos.
+E. Dominio: Finanzas y Pagos (El Flujo de Dinero)
+Gestiona cómo te pagan tus clientes y tu contabilidad interna.
+FeePayment: Registra cada pago que un cliente te hace por tus servicios. Se vincula al ServiceContract que se está pagando y al User que paga. El status (pending_verification, verified_paid) es clave para tu flujo de validación manual.
+YapePlinTransaction: Tu análisis sobre esta tabla es correcto. Aunque la idea original era OCR/LLM, su estructura es perfectamente reutilizable para el flujo manual. Al subir la imagen, se crea un registro aquí con extraction_status = 'pending'. Tu equipo de staff lo revisa, llena manualmente los campos (extracted_amount, extracted_operation_number) y cambia el estado a verified_matched, lo que a su vez actualizaría el FeePayment relacionado. ¡No la descartes, es muy útil!
+ClientBalanceLedger: Un libro contable por cliente. Ideal para manejar saldos a favor, adelantos o notas de crédito.
+CompanyTransaction: Tu libro contable interno. Registra los ingresos (los FeePayment verificados) y los gastos (pago de API, sueldos, etc.).
+F. Dominio: Comunicación y Soportes
+Elementos que facilitan la interacción y el almacenamiento.
+AttachedDocument: Un repositorio central para cualquier archivo (constancias de declaración, vouchers de pago, reportes, etc.), vinculando quién lo subió y a qué ServiceContract pertenece.
+Communication: Una bitácora de todas las notificaciones (email, etc.) enviadas a los usuarios. Muy útil para saber si un cliente fue notificado de algo importante.
+
+TokenPrueba (Apis-Net)
+apis-token-15827.iYGHxHragu1v29sESjl5r0PxeMKhaVeG

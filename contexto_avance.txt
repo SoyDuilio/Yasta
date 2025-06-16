@@ -1,37 +1,36 @@
-Claro que sí. Aquí tienes un resumen conciso y completo para que podamos retomar el proyecto mañana sin perder el hilo.
-
-Resumen del Estado del Proyecto YASTA
-
-Objetivo Principal:
-Estábamos solucionando un problema de flujo de usuario y de renderizado en el dashboard del cliente (dashboard_client.html) y en la página de onboarding (dashboard_onboarding.html).
-
-Arquitectura Implementada:
-
-Se ha establecido una arquitectura de plantillas robusta con una base para la aplicación (layouts/_app_base.html) que todos los dashboards extienden.
-
-Esta base incluye un header universal (partials/_app_header.html) y una barra de sub-navegación contextual y condicional.
-
-Las migraciones de la base de datos se manejan con Alembic y se ejecutan automáticamente en producción (Railway) a través de un pre-deploy step (alembic upgrade head).
-
-Problema Actual:
-
-En el entorno local, todo funciona correctamente.
-
-En producción (yasta.cloud en Railway), la autenticación de usuarios está fallando. A pesar de un inicio de sesión aparentemente exitoso, las peticiones posteriores no reconocen al usuario.
-
-Evidencia: Los logs de producción muestran repetidamente el mensaje [Guardian] No user found, exiting., lo que confirma que get_current_user_from_cookie está devolviendo None. Esto provoca que el usuario siempre vea la página de inicio y, al final, un error de redirección (/#auth-general-error) probablemente causado por el frontend.
-
-Últimas Acciones Realizadas:
-
-Modelo y Migraciones: Se corrigió el modelo User para incluir los campos role y sol_validation_status con tipos PGEnum y valores por defecto. La base de datos de producción fue "sellada" (alembic stamp head) y ahora está sincronizada.
-
-Lógica del Guardián (user_flow_guardian): Se simplificó la lógica para evitar bucles de redirección. La responsabilidad de mostrar contenido diferente (banner de onboarding vs. dashboard completo) recae ahora en las plantillas.
-
-Configuración de Cookies: Se ajustó el SessionMiddleware para que sea dinámico: en producción usa https_only=True y en desarrollo https_only=False, controlado por una variable de entorno ENVIRONMENT.
-
-SECRET_KEY: Se confirmó que el problema principal parece ser la validación de la cookie de sesión en producción, probablemente debido a una mala configuración o lectura de la SECRET_KEY en Railway.
-
-Siguiente Paso Pendiente:
-La última acción recomendada fue regenerar una nueva SECRET_KEY, configurarla cuidadosamente en las variables de entorno de Railway y probar el inicio de sesión en una ventana de incógnito para descartar cualquier problema con la clave o cookies antiguas.
-
-Con este contexto, mañana podremos retomar directamente desde la depuración del problema de la sesión en producción.
+Contexto para Mañana: Resumen del Estado del Proyecto YASTA (15 de Junio)
+Objetivo Logrado Hoy:
+Se ha resuelto el problema crítico de autenticación en producción. El flujo de login con Google ahora funciona y la cookie de sesión (JWT) se establece correctamente. La causa raíz era una columna (sol_validation_status) faltante en la base de datos de producción, que impedía la consulta de usuarios y rompía el callback de OAuth. El problema se solucionó aplicando la migración de base de datos manualmente.
+Estado Actual y Siguiente Bloqueo:
+Flujo de Redirección Corregido: Se implementó una lógica de redirección post-login robusta que se basa explícitamente en el user.role.
+role=authenticated -> /onboarding
+role=client_freemium -> /dashboard/client
+Esto ha sido verificado manualmente cambiando un rol en la base de datos, y funciona como se espera.
+Problema Principal Pendiente: El mecanismo para que un usuario pase de authenticated a client_freemium está roto. El formulario o la acción designada para esta transición no funciona en producción. Esto impide que los usuarios nuevos puedan usar el servicio después del onboarding y es nuestra máxima prioridad técnica.
+Problema Secundario Emergente: Se ha observado un error intermitente (/onboarding#auth-general-error) en la página de onboarding, sugiriendo que una petición de datos en segundo plano podría estar fallando en esa página.
+Tareas Pendientes Técnicas:
+Depurar el Formulario de Conversión a Freemium: Utilizar las herramientas de red del navegador para identificar la petición de API que falla al enviar el formulario y analizar el mensaje de error que devuelve el servidor. Esta es la primera tarea para mañana.
+Investigar el Error de Onboarding: Si el error persiste, aplicar la misma técnica de depuración de red en la página /onboarding para encontrar la petición fallida.
+Discusión Estratégica y de Producto (Tareas Pendientes de Diseño de Flujo)
+Excelente que ya estés pensando en los siguientes pasos funcionales. Estos son los puntos clave a definir:
+A. Canales de Comunicación Usuario -> Yasta:
+Consultas y Soporte:
+Opción 1 (Simple): Un enlace mailto: (soporte@yasta.cloud) y/o un número de WhatsApp. Rápido de implementar, pero difícil de escalar y rastrear.
+Opción 2 (Integrado): Un pequeño formulario de contacto en la web que envíe un correo electrónico a nuestro equipo (o cree un ticket en un sistema simple como Trello/Notion vía API).
+Opción 3 (Avanzada): Un widget de chat en vivo (Crisp, Tawk.to) que permita una comunicación más directa. Muchos tienen planes gratuitos generosos.
+Periodo Tributario Inicial:
+Esto es un dato crítico para el onboarding. Debe ser un campo obligatorio en el formulario de onboarding/conversión.
+Implementación: Un campo de formulario tipo "mes/año" (ej. MM/YYYY) o dos desplegables (Mes, Año). Se debe guardar en la base de datos asociado al perfil del cliente.
+Recepción de Vouchers de Pago (Yape/Plin):
+Análisis de Riesgo vs. Esfuerzo: Tu análisis es perfecto. La validación por OCR/LLM de un voucher es costosa en recursos y frágil ante la manipulación. Para una tarifa económica, el riesgo de fraude es bajo y el costo de una validación manual es mucho menor.
+Propuesta de Flujo (MVP - Producto Mínimo Viable):
+a. El usuario realiza el pago.
+b. En el formulario, se le presenta un campo para subir la imagen del voucher y otro para ingresar el número de operación.
+c. Al enviar, el sistema guarda la imagen y marca la cuenta del usuario como "pago_pendiente_de_verificacion".
+d. Un administrador (tú) recibe una notificación, revisa la imagen y el monto en la cuenta de Yape/Plin y, con un clic en un panel de administración simple, aprueba el pago, cambiando el rol del usuario a client_paid.
+e. Este flujo minimiza el riesgo de fraude y es muy barato de implementar y operar al principio.
+B. Canales de Comunicación Yasta -> Usuario:
+Push Notifications y SWAs (Single Web Apps):
+Estás en lo cierto. Para enviar notificaciones push a un navegador (móvil o de escritorio), tu sitio web necesita comportarse como una Progressive Web App (PWA).
+¿Qué es una PWA? No es un framework distinto, sino un conjunto de tecnologías web (Service Worker, Manifest.json) que le dan a tu web "superpoderes" como funcionar offline, ser "instalable" en la pantalla de inicio y, crucialmente, recibir notificaciones push.
+Alternativa: El correo electrónico. Es menos inmediato pero universal y 100% fiable. Una combinación de ambos es ideal: emails para notificaciones importantes (facturas, cambios de estado) y push notifications para recordatorios en tiempo real ("Tu declaración está lista").

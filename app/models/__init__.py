@@ -6,7 +6,7 @@
 # El orden aquí es crucial para evitar errores de dependencia.
 
 # 1. Modelos Base o de los que dependen muchos otros.
-from .user import User, UserRole
+from .user import User, UserRole, SOLValidationStatus
 from .client_profile import ClientProfile, ClientType
 
 # 2. Tabla de Asociación que une a los de arriba.
@@ -37,4 +37,7 @@ from .monthly_client_summary import MonthlyClientSummary
 from .company_transaction import CompanyTransaction, TransactionType
 from .company_tax_declaration import CompanyTaxDeclaration, TaxDeclarationTypeCompany
 
-# (Aquí añadiremos los nuevos modelos de Cronograma, Tarifas y Saldos cuando lleguemos a ese paso)
+# 9. Modelos de Configuración y Reglas de Negocio
+from .sunat_schedule import SunatSchedule, ContributorGroup
+from .buen_contribuyente import BuenContribuyente # <-- NUEVO MODELO AÑADIDO
+from .service_tariff import ServiceTariff

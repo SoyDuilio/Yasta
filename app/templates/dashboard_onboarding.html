@@ -23,13 +23,14 @@
         .btn-light:hover { transform: scale(1.05); }
         .calendar-item { display: flex; justify-content: space-between; align-items: center; background-color: rgba(17, 24, 39, 0.5); padding: 0.75rem; border-radius: 0.5rem; }
         .calendar-item span:first-child { color: #d1d5db; }
-        .calendar-item .due-urgent { font-weight: 600; color: #f87171; }
-        .calendar-item .due-soon { font-weight: 600; color: #fbbf24; }
+        .calendar-item .due-text { font-weight: 600; color: #fbbf24; } /* Estilo para vencimiento */
         .chart-container { position: relative; height: 220px; width: 100%; }
         #custom-toast { position: fixed; top: 20px; left: 50%; transform: translate(-50%, -150%); background-color: #2d3748; color: #e2e8f0; padding: 1rem 1.5rem; border-radius: 0.5rem; border: 1px solid #4a5568; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); z-index: 10000; transition: transform 0.4s ease-in-out; display: flex; align-items: center; gap: 0.75rem; }
         #custom-toast.show { transform: translate(-50%, 0); }
+        #custom-toast.error { background-color: #c53030; border-color: #9b2c2c; }
         .btn-modal-submit { display: flex; justify-content: center; align-items: center; width: 100%; background-color: #4f46e5; color: white; font-size: 1rem; font-weight: 600; padding: 0.625rem 1rem; margin-top: 1rem; border: none; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s; }
         .btn-modal-submit:hover { background-color: #4338ca; }
+        .btn-modal-submit:disabled { background-color: #6b7280; cursor: not-allowed; }
     </style>
 {% endblock %}
 
@@ -52,7 +53,7 @@
 
 {% block main_content %}
     <div id="custom-toast">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span id="toast-icon"></span>
         <span id="toast-message"></span>
     </div>
 
@@ -69,8 +70,11 @@
                     <button data-modal-target="freemium-register-modal" class="btn-light">¡Quiero mi prueba ahora!</button>
                 </div>
                 <div class="teaser-card">
-                    <h3 class="card-title"><svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>Calendario de Vencimientos</h3>
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem;"><div class="calendar-item"><span>Declaración IGV-Renta (Mayo)</span><span class="due-urgent">Vence en 2 días</span></div><div class="calendar-item"><span>Declaración PLAME (Mayo)</span><span class="due-soon">Vence en 5 días</span></div></div>
+                    <h3 class="card-title"><svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>Próximas Declaraciones</h3>
+                    <div id="next-periods-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- El contenido se llenará con JavaScript -->
+                        <div class="calendar-item"><span>Declaración IGV-Renta (Ejemplo)</span><span class="due-text">Vence pronto</span></div>
+                    </div>
                 </div>
             </div>
             <div class="grid-column grid-col-span-3">
@@ -91,12 +95,31 @@
             <button type="button" class="modal-close" data-modal-close="freemium-register-modal">×</button>
             <h3 id="modal-title" class="section-title !text-2xl !mb-6">¡Estás a un paso!</h3>
             <p class="text-center text-gray-400 mb-8">Completa tus datos para activar tus 2 meses gratis.</p>
-            <form id="freemium-form" hx-post="{{ url_for('onboarding_finalize') }}" hx-swap="none">
+            <form id="freemium-form" action="{{ url_for('onboarding_finalize') }}" method="POST">
                 <div class="space-y-6">
-                    <div class="form-group"><label for="client_ruc_modal" class="form-label">Tu RUC</label><input type="text" id="client_ruc_modal" name="client_ruc" class="form-input" required placeholder="Ingresa tu RUC y presiona Tab" autocomplete="off"></div><div id="ruc-details" class="hidden space-y-4"><div class="form-group"><label class="form-label">Razón Social / Nombres</label><input type="text" id="business_name" name="business_name" class="form-input bg-gray-700" readonly></div><div class="form-group"><label class="form-label">Dirección Fiscal</label><input type="text" id="business_address" name="business_address" class="form-input bg-gray-700" readonly></div></div><div class="form-group"><label for="sol_username_modal" class="form-label">Usuario SOL</label><input type="text" id="sol_username_modal" name="sol_username" class="form-input" required autocomplete="username"></div><div class="form-group"><label for="sol_password_modal" class="form-label">Clave SOL</label><input type="password" id="sol_password_modal" name="sol_password" class="form-input" required autocomplete="new-password"></div><div class="form-group"><label for="sol_password_confirm_modal" class="form-label">Confirmar Clave SOL</label><input type="password" id="sol_password_confirm_modal" name="sol_password_confirm" class="form-input" required autocomplete="new-password"></div><div class="form-group"><label for="contact_phone_modal" class="form-label">N° de WhatsApp</label><input type="tel" id="contact_phone_modal" name="contact_phone" class="form-input" placeholder="Ej: 987654321" autocomplete="tel"></div><div class="form-group-checkbox"><input type="checkbox" id="terms_modal" name="terms" required class="form-checkbox"><label for="terms_modal" class="form-label-checkbox">Acepto los <a href="{{ url_for('terms_page') }}" target="_blank" class="text-primary-400 hover:underline">Términos</a> y autorizo a YASTA a usar mi Clave SOL.</label></div>
-                    <button type="submit" class="btn-modal-submit">
+                    <div class="form-group">
+                        <label for="client_ruc_modal" class="form-label">Tu RUC</label>
+                        <div class="relative">
+                            <input type="text" id="client_ruc_modal" name="client_ruc" class="form-input" required placeholder="Ingresa tu RUC y presiona Tab" autocomplete="off" maxlength="11">
+                            <div id="ruc-spinner" class="absolute inset-y-0 right-0 flex items-center pr-3 hidden">
+                                <svg class="animate-spin h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ruc-details" class="hidden space-y-4">
+                        <div class="form-group">
+                            <label class="form-label">Razón Social / Nombres</label>
+                            <input type="text" id="business_name" name="business_name" class="form-input bg-gray-700" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Dirección Fiscal</label>
+                            <input type="text" id="business_address" name="business_address" class="form-input bg-gray-700" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group"><label for="sol_username_modal" class="form-label">Usuario SOL</label><input type="text" id="sol_username_modal" name="sol_username" class="form-input" required autocomplete="username"></div><div class="form-group"><label for="sol_password_modal" class="form-label">Clave SOL</label><input type="password" id="sol_password_modal" name="sol_password" class="form-input" required autocomplete="new-password"></div><div class="form-group"><label for="sol_password_confirm_modal" class="form-label">Confirmar Clave SOL</label><input type="password" id="sol_password_confirm_modal" name="sol_password_confirm" class="form-input" required autocomplete="new-password"></div><div class="form-group"><label for="contact_phone_modal" class="form-label">N° de WhatsApp</label><input type="tel" id="contact_phone_modal" name="contact_phone" class="form-input" placeholder="Ej: 987654321" autocomplete="tel"></div><div class="form-group-checkbox"><input type="checkbox" id="terms_modal" name="terms" required class="form-checkbox"><label for="terms_modal" class="form-label-checkbox">Acepto los <a href="{{ url_for('terms_page') }}" target="_blank" class="text-primary-400 hover:underline">Términos</a> y autorizo a YASTA a usar mi Clave SOL.</label></div>
+                    <button type="submit" id="freemium-submit-btn" class="btn-modal-submit">
                         <span>Validar y Activar Prueba</span>
-                        <span class="htmx-indicator"><svg class="animate-spin ml-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></span>
+                        <span class="submit-spinner hidden"><svg class="animate-spin ml-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></span>
                     </button>
                 </div>
             </form>
@@ -106,84 +129,5 @@
 
 {% block page_scripts %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof Chart !== 'undefined') {
-            const lineChartElement = document.getElementById('lineChart');
-            const pieChartElement = document.getElementById('pieChart');
-            if (lineChartElement) { new Chart(lineChartElement, { type: 'line', data: { labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'], datasets: [{ label: 'Impuestos', data: [650, 590, 800, 810, 560, 1250], borderColor: '#818cf8', tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } } } }); }
-            if(pieChartElement) { new Chart(pieChartElement, { type: 'doughnut', data: { labels: ['Planillas', 'Servicios', 'Compras', 'Otros'], datasets: [{ data: [300, 150, 200, 50], backgroundColor: ['#c084fc', '#f87171', '#fbbf24', '#60a5fa'], borderColor: '#1f2937', borderWidth: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#d1d5db', padding: 10 } } } } }); }
-        }
-        function setupModals() {
-            document.querySelectorAll('[data-modal-target]').forEach(button => {
-                button.addEventListener('click', () => {
-                    const modal = document.getElementById(button.dataset.modalTarget);
-                    if(modal) modal.style.display = 'flex';
-                });
-            });
-            document.querySelectorAll('.modal').forEach(modal => {
-                const closeButton = modal.querySelector('.modal-close');
-                if (closeButton) { closeButton.addEventListener('click', () => { modal.style.display = 'none'; }); }
-                modal.addEventListener('click', (e) => { if (e.target === modal) { modal.style.display = 'none'; }});
-            });
-        }
-        setupModals();
-        const form = document.getElementById('freemium-form');
-        if (form) {
-            form.addEventListener('submit', function(event) {
-                const pass1 = document.getElementById('sol_password_modal').value;
-                const pass2 = document.getElementById('sol_password_confirm_modal').value;
-                if (pass1 !== pass2) {
-                    alert('Las Claves SOL no coinciden. Por favor, verifícalas.');
-                    event.preventDefault(); 
-                    return false;
-                }
-            });
-            const rucInput = document.getElementById('client_ruc_modal');
-            if (rucInput) {
-                rucInput.addEventListener('blur', async function() {
-                    const ruc = this.value.trim();
-                    const rucDetailsContainer = document.getElementById('ruc-details');
-                    if (ruc.length === 11 && (ruc.startsWith('10') || ruc.startsWith('20'))) {
-                        await new Promise(resolve => setTimeout(resolve, 500)); 
-                        const data = { success: true, razonSocial: ruc.startsWith('20') ? `EMPRESA DEMO S.A.C.` : `{{ current_user.contact_name or "USUARIO DEMO" }}`, direccion: `AV. SIEMPREVIVA 123 - LIMA` };
-                        if (data.success && rucDetailsContainer) {
-                            document.getElementById('business_name').value = data.razonSocial;
-                            document.getElementById('business_address').value = data.direccion;
-                            rucDetailsContainer.classList.remove('hidden');
-                        }
-                    } else if (rucDetailsContainer) {
-                        rucDetailsContainer.classList.add('hidden');
-                    }
-                });
-            }
-        }
-        document.body.addEventListener('htmx:afterOnLoad', function(event) {
-            if (event.detail.elt.id === 'freemium-form' && event.detail.xhr.status === 200) {
-                const modal = document.getElementById('freemium-register-modal');
-                if (modal) modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                const toast = document.getElementById('custom-toast');
-                const toastMessage = document.getElementById('toast-message');
-                if (toast && toastMessage) {
-                    toastMessage.textContent = "Datos enviados para validación. Te notificaremos pronto.";
-                    toast.classList.add('show');
-                    setTimeout(() => { toast.classList.remove('show'); }, 5000);
-                }
-                const statusContainer = document.getElementById('onboarding-status-container');
-                if (statusContainer) {
-                    // Ahora la sub-nav se hace visible y se rellena
-                    const subNav = document.getElementById('sub-nav');
-                    if (subNav) subNav.style.display = 'block'; // O 'flex' si usas flexbox
-                    statusContainer.innerHTML = `
-                        <span class="text-gray-400">Datos - SOL:</span>
-                        <span class="font-semibold px-2 py-0.5 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-md">
-                            Pendiente de verificar
-                        </span>
-                    `;
-                }
-            }
-        });
-    });
-    </script>
+    <script src="{{ url_for('static', path='js/dashboard_onboarding.js') }}"></script>
 {% endblock %}
