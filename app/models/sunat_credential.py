@@ -2,20 +2,19 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-# Importamos la Base ÚNICA.
+# Importamos la Base ÚNICA desde app/db/base.py
 from app.db.base import Base
 
-class SunatCredential(Base):
+class SunatCredential(Base): # <-- Asegúrate de que hereda de Base
     __tablename__ = "sunat_credentials"
 
-    sol_username = Column(String(255), nullable=False)
-    # NOTA: La encriptación debe manejarse en la capa de servicio/CRUD, no aquí.
-    encrypted_sol_password = Column(String(512), nullable=False) 
+    # Los campos 'id', 'created_at', 'updated_at' se heredan automáticamente.
     
-    # Clave foránea al perfil del cliente. Es una relación 1 a 1, por lo que debe ser única.
+    sol_username = Column(String(255), nullable=False)
+    encrypted_sol_password = Column(String(512), nullable=False) 
     owner_client_profile_id = Column(Integer, ForeignKey("client_profiles.id", ondelete="CASCADE"), nullable=False, index=True, unique=True)
     
-    # --- Relationships ---
+    # Relationships
     owner_client_profile = relationship("ClientProfile", back_populates="sunat_credential")
     access_audits = relationship("CredentialAccessAudit", back_populates="credential", cascade="all, delete-orphan")
 

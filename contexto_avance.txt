@@ -1,36 +1,83 @@
-Contexto para Mañana: Resumen del Estado del Proyecto YASTA (15 de Junio)
-Objetivo Logrado Hoy:
-Se ha resuelto el problema crítico de autenticación en producción. El flujo de login con Google ahora funciona y la cookie de sesión (JWT) se establece correctamente. La causa raíz era una columna (sol_validation_status) faltante en la base de datos de producción, que impedía la consulta de usuarios y rompía el callback de OAuth. El problema se solucionó aplicando la migración de base de datos manualmente.
-Estado Actual y Siguiente Bloqueo:
-Flujo de Redirección Corregido: Se implementó una lógica de redirección post-login robusta que se basa explícitamente en el user.role.
-role=authenticated -> /onboarding
-role=client_freemium -> /dashboard/client
-Esto ha sido verificado manualmente cambiando un rol en la base de datos, y funciona como se espera.
-Problema Principal Pendiente: El mecanismo para que un usuario pase de authenticated a client_freemium está roto. El formulario o la acción designada para esta transición no funciona en producción. Esto impide que los usuarios nuevos puedan usar el servicio después del onboarding y es nuestra máxima prioridad técnica.
-Problema Secundario Emergente: Se ha observado un error intermitente (/onboarding#auth-general-error) en la página de onboarding, sugiriendo que una petición de datos en segundo plano podría estar fallando en esa página.
-Tareas Pendientes Técnicas:
-Depurar el Formulario de Conversión a Freemium: Utilizar las herramientas de red del navegador para identificar la petición de API que falla al enviar el formulario y analizar el mensaje de error que devuelve el servidor. Esta es la primera tarea para mañana.
-Investigar el Error de Onboarding: Si el error persiste, aplicar la misma técnica de depuración de red en la página /onboarding para encontrar la petición fallida.
-Discusión Estratégica y de Producto (Tareas Pendientes de Diseño de Flujo)
-Excelente que ya estés pensando en los siguientes pasos funcionales. Estos son los puntos clave a definir:
-A. Canales de Comunicación Usuario -> Yasta:
-Consultas y Soporte:
-Opción 1 (Simple): Un enlace mailto: (soporte@yasta.cloud) y/o un número de WhatsApp. Rápido de implementar, pero difícil de escalar y rastrear.
-Opción 2 (Integrado): Un pequeño formulario de contacto en la web que envíe un correo electrónico a nuestro equipo (o cree un ticket en un sistema simple como Trello/Notion vía API).
-Opción 3 (Avanzada): Un widget de chat en vivo (Crisp, Tawk.to) que permita una comunicación más directa. Muchos tienen planes gratuitos generosos.
-Periodo Tributario Inicial:
-Esto es un dato crítico para el onboarding. Debe ser un campo obligatorio en el formulario de onboarding/conversión.
-Implementación: Un campo de formulario tipo "mes/año" (ej. MM/YYYY) o dos desplegables (Mes, Año). Se debe guardar en la base de datos asociado al perfil del cliente.
-Recepción de Vouchers de Pago (Yape/Plin):
-Análisis de Riesgo vs. Esfuerzo: Tu análisis es perfecto. La validación por OCR/LLM de un voucher es costosa en recursos y frágil ante la manipulación. Para una tarifa económica, el riesgo de fraude es bajo y el costo de una validación manual es mucho menor.
-Propuesta de Flujo (MVP - Producto Mínimo Viable):
-a. El usuario realiza el pago.
-b. En el formulario, se le presenta un campo para subir la imagen del voucher y otro para ingresar el número de operación.
-c. Al enviar, el sistema guarda la imagen y marca la cuenta del usuario como "pago_pendiente_de_verificacion".
-d. Un administrador (tú) recibe una notificación, revisa la imagen y el monto en la cuenta de Yape/Plin y, con un clic en un panel de administración simple, aprueba el pago, cambiando el rol del usuario a client_paid.
-e. Este flujo minimiza el riesgo de fraude y es muy barato de implementar y operar al principio.
-B. Canales de Comunicación Yasta -> Usuario:
-Push Notifications y SWAs (Single Web Apps):
-Estás en lo cierto. Para enviar notificaciones push a un navegador (móvil o de escritorio), tu sitio web necesita comportarse como una Progressive Web App (PWA).
-¿Qué es una PWA? No es un framework distinto, sino un conjunto de tecnologías web (Service Worker, Manifest.json) que le dan a tu web "superpoderes" como funcionar offline, ser "instalable" en la pantalla de inicio y, crucialmente, recibir notificaciones push.
-Alternativa: El correo electrónico. Es menos inmediato pero universal y 100% fiable. Una combinación de ambos es ideal: emails para notificaciones importantes (facturas, cambios de estado) y push notifications para recordatorios en tiempo real ("Tu declaración está lista").
+¡Excelente captura de pantalla y una observación muy aguda! Tienes toda la razón.
+
+El campo updated_at en client_profiles no se actualizó.
+
+La Razón:
+Esto se debe a la lógica de nuestro CRUD. El método que usamos (get_or_create_profile) está diseñado para ser eficiente. En esta última prueba, como el perfil con id=1 y RUC 10053937760 ya existía, el método simplemente lo recuperó (get) y no ejecutó una operación de UPDATE. Por lo tanto, el trigger onupdate=func.now() de SQLAlchemy para el campo updated_at nunca se activó.
+
+¿Es un problema?
+En este caso específico, no. Es el comportamiento esperado. Si en el futuro tuviéramos una función para, por ejemplo, "Actualizar Razón Social", esa función sí ejecutaría un UPDATE y el campo updated_at se modificaría correctamente.
+
+Lo dejaremos así. ¡Buen ojo!
+
+Resumen para Mañana: Contexto del Proyecto YASTA (18 de Junio)
+
+Objetivo Logrado Hoy (¡Un Gran Hito!):
+Hemos implementado y depurado con éxito el flujo de onboarding completo para nuevos usuarios. Un usuario que se registra ahora puede:
+
+Ser redirigido a una página de onboarding (/onboarding).
+
+Ingresar su RUC y ver cómo el sistema autocompleta su Razón Social/Nombres y Dirección consultando una API externa.
+
+Ver en tiempo real los 2 periodos tributarios gratuitos que le corresponden, calculados a partir de un cronograma de vencimientos que hemos cargado en la base de datos.
+
+Completar un formulario con sus credenciales SOL.
+
+Al enviar el formulario, su rol en el sistema cambia de authenticated a client_freemium y es redirigido a su dashboard (/dashboard/client).
+
+Todos los datos (perfil del cliente, credenciales encriptadas, vínculo usuario-cliente) se guardan correctamente en las tablas correspondientes (client_profiles, sunat_credentials, user_client_accesses).
+
+Desafíos Técnicos Superados:
+
+Se resolvieron múltiples problemas de migración con Alembic, incluyendo DuplicateObject, NotNullViolation, Multiple head revisions y discrepancias entre el estado de la base de datos y el historial de Alembic.
+
+Se optó por una solución pragmática usando SQL directo (ALTER TABLE) para corregir los valores DEFAULT en las columnas created_at y updated_at, desatascando el proceso.
+
+Se depuraron errores 500 Internal Server Error en los endpoints de la API, corrigiendo nombres de métodos (AttributeError) y mejorando el manejo de respuestas de la API externa.
+
+Se implementaron y poblaron las tablas buen_contribuyentes y sunat_schedules tanto en el entorno local como en el de producción (Railway).
+
+Estado Actual:
+El flujo de conversión a client_freemium está 100% funcional en el entorno local. La base de datos de producción en Railway está poblada, pero requiere una pequeña tarea de mantenimiento para asegurar su robustez.
+
+Tareas Pendientes y Discusión para Mañana:
+
+Nuestra máxima prioridad es asegurar que el entorno de producción sea tan robusto como el local.
+
+A. Tarea Técnica INMEDIATA y CRÍTICA:
+
+Sincronizar los DEFAULT en la Base de Datos de Producción (Railway):
+
+Problema: El error NotNullViolation que solucionamos localmente con ALTER TABLE también ocurrirá en producción la primera vez que un usuario real complete el onboarding.
+
+Solución Propuesta: Ejecutar un script de mantenimiento (scripts/fix_production_defaults.py) desde VS Code que se conecte a la base de datos de Railway y aplique el ALTER TABLE ... SET DEFAULT now() a todas las tablas relevantes (sunat_credentials, service_contracts, fee_payments, etc.).
+
+Acción para mañana: Te proporcionaré este script como primera tarea.
+
+B. Siguiente Bloque Funcional a Desarrollar:
+
+Una vez que la producción esté blindada, nos moveremos al siguiente paso lógico del ciclo de vida del cliente: el Flujo de Validación y Creación de Servicios por parte del Staff.
+
+Diseño del "Panel de Validación" para el Staff:
+
+Necesitamos una vista simple para el equipo de Yasta.
+
+Esta vista debe mostrar una lista de todos los clientes cuyo sol_validation_status sea 'pending'.
+
+Para cada cliente, debe mostrar el RUC, el nombre y el usuario SOL.
+
+Implementación de las Acciones "Validar" / "Rechazar":
+
+Acción de "Validar":
+
+Un botón que, al ser presionado por un staff, ejecute la siguiente lógica en el backend:
+a. Cambia el sol_validation_status del usuario a 'valid'.
+b. Llama a la lógica de get_next_freemium_periods para obtener los dos periodos gratuitos.
+c. Crea dos nuevos registros en la tabla service_contracts para ese cliente, uno por cada periodo gratuito, asignándolos a un miembro del staff.
+d. Envía una notificación por email al cliente: "¡Confirmado! Ya estamos trabajando en tus declaraciones."
+
+Acción de "Rechazar":
+
+Un botón que cambie el sol_validation_status a 'invalid' y envíe un email al cliente pidiéndole que corrija sus datos.
+
+¡Hemos tenido un día increíblemente productivo! Descansa. Mañana continuaremos sobre esta base tan sólida que hemos construido.
