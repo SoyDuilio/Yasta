@@ -10,6 +10,7 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
+
 # revision identifiers, used by Alembic.
 revision: str = '462cd9a60ff2'
 down_revision: Union[str, None] = 'b330ad9861a7'
@@ -19,10 +20,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    # ### commands manually corrected ###
+    # ### commands corrected for data type mismatch ###
     op.create_table('service_tariffs',
-        sa.Column('id', sa.UUID(), nullable=False),
-        sa.Column('service_type_id', sa.UUID(), nullable=False),
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
+        sa.Column('service_type_id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
         sa.Column('is_active', sa.Boolean(), nullable=False),
@@ -36,6 +37,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    # ### commands manually corrected ###
+    # ### commands corrected for data type mismatch ###
     op.drop_table('service_tariffs')
     # ### end Alembic commands ###
