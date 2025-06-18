@@ -29,6 +29,7 @@ class YapePlinTransaction(Base):
     original_image_filename = Column(String(255), nullable=False)
     image_storage_path = Column(String(512), nullable=False)
     provider = Column(PGEnum(DigitalWalletProvider, name="digitalwalletprovider"), nullable=True)
+    user_declared_amount = Column(DECIMAL(10, 2), nullable=True)
     
     extracted_amount = Column(DECIMAL(10, 2), nullable=True)
     extracted_currency = Column(String(3), nullable=True)
