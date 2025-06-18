@@ -20,6 +20,9 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.core.templating import mount_static_files
 
+# ### NUEVA LÍNEA 1 de 2: Importamos el router de pagos web ###
+from app.routers import payments as web_payments_router
+
 # --- ¡LA SOLUCIÓN DEFINITIVA ESTÁ AQUÍ! ---
 # 1. Se importa el paquete de modelos. Esto ejecuta app/models/__init__.py
 #    y carga TODOS los modelos en el orden correcto en la memoria de SQLAlchemy.
@@ -66,8 +69,17 @@ mount_static_files(app)
 
 # --- ROUTERS ---
 # Para cuando se incluyen los routers, SQLAlchemy ya conoce todos los modelos.
+
+# Rutas de la API (JSON)
 app.include_router(v1_api_router, prefix=settings.API_V1_STR)
+
+# Rutas Web (HTML)
 app.include_router(pages_router.router)
+
+# ### NUEVA LÍNEA 2 de 2: Incluimos el nuevo router para la aplicación web de pagos ###
+# Esto sigue la arquitectura limpia de separar API y Web App
+app.include_router(web_payments_router.router, prefix="/app", tags=["Web App - Payments"])
+
 
 # --- Health Check ---
 @app.get("/health", tags=["Utilities"])
