@@ -34,6 +34,7 @@ class FeePayment(Base):
     status = Column(PGEnum(FeePaymentStatus, name="feepaymentstatus"), default=FeePaymentStatus.PENDING_VERIFICATION, nullable=False)
     verification_notes = Column(Text, nullable=True)
     includes_sunat_tax_amount = Column(DECIMAL(10, 2), nullable=True, default=0.00)
+    security_code = Column(String(3), nullable=True, comment="Optional security code from payment apps like Yape.")
 
     # Relationships
     service_contract = relationship("ServiceContract", back_populates="fee_payments")

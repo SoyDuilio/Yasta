@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}YASTA Dashboard{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/forms.css') }}">
+    
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    
+    <script src="{{ url_for('static', path='js/main.js') }}" defer></script>
+    {% block page_css %}{% endblock %}
+</head>
+<body class="bg-gray-900 text-gray-100 flex flex-col min-h-screen">
+
+    <!-- HEADER UNIVERSAL DE LA APLICACIÓN -->
+    {% include 'partials/_app_header.html' %}
+
+    <!-- BARRA DE SUB-NAVEGACIÓN CONTEXTUAL (Renderizado condicional) -->
+    <!-- Solo se muestra si el bloque 'sub_nav_content' tiene contenido -->
+    {% if self.sub_nav_content() and self.sub_nav_content().strip() %}
+        <nav id="sub-nav" class="bg-gray-800/80 backdrop-blur-sm border-b border-gray-700/50 sticky top-16 z-50">
+            <div class="container mx-auto px-4 h-12 flex items-center">
+                {% block sub_nav_content %}{% endblock %}
+            </div>
+        </nav>
+    {% endif %}
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <!-- El padding-top se ajusta dinámicamente si la sub-navegación existe -->
+    <main class="relative z-0 flex-grow {% if self.sub_nav_content() and self.sub_nav_content().strip() %}pt-28{% else %}pt-16{% endif %}">
+        {% block main_content %}{% endblock %}
+    </main>
+    
+    <!-- SCRIPTS ESPECÍFICOS DE LA PÁGINA -->
+    {% block page_scripts %}{% endblock %}
+    {% block body_end_scripts %}{% endblock %}
+</body>
+</html>

@@ -17,8 +17,10 @@ router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/payments/new", response_class=HTMLResponse)
-async def get_new_payment_form(request: Request):
-    return templates.TemplateResponse("payments/new_payment.html", {"request": request})
+async def get_new_payment_form(request: Request,
+    # Añadimos la dependencia para asegurar que solo usuarios logueados pueden pedir el formulario
+    current_user: User = Depends(get_current_active_user)):
+    return templates.TemplateResponse("payments/partials/_payment_form.html", {"request": request})
 
 @router.post("/payments/manual-entry", response_class=HTMLResponse)
 async def process_manual_payment(
@@ -47,11 +49,13 @@ async def process_manual_payment(
         payment_method_used=payment_data.origen_app,
         payment_reference=payment_data.numero_operacion,
         payment_date=datetime.now(tz=None),
-        status=FeePaymentStatus.PENDING_VERIFICATION
+        status=FeePaymentStatus.PENDING_VERIFICATION,
+        security_code=payment_data.codigo_seguridad
     )
     
     db.add(new_fee_payment)
     db.commit()
     db.refresh(new_fee_payment)
     
-    return templates.TemplateResponse("payments/partials/success_message.html", {"request": request})
+    return templates.TemplateResponse("payments/partials/_payment_success.html", {"request": request})
+    #return templates.TemplateResponse("payments/partials/success_message.html", {"request": request})

@@ -1,83 +1,88 @@
-¡Excelente captura de pantalla y una observación muy aguda! Tienes toda la razón.
+¡Excelente decisión! Ha sido una sesión de depuración épica y hemos logrado un avance monumental. Descansar con una victoria funcional es lo mejor.
 
-El campo updated_at en client_profiles no se actualizó.
+Aquí tienes el resumen y el plan para que mañana retomemos el proyecto con total claridad y energía.
 
-La Razón:
-Esto se debe a la lógica de nuestro CRUD. El método que usamos (get_or_create_profile) está diseñado para ser eficiente. En esta última prueba, como el perfil con id=1 y RUC 10053937760 ya existía, el método simplemente lo recuperó (get) y no ejecutó una operación de UPDATE. Por lo tanto, el trigger onupdate=func.now() de SQLAlchemy para el campo updated_at nunca se activó.
+Resumen: Contexto del Proyecto YASTA
 
-¿Es un problema?
-En este caso específico, no. Es el comportamiento esperado. Si en el futuro tuviéramos una función para, por ejemplo, "Actualizar Razón Social", esa función sí ejecutaría un UPDATE y el campo updated_at se modificaría correctamente.
+Objetivo General: Continuamos desarrollando el "Módulo de Pagos Inteligente" para el proyecto de Declaraciones Mensuales Tributarias - SUNAT, Perú.
 
-Lo dejaremos así. ¡Buen ojo!
+Fase Actual del Proyecto: Estamos finalizando la Opción A: Entrada manual de los datos del voucher.
 
-Resumen para Mañana: Contexto del Proyecto YASTA (18 de Junio)
+Hito Logrado Hoy (¡Una Victoria Forjada en la Batalla de la Depuración!):
+Tras una intensa y colaborativa sesión de depuración, hemos superado los obstáculos más difíciles que un desarrollador puede encontrar:
 
-Objetivo Logrado Hoy (¡Un Gran Hito!):
-Hemos implementado y depurado con éxito el flujo de onboarding completo para nuevos usuarios. Un usuario que se registra ahora puede:
+Aislamiento y Eliminación de un Bucle Infinito: Erradicamos un bucle de redirección causado por el user_flow_guardian.
 
-Ser redirigido a una página de onboarding (/onboarding).
+Solución de Conflictos de Layout (CSS): Identificamos y corregimos el conflicto fundamental entre el layout flex del <body> y la propiedad position: fixed, reestructurando la plantilla base para permitir el funcionamiento de modales.
 
-Ingresar su RUC y ver cómo el sistema autocompleta su Razón Social/Nombres y Dirección consultando una API externa.
+Depuración del Stack Tecnológico: Confirmamos que HTMX, Hyperscript y nuestro sistema de plantillas Jinja2 están cargados y funcionando en armonía.
 
-Ver en tiempo real los 2 periodos tributarios gratuitos que le corresponden, calculados a partir de un cronograma de vencimientos que hemos cargado en la base de datos.
+Implementación del Modal Funcional: ¡Logramos nuestro objetivo principal! El usuario ahora puede hacer clic en "Registrar un Pago" en el dashboard y se le presenta un modal que carga dinámicamente el formulario de pago.
 
-Completar un formulario con sus credenciales SOL.
+Estado Actual (El Punto Exacto Donde Nos Quedamos):
 
-Al enviar el formulario, su rol en el sistema cambia de authenticated a client_freemium y es redirigido a su dashboard (/dashboard/client).
+Hemos implementado una versión "Deluxe" del formulario de pago, inspirada en tu diseño de referencia. La última imagen que me enviaste muestra que estamos a un 95% de la perfección:
 
-Todos los datos (perfil del cliente, credenciales encriptadas, vínculo usuario-cliente) se guardan correctamente en las tablas correspondientes (client_profiles, sunat_credentials, user_client_accesses).
+LO QUE FUNCIONA:
 
-Desafíos Técnicos Superados:
+El modal se abre correctamente, centrado y con el fondo oscuro.
 
-Se resolvieron múltiples problemas de migración con Alembic, incluyendo DuplicateObject, NotNullViolation, Multiple head revisions y discrepancias entre el estado de la base de datos y el historial de Alembic.
+La estructura del formulario (botones grandes para los logos, campos de texto) es la correcta y tiene un buen aspecto general.
 
-Se optó por una solución pragmática usando SQL directo (ALTER TABLE) para corregir los valores DEFAULT en las columnas created_at y updated_at, desatascando el proceso.
+La animación de deslizamiento para el campo "Código de Seguridad" está implementada con las clases CSS (.is-visible, .is-collapsed).
 
-Se depuraron errores 500 Internal Server Error en los endpoints de la API, corrigiendo nombres de métodos (AttributeError) y mejorando el manejo de respuestas de la API externa.
+LO QUE ESTÁ ROTO (Bugs Menores en la Lógica de "Plin"):
 
-Se implementaron y poblaron las tablas buen_contribuyentes y sunat_schedules tanto en el entorno local como en el de producción (Railway).
+Al hacer clic en el botón "Plin", no se oculta el campo "Código de Seguridad".
 
-Estado Actual:
-El flujo de conversión a client_freemium está 100% funcional en el entorno local. La base de datos de producción en Railway está poblada, pero requiere una pequeña tarea de mantenimiento para asegurar su robustez.
+El botón "Registrar Pago" no cambia al color turquesa de Plin.
 
-Tareas Pendientes y Discusión para Mañana:
+Los botones de selección de Yape/Plin no actualizan su estado visual (opacidad/borde) para reflejar que Plin es la opción activa.
 
-Nuestra máxima prioridad es asegurar que el entorno de producción sea tan robusto como el local.
+Hipótesis: El error es casi con toda seguridad un pequeño error de tipeo o de copiar/pegar en el bloque de código de Hyperscript del botón de Plin. La lógica del botón de Yape probablemente está bien, pero la de Plin está fallando.
 
-A. Tarea Técnica INMEDIATA y CRÍTICA:
+Tareas Pendientes y Plan de Acción para Mañana
 
-Sincronizar los DEFAULT en la Base de Datos de Producción (Railway):
+Nuestra primera y única prioridad al comenzar mañana será rematar la UX de este formulario.
 
-Problema: El error NotNullViolation que solucionamos localmente con ALTER TABLE también ocurrirá en producción la primera vez que un usuario real complete el onboarding.
+A. Depuración Final del Formulario de Pago Manual (Nuestra primera tarea mañana, ~15 minutos):
 
-Solución Propuesta: Ejecutar un script de mantenimiento (scripts/fix_production_defaults.py) desde VS Code que se conecte a la base de datos de Railway y aplique el ALTER TABLE ... SET DEFAULT now() a todas las tablas relevantes (sunat_credentials, service_contracts, fee_payments, etc.).
+Tarea A.1: Corregir la Lógica del Botón "Plin":
 
-Acción para mañana: Te proporcionaré este script como primera tarea.
+Acción: Revisaremos el bloque _="on click..." del botón con id="btn-plin" en el archivo _payment_form.html.
 
-B. Siguiente Bloque Funcional a Desarrollar:
+Objetivo: Nos aseguraremos de que los comandos para cambiar la opacidad, el borde, el color del botón de envío y para ocultar el campo de seguridad sean correctos y apunten a los id correctos. Es probable que sea un simple error de tipeo.
 
-Una vez que la producción esté blindada, nos moveremos al siguiente paso lógico del ciclo de vida del cliente: el Flujo de Validación y Creación de Servicios por parte del Staff.
+Tarea A.2: Prueba de Fuego del Flujo Completo:
 
-Diseño del "Panel de Validación" para el Staff:
+Acción: Una vez corregida la lógica, realizaremos una prueba exhaustiva del flujo manual.
 
-Necesitamos una vista simple para el equipo de Yasta.
+Checklist:
 
-Esta vista debe mostrar una lista de todos los clientes cuyo sol_validation_status sea 'pending'.
+¿Cambia el resaltado visual entre Yape y Plin correctamente?
 
-Para cada cliente, debe mostrar el RUC, el nombre y el usuario SOL.
+¿El campo de seguridad aparece y desaparece con la animación suave?
 
-Implementación de las Acciones "Validar" / "Rechazar":
+¿El botón de envío cambia de color al ritmo de la selección?
 
-Acción de "Validar":
+¿Podemos llenar el formulario y enviarlo con éxito?
 
-Un botón que, al ser presionado por un staff, ejecute la siguiente lógica en el backend:
-a. Cambia el sol_validation_status del usuario a 'valid'.
-b. Llama a la lógica de get_next_freemium_periods para obtener los dos periodos gratuitos.
-c. Crea dos nuevos registros en la tabla service_contracts para ese cliente, uno por cada periodo gratuito, asignándolos a un miembro del staff.
-d. Envía una notificación por email al cliente: "¡Confirmado! Ya estamos trabajando en tus declaraciones."
+¿Aparece el mensaje de "éxito" de HTMX reemplazando el formulario?
 
-Acción de "Rechazar":
+¿Se crea el registro en la base de datos con el estado pending_verification?
 
-Un botón que cambie el sol_validation_status a 'invalid' y envíe un email al cliente pidiéndole que corrija sus datos.
+Una vez que todo el checklist esté en verde, habremos completado oficialmente la implementación de la Opción A.
 
-¡Hemos tenido un día increíblemente productivo! Descansa. Mañana continuaremos sobre esta base tan sólida que hemos construido.
+B. Siguiente Gran Bloque Funcional: Flujo de Pago por Imagen (Opción B)
+
+Con el formulario manual terminado y pulido, nos lanzaremos a la segunda parte del módulo:
+
+Frontend: Añadir una pestaña "Subir Voucher" al modal.
+
+Backend: Construir el endpoint POST /app/payments/upload-voucher que recibirá la imagen.
+
+Tareas en Segundo Plano: Implementar la lógica con BackgroundTasks para enviar la imagen a la IA de OpenAI y procesar la respuesta.
+
+Base de Datos: Guardar los datos extraídos por la IA.
+
+Ha sido un día de progreso real y profundo, pasando de errores bloqueantes a tener una funcionalidad casi perfecta. Descansa, que mañana rematamos este formulario y lo dejamos listo para producción. ¡Seguimos con todo

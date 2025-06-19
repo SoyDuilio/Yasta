@@ -1,0 +1,109 @@
+<!-- app/templates/dev/dashboard.html -->
+{% extends "layouts/_app_base.html" %}
+
+{% block title %}Dev Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-8">
+    <h1 class="text-4xl font-bold mb-8">🛠️ Developer Dashboard</h1>
+
+    <!-- Sección de Pagos Recientes -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-semibold mb-4">Pagos Recientes</h2>
+        <div class="overflow-x-auto bg-gray-800 rounded-lg">
+            <table class="min-w-full text-left">
+                <thead class="border-b border-gray-700">
+                    <tr>
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Usuario</th>
+                        <th class="p-4">Monto</th>
+                        <th class="p-4">Estado</th>
+                        <th class="p-4">Fecha</th>
+                        <th class="p-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr class="border-b border-gray-700">
+                        <td class="p-4">{{ payment.id }}</td>
+                        <td class="p-4">{{ payment.user.email }}</td>
+                        <td class="p-4">S/ {{ "%.2f"|format(payment.amount) }}</td>
+                        <td class="p-4"><span class="px-2 py-1 text-sm rounded-full bg-blue-900">{{ payment.status }}</span></td>
+                        <td class="p-4">{{ payment.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="p-4">
+                            <button class="text-indigo-400 hover:underline">Cambiar Estado</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Sección de Usuarios -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-semibold mb-4">Usuarios</h2>
+        <div class="overflow-x-auto bg-gray-800 rounded-lg">
+            <table class="min-w-full text-left">
+                <thead class="border-b border-gray-700">
+                    <tr>
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Email</th>
+                        <th class="p-4">Rol</th>
+                        <th class="p-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="border-b border-gray-700">
+                        <td class="p-4">{{ user.id }}</td>
+                        <td class="p-4">{{ user.email }}</td>
+                        <td class="p-4">{{ user.role }}</td>
+                        <td class="p-4">
+                             <button class="text-indigo-400 hover:underline">Cambiar Rol</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Puedes añadir la tabla de Clientes aquí de forma similar -->
+    <!-- CORRECCIÓN: Nueva sección para Perfiles de Cliente -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-semibold mb-4">Perfiles de Cliente (Clients)</h2>
+        <div class="overflow-x-auto bg-gray-800 rounded-lg">
+            <table class="min-w-full text-left">
+                <thead class="border-b border-gray-700">
+                    <tr>
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Nombre Comercial</th>
+                        <th class="p-4">RUC</th>
+                        <th class="p-4">Tipo</th>
+                        <th class="p-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- La variable 'clients' ahora contiene objetos ClientProfile -->
+                    {% for client in clients %} 
+                    <tr class="border-b border-gray-700">
+                        <td class="p-4">{{ client.id }}</td>
+                        <td class="p-4">{{ client.trade_name }}</td>
+                        <td class="p-4">{{ client.ruc }}</td>
+                        <td class="p-4">{{ client.client_type }}</td>
+                        <td class="p-4">
+                             <button class="text-indigo-400 hover:underline">Ver Detalles</button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="p-4 text-center text-gray-500">No hay perfiles de cliente registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

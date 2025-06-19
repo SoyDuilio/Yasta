@@ -20,9 +20,7 @@
     {% if current_user.sol_validation_status.value == 'valid' %}
         <div class="flex items-center space-x-4">
             <a href="#" class="px-1 py-2 text-sm font-semibold text-white border-b-2 border-indigo-500">Resumen</a>
-            <a href="#" class="px-1 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-gray-500 transition-colors duration-200">Declaraciones</a>
-            <a href="#" class="px-1 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-gray-500 transition-colors duration-200">Pagos</a>
-            <a href="#" class="px-1 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-gray-500 transition-colors duration-200">Configuración</a>
+            <!-- ... otros enlaces ... -->
         </div>
     {% endif %}
 {% endblock %}
@@ -30,48 +28,24 @@
 
 {% block main_content %}
 <div class="container mx-auto px-4">
-
     {% if current_user.sol_validation_status.value != 'valid' %}
-
-        <!-- ***** INICIO DE LA CORRECCIÓN FINAL ***** -->
-        <!-- Bloque de Onboarding Reescrito desde Cero para Máxima Simplicidad y Control -->
-        <div class="flex flex-col items-center justify-center pt-16 text-center">
-            
-            <!-- Contenedor del Icono con tamaño FIJO -->
-            <div class="flex items-center justify-center w-20 h-20 rounded-full bg-indigo-500/20 mb-6">
-                <svg class="w-10 h-10 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm0 13.036h.008v.008h-.008v-.008z" />
-                </svg>
-            </div>
-            
-            <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Conecta tu Clave SOL para empezar</h2>
-            
-            <p class="mt-4 max-w-2xl text-lg leading-8 text-gray-300">
-                Estás a un solo paso de activar tu dashboard. Al conectar tu Clave SOL, podremos automatizar tus impuestos y darte visibilidad total de tu negocio.
-            </p>
-            
-            <div class="mt-10">
-                <a href="{{ url_for('onboarding_start_page') }}" class="rounded-md bg-indigo-600 px-5 py-3 text-base font-semibold text-white shadow-lg hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-transform hover:scale-105">
-                    Completar mi registro
-                </a>
-            </div>
-            
-            <div class="mt-8 flex items-center text-xs text-gray-500">
-                <svg class="h-4 w-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 00-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                </svg>
-                <span>Tus credenciales se almacenan de forma segura y encriptada.</span>
-            </div>
-        </div>
-        <!-- ***** FIN DE LA CORRECCIÓN FINAL ***** -->
-
+        <!-- Vista de Onboarding -->
     {% else %}
-
-        <!-- VISTA 2: DASHBOARD COMPLETO Y FUNCIONAL -->
+        <!-- DASHBOARD COMPLETO -->
         <div>
-            <header class="mb-8">
-                <h1 class="text-3xl font-bold text-white">Resumen del Periodo</h1>
-                <p class="text-gray-400 mt-1">Hola {{ current_user.contact_name }}, aquí tienes un vistazo rápido de tu situación fiscal.</p>
+            <header class="mb-8 flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Resumen del Periodo</h1>
+                    <p class="text-gray-400 mt-1">Hola {{ current_user.contact_name }}, aquí tienes un vistazo rápido.</p>
+                </div>
+                <div>
+                    <!-- Botón que USA TU SISTEMA: añade la clase 'active' -->
+                    <button 
+                        _="on click add .active to #payment-modal"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg">
+                        Registrar un Pago
+                    </button>
+                </div>
             </header>
             <div class="dashboard-grid">
                 <div class="dashboard-widget"><h3 class="widget-title">Impuesto por Pagar (Junio)</h3><p class="kpi-value">S/ 1,250.00</p><p class="kpi-label">IGV + Renta</p></div>
@@ -81,24 +55,29 @@
                 <div class="dashboard-widget"><h3 class="widget-title">Distribución de Gastos</h3><div class="chart-container-widget"><canvas id="clientPieChart"></canvas></div></div>
             </div>
         </div>
-
     {% endif %}
 </div>
 {% endblock %}
 
 
+{% block body_end_scripts %}
+    <!-- Modal que AHORA USA TU SISTEMA: tiene la clase '.modal' -->
+    <div id="payment-modal" 
+         class="modal"
+         hx-get="/app/payments/new?cache_bust={{ now() | int }}" 
+         hx-trigger="load" 
+         hx-target="#payment-modal-content"
+         hx-swap="innerHTML">
+        <div id="payment-modal-content">
+            <!-- El contenido del formulario se cargará aquí -->
+            <div class="htmx-indicator text-white text-center"><p>Cargando...</p></div>
+        </div>
+    </div>
+{% endblock %}
+
 {% block page_scripts %}
     {% if current_user.sol_validation_status.value == 'valid' %}
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof Chart !== 'undefined') {
-                const lineChartElement = document.getElementById('clientLineChart');
-                const pieChartElement = document.getElementById('clientPieChart');
-                if (lineChartElement) { new Chart(lineChartElement, { type: 'line', data: { labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'], datasets: [{ label: 'Impuestos', data: [650, 590, 800, 810, 560, 1250], borderColor: '#818cf8', tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } } } }); }
-                if(pieChartElement) { new Chart(pieChartElement, { type: 'doughnut', data: { labels: ['Planillas', 'Servicios', 'Compras', 'Otros'], datasets: [{ data: [300, 150, 200, 50], backgroundColor: ['#c084fc', '#f87171', '#fbbf24', '#60a5fa'], borderColor: '#1f2937', borderWidth: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#d1d5db', padding: 10 } } } } }); }
-            }
-        });
-        </script>
+        <!-- ... script de charts ... -->
     {% endif %}
 {% endblock %}

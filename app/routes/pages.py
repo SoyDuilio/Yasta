@@ -19,8 +19,7 @@ async def user_flow_guardian(
     current_user: Optional[User] = Depends(get_current_user_from_cookie)
 ):
     if not current_user:
-        print("[Guardian] No user found, exiting.")
-        return
+        return # Si no hay usuario, el guardián no hace nada.
 
     current_path = request.url.path
     user_role = current_user.role
@@ -29,38 +28,52 @@ async def user_flow_guardian(
     print(f"User: {current_user.email}, Role: {user_role.value}")
     print(f"Requested Path: {current_path}")
 
-    # Definimos las rutas de destino y las rutas permitidas
+    # Definimos rutas clave
     onboarding_path = str(request.url_for("onboarding_start_page"))
     client_dashboard_path = str(request.url_for("client_dashboard_page"))
-    # ... otros destinos
-
-    # Roles
-    client_roles = {UserRole.CLIENT_FREEMIUM, UserRole.CLIENT_PAID}
+    staff_dashboard_path = str(request.url_for("staff_dashboard_page"))
     
-    # Regla 1: Un usuario recién autenticado siempre debe ir a onboarding.
+    # Definimos Zonas Prohibidas
+    staff_zone_prefix = "/dashboard/staff"
+    client_zone_prefix = "/dashboard/client"
+
+    # --- Roles Corregidos ---
+    client_roles = {UserRole.CLIENT_FREEMIUM, UserRole.CLIENT_PAID}
+    staff_roles = {
+        UserRole.STAFF_COLLABORATOR,
+        UserRole.STAFF_MANAGER,
+        UserRole.STAFF_CEO,
+        UserRole.ADMIN
+    }
+
+    # Regla 1: Usuario en Onboarding
     if user_role == UserRole.AUTHENTICATED:
         if current_path != onboarding_path:
             print(f"[Guardian] REDIRECTING 'authenticated' user to onboarding.")
-            raise HTTPException(status_code=307, headers={"Location": onboarding_path})
-        print(f"[Guardian] 'authenticated' user is already on onboarding. Allowing.")
+            raise HTTPException(status_code=307, detail="Redirecting to onboarding", headers={"Location": onboarding_path})
         return
 
-    # Regla 2: Un usuario Cliente.
+    # Regla 2: Usuario Cliente
     elif user_role in client_roles:
-        client_zone_prefix = "/dashboard/client"
-        if not current_path.startswith(client_zone_prefix):
-            print(f"[Guardian] Client is outside client zone.")
-            if current_path == onboarding_path:
-                print(f"[Guardian] Client is on onboarding page. Allowing.")
-                return
-            
-            print(f"[Guardian] REDIRECTING client to client dashboard.")
-            raise HTTPException(status_code=307, headers={"Location": client_dashboard_path})
-    
-    print(f"[Guardian] No redirection rules matched. Allowing access to {current_path}.")
-    # ... resto de las reglas para staff ...
-    # Si ninguna regla de redirección se aplicó, significa que el usuario está
-    # en una página permitida para su rol. El flujo continúa.
+        # Un cliente NO PUEDE estar en la zona de staff.
+        if current_path.startswith(staff_zone_prefix):
+            print(f"[Guardian] DENYING client access to staff zone. Redirecting to client dashboard.")
+            raise HTTPException(status_code=307, detail="Redirecting to client dashboard", headers={"Location": client_dashboard_path})
+        
+        # Un cliente que ya pasó el onboarding no debería volver a la página de onboarding.
+        if current_path == onboarding_path:
+            print(f"[Guardian] Client already onboarded. Redirecting from onboarding to dashboard.")
+            raise HTTPException(status_code=307, detail="Redirecting to client dashboard", headers={"Location": client_dashboard_path})
+
+    # Regla 3: Usuario Staff
+    elif user_role in staff_roles:
+        # Un staff NO PUEDE estar en la zona de cliente.
+        if current_path.startswith(client_zone_prefix):
+             print(f"[Guardian] DENYING staff access to client zone. Redirecting to staff dashboard.")
+             raise HTTPException(status_code=307, detail="Redirecting to staff dashboard", headers={"Location": staff_dashboard_path})
+
+    print(f"[Guardian] No redirection rules matched for {current_path}. Allowing access.")
+    # Si ninguna regla de redirección se aplicó, se permite el acceso.
 
 APP_DIR_FOR_STATIC = Path(__file__).resolve().parent.parent.parent.parent
 router = APIRouter(tags=["Frontend Pages"])

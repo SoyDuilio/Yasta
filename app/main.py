@@ -1,60 +1,48 @@
 # app/main.py
-from app.core.config import settings
-print("--- INICIANDO VERIFICACIÓN DE SECRET_KEY ---")
-try:
-    # Usamos str() para asegurarnos de que funciona aunque Pydantic use un tipo SecretStr
-    key_str = str(settings.SECRET_KEY)
-    if len(key_str) > 8:
-        print(f"SECRET_KEY cargada correctamente. Fragmento: {key_str[:4]}...{key_str[-4:]}")
-    else:
-        print("ADVERTENCIA: SECRET_KEY es demasiado corta o no se cargó.")
-    print(f"ENVIRONMENT: {settings.ENVIRONMENT}")
-except Exception as e:
-    print(f"ERROR al leer la SECRET_KEY de la configuración: {e}")
-print("------------------------------------------")
 
+# --- 1. Importaciones de Librerías Estándar y de Terceros ---
 from fastapi import FastAPI
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi.routing import APIRoute
 
+# --- 2. Importaciones del Proyecto (Organizadas por Módulo) ---
+from app.core.config import settings
 from app.core.templating import mount_static_files
 
-# ### NUEVA LÍNEA 1 de 2: Importamos el router de pagos web ###
-from app.routers import payments as web_payments_router
-
-# --- ¡LA SOLUCIÓN DEFINITIVA ESTÁ AQUÍ! ---
-# 1. Se importa el paquete de modelos. Esto ejecuta app/models/__init__.py
-#    y carga TODOS los modelos en el orden correcto en la memoria de SQLAlchemy.
+# La importación de 'models' es crucial y debe ir antes de los routers
+# para asegurar que SQLAlchemy conozca todos los modelos de antemano.
 from app import models
 
-# 2. Se importan los routers DESPUÉS de que los modelos ya son conocidos.
+# Importamos los routers que se registrarán en la aplicación principal.
+# Se usan alias para mayor claridad.
 from app.apis.v1.api import api_router as v1_api_router
-from app.apis.v1.endpoints import pages as pages_router
+from app.routes import pages as pages_router
+from app.routes import payments as web_payments_router
+from app.routes import dev_tools as dev_tools_router
 
-
+# --- 3. Inicialización de la Aplicación FastAPI ---
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
 )
 
+# --- 4. Configuración de Middlewares ---
+# Middleware para manejar correctamente los headers de proxies.
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
-# --- MIDDLEWARES (Session, CORS) ---
-# Versión corregida y segura para producción
-# Leemos una variable de entorno. Si no existe, asumimos que no es producción.
-# El '0' al final es el valor por defecto si la variable no se encuentra.
+# Middleware para manejar las sesiones de usuario a través de cookies.
 IS_PRODUCTION = settings.ENVIRONMENT == "production"
-
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.SECRET_KEY,
-    # El valor de https_only ahora depende del entorno
-    https_only=IS_PRODUCTION,
+    https_only=IS_PRODUCTION,  # Solo cookies seguras en producción
     same_site="lax",
-    max_age=14 * 24 * 60 * 60  # 14 días
+    max_age=14 * 24 * 60 * 60  # Sesión expira en 14 días
 )
 
+# Middleware para la configuración de CORS.
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
@@ -64,24 +52,32 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
-# --- Montar archivos estáticos ---
+# --- 5. Montaje de Archivos Estáticos ---
+# Sirve la carpeta /static para CSS, JS, imágenes, etc.
 mount_static_files(app)
 
-# --- ROUTERS ---
-# Para cuando se incluyen los routers, SQLAlchemy ya conoce todos los modelos.
+# --- 6. Inclusión de Routers (Organizados por Tipo) ---
+# Para este punto, SQLAlchemy ya conoce todos los modelos.
 
-# Rutas de la API (JSON)
+# a) Rutas de la Aplicación Web (Sirven principalmente HTML)
+app.include_router(pages_router.router, tags=["Web App - Pages"])
+app.include_router(web_payments_router.router, prefix="/app", tags=["Web App - Payments"])
+app.include_router(dev_tools_router.router, prefix="/dev", tags=["Developer Tools"])
+
+# b) Rutas de la API (Sirven principalmente JSON)
 app.include_router(v1_api_router, prefix=settings.API_V1_STR)
 
-# Rutas Web (HTML)
-app.include_router(pages_router.router)
-
-# ### NUEVA LÍNEA 2 de 2: Incluimos el nuevo router para la aplicación web de pagos ###
-# Esto sigue la arquitectura limpia de separar API y Web App
-app.include_router(web_payments_router.router, prefix="/app", tags=["Web App - Payments"])
-
-
-# --- Health Check ---
+# --- 7. Endpoints de Utilidad (directamente en la raíz) ---
 @app.get("/health", tags=["Utilities"])
 async def health_check():
+    """Endpoint simple para verificar que la aplicación está en funcionamiento."""
     return {"status": "healthy"}
+
+# --- 8. Código de Depuración (Opcional) ---
+# Este bloque es útil durante el desarrollo para verificar las rutas registradas.
+if not IS_PRODUCTION:
+    print("\n--- LISTA DE RUTAS REGISTRADAS ---")
+    for route in app.routes:
+        if isinstance(route, APIRoute):
+            print(f"Path: {route.path}, Name: {route.name}, Methods: {route.methods}")
+    print("----------------------------------\n")

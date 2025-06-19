@@ -4,12 +4,10 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; font-size: 16px; }
 body {
-    position: relative;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: 'Inter', -apple-system, /* ... */;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden !important; /* Prevenir scroll horizontal */
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 img, svg, video { max-width: 100%; height: auto; display: block; }
@@ -38,6 +36,12 @@ button { font-family: inherit; cursor: pointer; }
     --bg-color: var(--color-bg-light); --bg-muted-color: var(--color-bg-muted-light);
     --border-color: var(--color-border-light); --primary-color: var(--color-primary-500);
     --accent-color: var(--color-secondary-500); --link-color: var(--color-primary-600);
+
+     /* --- NUEVAS VARIABLES DE MARCA --- */
+    --color-yape: #5A008A;
+    --color-yape-light: #7E3F9B;
+    --color-plin: #00A99D;
+    --color-plin-light: #00C7B7;
 }
 
 html.dark {

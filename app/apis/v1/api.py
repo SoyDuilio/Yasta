@@ -1,7 +1,8 @@
-# app/apis/v1/api.py
+# app/apis/v1/api.py (Corregido)
+
 from fastapi import APIRouter
 
-# Importamos todos los módulos de endpoints en una sola línea.
+# Importamos solo los endpoints que son verdaderamente de la API
 from app.apis.v1.endpoints import (
     auth,
     onboarding,
@@ -9,17 +10,18 @@ from app.apis.v1.endpoints import (
     staff,
     management,
     chatbot,
-    utils  # <-- NUEVO ROUTER DE UTILIDADES
+    utils
 )
 
 api_router = APIRouter()
 
+# Registramos los routers de la API
 api_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-api_router.include_router(onboarding.router, tags=["Onboarding"]) # Prefix ya está en el router
+api_router.include_router(onboarding.router, tags=["Onboarding"])
 api_router.include_router(clients.router, prefix="/clients", tags=["Clients"])
 api_router.include_router(staff.router, prefix="/staff", tags=["Staff"])
 api_router.include_router(management.router, prefix="/management", tags=["Management"])
 api_router.include_router(chatbot.router, prefix="/chatbot", tags=["Chatbot"])
+api_router.include_router(utils.router, tags=["Utilities"])
 
-# Incluimos el nuevo router de utilidades
-api_router.include_router(utils.router, tags=["Utilities"]) # Prefix ya está en el router
+# La referencia a 'pages.router' ha sido eliminada.
