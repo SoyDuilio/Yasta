@@ -1,7 +1,7 @@
 {
-  "name": "Reporte Rural",
-  "short_name": "ReporteRural",
-  "description": "Una PWA para reportar avistamientos de animales en zonas rurales.",
+  "name": "Reporte Simpatizantes",
+  "short_name": "Candi",
+  "description": "Una PWA para Registrar Encuestas.",
   "start_url": "/pwa",
   "display": "standalone",
   "background_color": "#2a3c4b",
@@ -9,14 +9,16 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "iconos/icon-192x192.png",
+      "src": "/static/pwa/iconos/icon-192x192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
-      "src": "iconos/icon-512x512.png",
+      "src": "/static/pwa/iconos/icon-512x512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ]
 }

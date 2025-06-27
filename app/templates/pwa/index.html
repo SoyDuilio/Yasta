@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Candi</title>
+
+    <!-- Configuración PWA y Estilos -->
     <!-- Meta tag para el color de la barra de estado en móviles -->
-    <meta name="theme-color" content="#3b5998"/>
-    <!-- Enlace al manifiesto de la PWA -->
+    <meta name="theme-color" content="#3367D6"/>
+    <meta name="vapid-public-key" content="{{ vapid_public_key }}">
     <link rel="manifest" href="{{ url_for('static', path='pwa/manifest.json') }}">
+
+    <!-- Ícono para iOS y fallback para otros dispositivos -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', path='pwa/iconos/icon-192x192.png') }}">
+
     <!-- Enlace a la hoja de estilos -->
     <link rel="stylesheet" href="{{ url_for('static', path='pwa/styles.css') }}">
     
