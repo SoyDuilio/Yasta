@@ -6,7 +6,6 @@ const CACHE_NAME = 'reporte-candi-v1';
 // Lista de archivos para almacenar en caché, con las rutas correctas
 const urlsToCache = [
   '/pwa', // La ruta principal de la PWA
-  '/static/pwa/index.html', // Es buena idea cachear el html también por su ruta estática
   '/static/pwa/styles.css',
   '/static/pwa/app.js',
   '/static/pwa/manifest.json', // El manifest también se debe cachear
