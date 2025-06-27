@@ -5,15 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}YASTA Dashboard{% endblock %}</title>
     
+     <!-- === FUENTES (NUEVO) === -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <!-- ======================= -->
+
     <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/components.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/forms.css') }}">
-    
+
+    <!-- NUESTRA HOJA DE ESTILOS, CARGADA AL FINAL PARA TENER PRIORIDAD -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/payment_flow.css') }}">
+
+
+
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+
     <script src="{{ url_for('static', path='js/main.js') }}" defer></script>
     {% block page_css %}{% endblock %}
 </head>
 <body class="bg-gray-900 text-gray-100" hx-ext="head-support">
-
     <!-- ***** INICIO DE LA REESTRUCTURACIÓN ***** -->
     <!-- Este div se convierte en el contenedor flex principal, liberando al body -->
     <div class="flex flex-col min-h-screen">
@@ -43,8 +56,25 @@
     <!-- Este bloque ahora está fuera del contenedor flex, anclado directamente al body -->
     {% block body_end_scripts %}{% endblock %}
 
-    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+<!-- ===== SCRIPT DE INICIALIZACIÓN DEFINITIVO ===== -->
+<script>
+    // Función para inicializar Hyperscript en todo el contenido existente
+    function initializeHyperscriptOnBody() {
+        _hyperscript.processNode(document.body);
+        console.log("Hyperscript inicializado en el body del DASHBOARD.");
+    }
 
+    // Se ejecuta una vez que todo el HTML inicial está listo
+    document.addEventListener('DOMContentLoaded', initializeHyperscriptOnBody);
+
+    // Se queda escuchando por cualquier contenido nuevo que HTMX traiga
+    htmx.on("htmx:afterSwap", function(evt) {
+        if (evt.detail.elt) {
+            console.log("HTMX afterSwap (Dashboard). Procesando nuevo nodo:", evt.detail.elt);
+            _hyperscript.processNode(evt.detail.elt);
+        }
+    });
+</script>
+<!-- ============================================== -->
 </body>
 </html>

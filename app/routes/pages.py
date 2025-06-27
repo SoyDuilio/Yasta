@@ -126,3 +126,19 @@ async def favicon():
     if favicon_path.is_file():
         return FileResponse(favicon_path)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+
+@router.get("/test-modal", response_class=HTMLResponse)
+async def test_modal_page(request: Request):
+    """
+    Ruta de prueba para aislar el problema del modal, HTMX e Hyperscript.
+    """
+    return templates.TemplateResponse("test_modal.html", {"request": request})
+
+@router.get("/test-modal/content", response_class=HTMLResponse)
+async def test_modal_content(request: Request):
+    """
+    Ruta que devuelve el contenido del modal (el mensaje de éxito).
+    """
+    return templates.TemplateResponse("partials/_test_success.html", {"request": request})

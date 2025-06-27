@@ -1,0 +1,12 @@
+<!-- app/templates/partials/_test_success.html -->
+<div class="modal-content" init="wait 2s then remove .active from #modal-wrapper">
+    
+    <!-- El botón de cierre 'X' -->
+    <button class="close-button" _="on click remove .active from #modal-wrapper">
+        ×
+    </button>
+    
+    <h2>¡Modal de Prueba Cargado!</h2>
+    <p>Este modal debería tener un botón 'X' funcional.</p>
+    <p>También debería cerrarse solo en 2 segundos.</p>
+</div>

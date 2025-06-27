@@ -1,11 +1,16 @@
 # app/main.py
 
 # --- 1. Importaciones de Librerías Estándar y de Terceros ---
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Depends
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.routing import APIRoute
+
+from app.core.templating import templates
+from app.core.config import settings
+
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 
 # --- 2. Importaciones del Proyecto (Organizadas por Módulo) ---
 from app.core.config import settings
@@ -81,3 +86,10 @@ if not IS_PRODUCTION:
         if isinstance(route, APIRoute):
             print(f"Path: {route.path}, Name: {route.name}, Methods: {route.methods}")
     print("----------------------------------\n")
+
+
+#PWA CANDI
+
+@app.get("/pwa", response_class=HTMLResponse)
+async def pwa_candi(request: Request):
+    return templates.TemplateResponse("pwa/index.html", {"request": request})

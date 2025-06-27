@@ -1,0 +1,128 @@
+/* app/static/css/payment_flow.css */
+
+/*
+ * ===================================================================
+ *  ESTILOS DEDICADOS PARA EL FLUJO DE REGISTRO DE PAGO (VERSIÓN 2.0)
+ *  Diseño vibrante, limpio y profesional.
+ * ===================================================================
+*/
+
+/* 0. Variables de Color del Flujo */
+:root {
+    --yasta-yape-color: #5A008A; /* Púrpura Yape */
+    --yasta-plin-color: #00A99D; /* Celeste/Teal Plin */
+}
+
+/* 1. El Contenedor Principal (sin cambios) */
+.payment-flow {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+.payment-flow.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 2. El Overlay Oscuro (sin cambios) */
+.payment-flow__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(17, 24, 39, 0.8);
+    backdrop-filter: blur(4px);
+}
+
+/* 3. El Panel Principal (DISEÑO MEJORADO) */
+.payment-flow__panel {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    
+    /* FONDO CON DEGRADADO SUTIL PARA DARLE VIDA */
+    background-image: linear-gradient(145deg, #1f2937, #111827);
+    
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    padding: 2.5rem;
+    
+    transform: scale(0.95);
+    transition: transform 0.3s ease-in-out;
+}
+.payment-flow.is-active .payment-flow__panel {
+    transform: scale(1);
+}
+
+/* 4. El Botón de Cierre (sin cambios) */
+.payment-flow__close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+}
+.payment-flow__close-btn:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+    transform: scale(1.1);
+}
+.payment-flow__close-btn svg {
+    width: 24px;
+    height: 24px;
+    color: #9ca3af;
+}
+.payment-flow__close-btn:hover svg {
+    color: #ffffff;
+}
+
+/* 5. Contenido Interno (NUEVA TIPOGRAFÍA) */
+.payment-flow__content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+    font-family: 'Inter', sans-serif; /* Fuente nítida para todo el contenido */
+}
+
+/* 6. Estilos específicos para los textos del formulario */
+.payment-flow__content .form-label {
+    font-size: 0.875rem;
+    font-weight: 500; /* Un poco más de peso para legibilidad */
+    color: #9ca3af; /* gray-400 */
+    margin-bottom: 0.5rem;
+}
+.payment-flow__content .form-input {
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+}
+.payment-flow__content h2 {
+    font-family: 'Poppins', sans-serif; /* Fuente de alto impacto para el título */
+}
+
+
+/* 7. Diseño Responsive (sin cambios) */
+@media (max-width: 640px) {
+    .payment-flow { align-items: flex-end; }
+    .payment-flow__panel {
+        width: 100%;
+        max-width: 100%;
+        height: 90vh;
+        border-radius: 1.5rem 1.5rem 0 0;
+        padding: 1.5rem;
+        transform: translateY(100%);
+    }
+    .payment-flow.is-active .payment-flow__panel { transform: translateY(0); }
+    .payment-flow__close-btn { top: 1rem; right: 1rem; }
+}

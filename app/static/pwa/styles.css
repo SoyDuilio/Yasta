@@ -1,0 +1,177 @@
+/* styles.css */
+:root {
+    --color-primario: #3b5998;
+    --color-secundario: #8b9dc3;
+    --color-fondo: #dfe3ee;
+    --color-texto: #1d2129;
+    --color-blanco: #ffffff;
+    --sombra-caja: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    text-align: center;
+}
+
+header {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+    padding: 1rem;
+    box-shadow: var(--sombra-caja);
+}
+
+main {
+    padding: 1.5rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- Pantallas --- */
+#pantallaInicio, #pantallaRevision {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+#pantallaCamara {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 10;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+canvas {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: var(--sombra-caja);
+    background-color: #ccc;
+}
+
+/* --- Botones --- */
+button {
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-primario {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+}
+.btn-primario:hover {
+    background-color: #2f477a;
+}
+.btn-primario:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-secundario {
+    background-color: var(--color-secundario);
+    color: var(--color-blanco);
+}
+.btn-secundario:hover {
+    background-color: #7a8aae;
+}
+
+.btn-captura {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: var(--color-blanco);
+    border: 5px solid var(--color-primario);
+    z-index: 20;
+}
+.btn-captura:active {
+    background-color: #ddd;
+}
+
+.grupo-botones {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* --- Otros Elementos --- */
+#formularioInicial {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 400px;
+}
+input[type="tel"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.estado {
+    margin-top: 1rem;
+    font-style: italic;
+    color: #555;
+}
+
+.datos-reporte {
+    background-color: var(--color-blanco);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: var(--sombra-caja);
+    text-align: left;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+.datos-reporte p {
+    margin: 0.5rem 0;
+}
+
+/* --- Spinner de Carga --- */
+.spinner-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+.spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid var(--color-primario);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

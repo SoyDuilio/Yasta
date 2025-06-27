@@ -1,0 +1,22 @@
+{
+  "name": "Reporte Rural",
+  "short_name": "ReporteRural",
+  "description": "Una PWA para reportar avistamientos de animales en zonas rurales.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#2a3c4b",
+  "theme_color": "#3b5998",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "iconos/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "iconos/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

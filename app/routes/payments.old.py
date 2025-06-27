@@ -13,12 +13,6 @@ from app.models.fee_payment import FeePayment, FeePaymentStatus
 from app.models.user import User
 from app.apis.deps import get_current_active_user
 
-# --- NUEVAS IMPORTACIONES ---
-# Importamos la función CRUD que acabamos de crear
-from app.crud import crud_yape_plin_transaction
-# Importamos el Enum para el proveedor (yape/plin)
-from app.models.yape_plin_transaction import DigitalWalletProvider
-
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
@@ -38,27 +32,30 @@ async def process_manual_payment(
     origen_app: str = Form(...),
     codigo_seguridad: Optional[str] = Form(None)
 ):
-    """
-    Procesa el registro manual de un pago Yape/Plin enviado por el cliente.
-
-    Esta función NO crea un FeePayment. En su lugar, crea un YapePlinTransaction
-    con el estado 'MANUAL_VERIFICATION_REQUIRED', que entra en el flujo de
-    verificación del equipo de Yasta.
-    """
-    
-    # 1. Validar y convertir el 'origen_app' del formulario al tipo Enum.
-    #    Si el valor no es 'yape' o 'plin', FastAPI devolverá un error 422 automáticamente.
-    provider_enum = DigitalWalletProvider(origen_app)
-    
-    # 2. Llamar a nuestra nueva función CRUD para crear el registro en la BD.
-    crud_yape_plin_transaction.create_manual_transaction(
-        db=db,
-        uploader_user=current_user,
-        provider=provider_enum,
-        amount=monto_pagado,
-        operation_number=numero_operacion,
-        security_code=codigo_seguridad
+    payment_data = PaymentManualCreate(
+        monto_pagado=monto_pagado,
+        numero_operacion=numero_operacion,
+        origen_app=origen_app,
+        codigo_seguridad=codigo_seguridad
     )
     
-    # 3. Devolver la respuesta de éxito al usuario. Esta parte no cambia.
+    # Por ahora, el codigo_seguridad se valida pero no se guarda en FeePayment
+    # ya que no tiene un campo para ello. Lo podríamos asociar a YapePlinTransaction
+    # en un futuro si es necesario.
+    new_fee_payment = FeePayment(
+        paying_user_id=current_user.id,
+        amount_paid=payment_data.monto_pagado,
+        currency="PEN",
+        payment_method_used=payment_data.origen_app,
+        payment_reference=payment_data.numero_operacion,
+        payment_date=datetime.now(tz=None),
+        status=FeePaymentStatus.PENDING_VERIFICATION,
+        security_code=payment_data.codigo_seguridad
+    )
+    
+    db.add(new_fee_payment)
+    db.commit()
+    db.refresh(new_fee_payment)
+    
     return templates.TemplateResponse("payments/partials/_payment_success.html", {"request": request})
+    #return templates.TemplateResponse("payments/partials/success_message.html", {"request": request})

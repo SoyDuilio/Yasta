@@ -13,15 +13,14 @@
     {% block page_css %}{% endblock %} {# Para CSS específico de la página #}
     
     <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     
     <script src="{{ url_for('static', path='js/main.js') }}" defer></script>
     {% block page_scripts_head %}{% endblock %}
 </head>
 <body class="bg-gray-900 text-gray-100 transition-colors duration-300 flex flex-col min-h-screen">
-
-    <!-- ================================== -->
     <!-- === HEADER === -->
-    <!-- ================================== -->
     <header id="main-header" class="flex-shrink-0"> {# Añadido flex-shrink-0 para evitar que se encoja #}
         <div class="container header-container">
             <a href="{{ url_for('home_page') }}" class="logo-area">
@@ -93,8 +92,6 @@
         </div>
     </footer>
 
-    {% block page_scripts_body %}{% endblock %}
-
     <!-- ================================== -->
     <!-- === MODAL DE AUTENTICACIÓN === -->
     <!-- ================================== -->
@@ -127,6 +124,27 @@
             </div>
         </div>
     </div>
+
+    <!-- 1. Bloque para scripts específicos de cada página (ej: dashboard_client.html lo usa para añadir su modal) -->
+    {% block page_scripts_body %}{% endblock %}
+
+     <!-- 2. NUESTRO SCRIPT DE INICIALIZACIÓN (después de que se hayan insertado los modales de la página) -->
+    <script>
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            // Asegurarnos que el elemento existe antes de procesarlo
+            if (evt.detail.elt) {
+                console.log("htmx:afterSwap detected. Processing node:", evt.detail.elt);
+                _hyperscript.processNode(evt.detail.elt);
+            }
+        });
+
+        // Este script inicializa Hyperscript en todo el body la primera vez
+        // para que cualquier elemento que ya esté presente (sin HTMX) funcione.
+        document.addEventListener('DOMContentLoaded', (event) => {
+            _hyperscript.processNode(document.body);
+            console.log("YASTA custom initializer script loaded and processed initial body.");
+        });
+    </script>
 
 </body>
 </html>

@@ -1,0 +1,64 @@
+<!-- app/templates/test_modal.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Test de Aislamiento del Modal</title>
+    <!-- Librerías directamente de CDN, sin nada local -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <style>
+        /* Estilos mínimos para que el modal se vea */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background-color: #333; color: white; padding: 40px;
+            position: relative; border: 1px solid #888; border-radius: 8px;
+            min-width: 400px; text-align: center;
+        }
+        .close-button {
+            position: absolute; top: 10px; right: 10px; font-size: 24px;
+            cursor: pointer; background: none; border: none; color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Página de Prueba</h1>
+    <p>Esta página aísla el problema. No carga tu CSS ni tu JS.</p>
+
+    <!-- El botón que dispara todo -->
+    <button 
+        hx-get="/test-modal/content" 
+        hx-target="#modal-container" 
+        hx-swap="innerHTML"
+        _="on htmx:afterRequest add .active to #modal-wrapper"
+    >
+        Cargar Contenido y Mostrar Modal
+    </button>
+
+    <!-- El contenedor del Modal -->
+    <div id="modal-wrapper" class="modal">
+        <div id="modal-container">
+            <!-- El contenido de _test_success.html se cargará aquí -->
+        </div>
+    </div>
+
+
+    <!-- El Script Inicializador -->
+    <script>
+        htmx.on("htmx:afterSwap", function(evt) {
+            if (evt.detail.elt) {
+                console.log("TEST PAGE: HTMX afterSwap. Processing node:", evt.detail.elt);
+                _hyperscript.processNode(evt.detail.elt);
+            }
+        });
+        console.log("TEST PAGE: Initializer script loaded.");
+    </script>
+
+</body>
+</html>

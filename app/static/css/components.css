@@ -115,7 +115,7 @@
 .modal-close {
     color: var(--text-muted-color);
     position: absolute;
-    top: 0.75rem;
+    top: 0.15rem;
     right: 1rem;
     font-size: 2rem;
     font-weight: bold;
@@ -130,7 +130,7 @@
 /* ... (otros estilos del modal) ... */
 .modal-content h3 { /* Título del modal */
     color: var(--text-color);
-    font-size: 1.5rem; /* Más grande */
+    font-size: 1.25rem; /* Más grande */
     font-weight: 600;  /* Semibold */
     /* margin-bottom: 1.5rem; ya en el HTML con mb-6 */
 }

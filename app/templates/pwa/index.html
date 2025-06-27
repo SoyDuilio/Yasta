@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Rural</title>
+    <!-- Meta tag para el color de la barra de estado en móviles -->
+    <meta name="theme-color" content="#3b5998"/>
+    <!-- Enlace al manifiesto de la PWA -->
+    <link rel="manifest" href="{{ url_for('static', path='pwa/manifest.json') }}">
+    <!-- Enlace a la hoja de estilos -->
+    <link rel="stylesheet" href="{{ url_for('static', path='pwa/styles.css') }}">
+    
+</head>
+<body>
+
+    <header>
+        <h1>Reporte Rural de Fauna</h1>
+    </header>
+
+    <main id="app">
+        <!-- Pantalla de Inicio y Formulario -->
+        <div id="pantallaInicio">
+            <h2>Crear Nuevo Reporte</h2>
+            <p>Toma una foto de un animal para iniciar un nuevo reporte.</p>
+            <form id="formularioInicial">
+                <label for="telefono">Tu número de teléfono (opcional):</label>
+                <input type="tel" id="telefono" name="telefono" placeholder="Ej: 987654321">
+            </form>
+            <button id="btnIniciar" class="btn-primario">Iniciar Cámara</button>
+            <p id="estado" class="estado"></p>
+        </div>
+
+        <!-- Pantalla de la Cámara -->
+        <div id="pantallaCamara" class="hidden">
+            <video id="video" autoplay playsinline></video>
+            <button id="btnCapturar" class="btn-captura"></button>
+        </div>
+
+        <!-- Pantalla de Revisión y Envío -->
+        <div id="pantallaRevision" class="hidden">
+            <h2>Revisar y Enviar Reporte</h2>
+            <!-- El canvas mostrará la foto con los datos estampados -->
+            <canvas id="canvas"></canvas>
+            <div id="datosReporte" class="datos-reporte">
+                <!-- Los datos se llenarán con JS -->
+            </div>
+            <div class="grupo-botones">
+                <button id="btnDescartar" class="btn-secundario">Descartar</button>
+                <button id="btnEnviar" class="btn-primario">Consultar Clima y Enviar</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Elemento para mostrar un spinner/rueda de carga -->
+    <div id="spinner" class="spinner-container hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Enlace al script principal de la aplicación -->
+    <script src="{{ url_for('static', path='pwa/app.js') }}"></script>
+</body>
+</html>

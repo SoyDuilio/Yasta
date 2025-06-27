@@ -1,0 +1,63 @@
+/* app/static/css/modal_fix.css */
+
+/*
+ * ===============================================
+ * REGLAS DE MÁXIMA PRIORIDAD PARA EL MODAL DE PAGO
+ * ===============================================
+ * Usamos IDs para anular cualquier conflicto de CSS existente.
+*/
+
+/* 1. El Marco del Modal */
+/* Asegura que el marco sea el punto de referencia para el posicionamiento. */
+#yasta-modal-frame {
+    position: relative !important; /* !important para máxima seguridad */
+}
+
+
+/* 2. El Botón de Cierre */
+/* Define la posición y apariencia del botón de cierre. */
+#yasta-modal-close-btn {
+    /* --- Posición Absoluta y Definitiva --- */
+    position: absolute !important;
+    top: 0.5rem !important;   /* <-- AJUSTADO */
+    right: 1.5rem !important;  /* <-- AJUSTADO */
+    z-index: 100 !important;
+
+    /* --- Dimensiones --- */
+    width: 40px !important;
+    height: 40px !important;
+
+    /* --- Apariencia --- */
+    background-color: rgba(30, 30, 30, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 9999px !important; /* fully-rounded */
+    cursor: pointer !important;
+    
+    /* --- Contenido Centrado --- */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    /* --- Transición --- */
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* 3. Efecto Hover para el Botón */
+#yasta-modal-close-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    transform: scale(1.1) !important;
+}
+
+/* 4. El SVG dentro del Botón */
+/* Asegura que el icono 'X' sea visible y tenga el color correcto. */
+#yasta-modal-close-btn svg {
+    width: 24px !important;
+    height: 24px !important;
+    color: #a0aec0 !important; /* Un gris claro (gray-400) */
+    transition: color 0.2s ease-in-out !important;
+}
+
+/* 5. Efecto Hover para el SVG */
+#yasta-modal-close-btn:hover svg {
+    color: #ffffff !important;
+}
