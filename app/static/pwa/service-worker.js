@@ -1,15 +1,20 @@
 // service-worker.js
 
-const CACHE_NAME = 'reporte-rural-cache-v1';
-// Lista de archivos para almacenar en caché.
+// service-worker.js
+
+const CACHE_NAME = 'reporte-candi-v1';
+// Lista de archivos para almacenar en caché, con las rutas correctas
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/iconos/icon-192x192.png',
-  '/iconos/icon-512x512.png'
+  '/pwa', // La ruta principal de la PWA
+  '/static/pwa/index.html', // Es buena idea cachear el html también por su ruta estática
+  '/static/pwa/styles.css',
+  '/static/pwa/app.js',
+  '/static/pwa/manifest.json', // El manifest también se debe cachear
+  '/static/pwa/iconos/icon-192x192.png',
+  '/static/pwa/iconos/icon-512x512.png'
 ];
+
+// ... el resto del service worker queda igual ...
 
 // Evento 'install': se dispara cuando el service worker se instala.
 self.addEventListener('install', event => {

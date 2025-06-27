@@ -89,7 +89,6 @@ if not IS_PRODUCTION:
 
 
 #PWA CANDI
-
 @app.get("/pwa", response_class=HTMLResponse)
 async def pwa_candi(request: Request):
     return templates.TemplateResponse("pwa/index.html", {"request": request})

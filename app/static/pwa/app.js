@@ -6,7 +6,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // --- REGISTRO DEL SERVICE WORKER ---
     // Esto es fundamental para que la PWA funcione offline.
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js')
+        // La ruta debe coincidir con su ubicación en el servidor
+        navigator.serviceWorker.register('/static/pwa/service-worker.js') 
             .then(registration => console.log('Service Worker registrado con éxito:', registration))
             .catch(error => console.log('Error al registrar el Service Worker:', error));
     }
