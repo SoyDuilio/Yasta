@@ -1,0 +1,18 @@
+<!-- ====================================================================== -->
+<!--    app/templates/payments/partials/_declaration_request_row.html       -->
+<!--    VERSIÓN FINAL Y COMPLETA (SIN ETIQUETAS)                            -->
+<!-- ====================================================================== -->
+<div class="declaration-row">
+    <div class="row-inputs">
+        <input type="number" name="year" value="2024" required>
+        <select name="month" required>
+            <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+        </select>
+        <select name="declaration_type" required>
+            <option value="original">Oiginal/Regular</option><option value="rectificatory">Rectificatoria</option><option value="substitutory">Sustitutoria</option>
+        </select>
+    </div>
+    <div class="row-action">
+        <button type="button" class="remove-row-btn" _="on click add .is-hiding to the closest .declaration-row wait 300ms remove the closest .declaration-row">×</button>
+    </div>
+</div>

@@ -1,5 +1,25 @@
 <!-- app/templates/payments/partials/success_message.html -->
-<div class="text-center p-4 bg-green-900/50 border border-green-700 rounded-lg">
-    <h3 class="font-bold text-lg text-green-300">¡Registro Exitoso!</h3>
-    <p class="text-gray-300">Hemos recibido la información de tu pago. Nuestro equipo lo verificará a la brevedad.</p>
+<!-- NUEVA VERSIÓN CENTRADA Y MEJORADA -->
+
+<!-- 
+    El id="unified-payment-form-container" es importante para que HTMX, 
+    al recibir este fragmento, reemplace correctamente el contenedor del formulario.
+-->
+<div id="unified-payment-form-container" 
+     class="flex flex-col items-center justify-center text-center p-6 min-h-[300px]">
+    
+    <div class="mb-4">
+        <svg class="w-16 h-16 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    </div>
+    
+    <h3 class="text-2xl font-bold text-white mb-2">¡Registro Exitoso!</h3>
+    
+    <p class="text-gray-300 max-w-sm">
+        Hemos recibido tu pago y tus solicitudes. Nuestro equipo lo verificará a la brevedad.
+    </p>
+
+    <h4 class="text-gray-400 mt-2">Yasta</h4>
+
 </div>

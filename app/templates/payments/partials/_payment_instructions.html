@@ -1,0 +1,16 @@
+<div class="modal-header">
+    <h2 class="modal-title">Realiza tu Pago</h2>
+    <button type="button" class="modal-close-btn" data-modal-close>×</button>
+</div>
+<div class="modal-body text-center">
+    <p class="text-gray-400 mb-8">Paga a través de Yape o Plin y luego registra tu operación.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex flex-col items-center"><h4 class="font-semibold text-lg mb-2">Yape</h4><img src="{{ url_for('static', path='img/yape_qr.png') }}" alt="QR Yape" class="w-48 h-48 rounded-lg mb-2"><p>N°: 999 888 777</p><a href="{{ url_for('static', path='img/yape_qr.png') }}" download class="text-indigo-400 hover:underline">Descargar QR</a></div>
+        <div class="flex flex-col items-center"><h4 class="font-semibold text-lg mb-2">Plin</h4><img src="{{ url_for('static', path='img/plin_qr.png') }}" alt="QR Plin" class="w-48 h-48 rounded-lg mb-2"><p>N°: 999 111 222</p><a href="{{ url_for('static', path='img/plin_qr.png') }}" download class="text-indigo-400 hover:underline">Descargar QR</a></div>
+    </div>
+</div>
+<div class="modal-footer" style="justify-content: center;">
+    <button class="modal-button-primary w-full" hx-get="{{ url_for('get_unified_payment_form') }}" hx-target="closest .modal-panel" hx-swap="innerHTML">
+        Ya realicé el pago, continuar al registro
+    </button>
+</div>

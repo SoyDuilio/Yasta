@@ -1,0 +1,132 @@
+<!-- ====================================================================== -->
+<!--    app/templates/payments/partials/_unified_payment_form.html          -->
+<!--    VERSIÓN FINAL, CORREGIDA Y COMPLETA                                 -->
+<!-- ====================================================================== -->
+<div id="unified-payment-form-container" class="max-w-2xl mx-auto">
+    <h2 class="form-title">Registrar un Pago</h2>
+
+    <form id="unified-payment-form" hx-encoding="multipart/form-data" hx-post="/app/payments/register-unified"
+        hx-target="#unified-payment-form-container" hx-swap="innerHTML">
+
+        <!-- === 1. SECCIÓN DE RUC === -->
+        <div class="form-group">
+            <label class="main-label" for="client_profile_selector">Empresa (RUC) para la que se realiza el pago:</label>
+            <select name="client_profile_id" id="client_profile_selector" required>
+                <option value="" disabled selected>Selecciona una empresa...</option>
+                {% for profile in client_profiles %}
+                <option value="{{ profile.id }}">{{ profile.ruc }} - {{ profile.business_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- === 2. SECCIÓN DE PERIODOS === -->
+        <div class="form-group">
+            <label class="main-label">Periodos que deseas que declaremos:</label>
+            <!-- Cabecera estática que NO se repite -->
+            <div class="declaration-header">
+                <div class="header-item">Año</div>
+                <div class="header-item">Mes</div>
+                <div class="header-item">Tipo</div>
+            </div>
+            <!-- Contenedor donde HTMX insertará las nuevas filas -->
+            <div id="declaration-rows-container">
+                <!-- La primera fila se incluye sin etiquetas -->
+                {% include 'payments/partials/_declaration_request_row.html' %}
+            </div>
+            <!-- Botón para añadir más filas -->
+            <button type="button" id="add-row-btn" hx-get="/app/payments/declaration-row"
+                hx-target="#declaration-rows-container" hx-swap="beforeend"
+                _="on htmx:afterSwap wait 10ms then add .animate-fadeInDown to the last .declaration-row in #declaration-rows-container">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Añadir otro periodo
+            </button>
+        </div>
+
+        <!-- === 3. SECCIÓN DE EVIDENCIA DE PAGO (PESTAÑAS) === -->
+        <div x-data="{ tab: 'VOUCHER' }" class="form-group">
+            <input type="hidden" name="payment_method" x-bind:value="tab">
+            <div class="tabs-nav">
+                <a @click.prevent="tab = 'VOUCHER'" class="tab-link" :class="{ 'active': tab === 'VOUCHER' }">Subir Voucher</a>
+                <a @click.prevent="tab = 'MANUAL'" class="tab-link" :class="{ 'active': tab === 'MANUAL' }">Ingresar Datos Manualmente</a>
+            </div>
+            <div class="tab-content-container">
+                <!-- Pestaña Subir Voucher -->
+                <div x-show="tab === 'VOUCHER'" x-cloak>
+                    <label class="main-label" for="voucher_file">Adjunta la captura del pago (Yape/Plin):</label>
+                    <input type="file" name="voucher_file" id="voucher_file" accept="image/png, image/jpeg, application/pdf" x-bind:required="tab === 'VOUCHER'">
+                </div>
+                <!-- Pestaña Datos Manuales -->
+                <div x-show="tab === 'MANUAL'" x-cloak x-data="{ provider: '' }">
+                    <div class="form-group-inner">
+                        <label class="main-label" for="manual_provider">Billetera Digital</label>
+                        <select name="provider" id="manual_provider" x-bind:required="tab === 'MANUAL'" x-model="provider">
+                            <option value="" disabled selected>Selecciona Yape o Plin</option>
+                            <option value="YAPE">Yape</option>
+                            <option value="PLIN">Plin</option>
+                        </select>
+                    </div>
+                    <div class="form-group-inner">
+                        <label class="main-label" for="operation_number">Número de Operación</label>
+                        <input type="text" name="operation_number" id="operation_number" x-bind:required="tab === 'MANUAL'">
+                    </div>
+                    <div class="form-group-inner">
+                        <label class="main-label" for="declared_amount">Monto Pagado (S/.)</label>
+                        <input type="number" step="0.01" name="declared_amount" id="declared_amount" x-bind:required="tab === 'MANUAL'" min="0.01">
+                    </div>
+                    <div class="form-group-inner" x-show="provider === 'YAPE'" x-transition x-cloak>
+                        <label class="main-label" for="security_code">Código de Seguridad (Opcional)</label>
+                        <input type="text" name="security_code" id="security_code" placeholder="Ej: 837" maxlength="10">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === 4. BOTÓN DE ENVÍO === -->
+        <div class="mt-8">
+            <button type="submit">Registrar Pago</button>
+        </div>
+    </form>
+
+    <!-- === SCRIPT DE ENSAMBLAJE (SIN CAMBIOS) === -->
+    <script>
+        document.getElementById('unified-payment-form').addEventListener('htmx:configRequest', function (event) {
+            if (event.detail.path.includes('/declaration-row')) { return; }
+            const form = event.target;
+            const declarations = [];
+            form.querySelectorAll('.declaration-row').forEach(row => {
+                const year = row.querySelector('input[name="year"]')?.value;
+                const month = row.querySelector('select[name="month"]')?.value;
+                const declarationType = row.querySelector('select[name="declaration_type"]')?.value;
+                if (year && month && declarationType) {
+                    declarations.push({ year: parseInt(year), month: parseInt(month), declaration_type: declarationType });
+                }
+            });
+            const paymentMethod = form.querySelector('input[name="payment_method"]').value;
+            let manualData = null;
+            if (paymentMethod === 'MANUAL') {
+                const providerEl = form.querySelector('select[name="provider"]');
+                const operationNumberEl = form.querySelector('input[name="operation_number"]');
+                const declaredAmountEl = form.querySelector('input[name="declared_amount"]');
+                const securityCodeEl = form.querySelector('input[name="security_code"]');
+                manualData = {
+                    provider: providerEl ? providerEl.value : null,
+                    operation_number: operationNumberEl ? operationNumberEl.value : '',
+                    declared_amount: declaredAmountEl ? parseFloat(declaredAmountEl.value) || 0 : 0,
+                    security_code: securityCodeEl ? securityCodeEl.value : null
+                };
+            }
+            const paymentData = {
+                client_profile_id: parseInt(form.querySelector('select[name="client_profile_id"]').value),
+                declarations: declarations,
+                payment_method: paymentMethod,
+                manual_data: manualData
+            };
+            event.detail.parameters['payment_data_json'] = JSON.stringify(paymentData);
+            ['client_profile_id', 'year', 'month', 'declaration_type', 'payment_method', 'operation_number', 'declared_amount', 'provider', 'security_code'].forEach(name => {
+                event.detail.parameters[name] = undefined;
+            });
+        });
+    </script>
+</div>
