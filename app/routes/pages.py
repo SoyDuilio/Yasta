@@ -4,6 +4,11 @@ from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from pathlib import Path
 from typing import Optional
 
+from sqlalchemy.orm import Session
+from app.db.session import get_db
+from app.models.client_profile import ClientProfile
+from app.models.user_client_access import UserClientAccess
+
 from app.core.templating import templates
 from app.core.config import settings
 from app.models.user import User, UserRole
@@ -19,16 +24,18 @@ async def user_flow_guardian(
     current_user: Optional[User] = Depends(get_current_user_from_cookie)
 ):
     if not current_user:
-        return # Si no hay usuario, el guardián no hace nada.
+        print("[Guardian] No hay usuario, permitiendo acceso.")
+        return
 
     current_path = request.url.path
     user_role = current_user.role
 
-    print(f"\n--- [Guardian Debug] ---")
+    print(f"\n--- [Guardian Debug Tick] ---")
     print(f"User: {current_user.email}, Role: {user_role.value}")
     print(f"Requested Path: {current_path}")
 
     # Definimos rutas clave
+    home_path = str(request.url_for("home_page"))
     onboarding_path = str(request.url_for("onboarding_start_page"))
     client_dashboard_path = str(request.url_for("client_dashboard_page"))
     staff_dashboard_path = str(request.url_for("staff_dashboard_page"))
@@ -46,33 +53,46 @@ async def user_flow_guardian(
         UserRole.ADMIN
     }
 
-    # Regla 1: Usuario en Onboarding
+    # Regla 1: Usuario en Onboarding (rol 'authenticated')
     if user_role == UserRole.AUTHENTICATED:
         if current_path != onboarding_path:
-            print(f"[Guardian] REDIRECTING 'authenticated' user to onboarding.")
+            print(f"✅ [Guardian Decision] REDIRECT: 'authenticated' user en '{current_path}' a '{onboarding_path}'.")
             raise HTTPException(status_code=307, detail="Redirecting to onboarding", headers={"Location": onboarding_path})
+        print(f"✅ [Guardian Decision] ALLOW: 'authenticated' user ya está en onboarding.")
         return
 
-    # Regla 2: Usuario Cliente
+    # Regla 2: Usuario Cliente (roles 'client_*')
     elif user_role in client_roles:
         # Un cliente NO PUEDE estar en la zona de staff.
         if current_path.startswith(staff_zone_prefix):
-            print(f"[Guardian] DENYING client access to staff zone. Redirecting to client dashboard.")
+            print(f"✅ [Guardian Decision] REDIRECT: client en zona de staff a '{client_dashboard_path}'.")
             raise HTTPException(status_code=307, detail="Redirecting to client dashboard", headers={"Location": client_dashboard_path})
         
         # Un cliente que ya pasó el onboarding no debería volver a la página de onboarding.
         if current_path == onboarding_path:
-            print(f"[Guardian] Client already onboarded. Redirecting from onboarding to dashboard.")
+            print(f"✅ [Guardian Decision] REDIRECT: client ya 'onboarded' a '{client_dashboard_path}'.")
+            raise HTTPException(status_code=307, detail="Redirecting to client dashboard", headers={"Location": client_dashboard_path})
+        
+        # ✅ NUEVA REGLA DE SEGURIDAD: Un cliente logueado no debería estar en la home page.
+        if current_path == home_path:
+            print(f"✅ [Guardian Decision] REDIRECT: client logueado en home a '{client_dashboard_path}'.")
             raise HTTPException(status_code=307, detail="Redirecting to client dashboard", headers={"Location": client_dashboard_path})
 
-    # Regla 3: Usuario Staff
+
+    # Regla 3: Usuario Staff (roles 'staff_*' y 'admin')
     elif user_role in staff_roles:
         # Un staff NO PUEDE estar en la zona de cliente.
         if current_path.startswith(client_zone_prefix):
-             print(f"[Guardian] DENYING staff access to client zone. Redirecting to staff dashboard.")
+             print(f"✅ [Guardian Decision] REDIRECT: staff en zona de cliente a '{staff_dashboard_path}'.")
+             raise HTTPException(status_code=307, detail="Redirecting to staff dashboard", headers={"Location": staff_dashboard_path})
+        
+        # ✅ NUEVA REGLA DE SEGURIDAD: Un staff logueado no debería estar en la home page.
+        if current_path == home_path:
+             print(f"✅ [Guardian Decision] REDIRECT: staff logueado en home a '{staff_dashboard_path}'.")
              raise HTTPException(status_code=307, detail="Redirecting to staff dashboard", headers={"Location": staff_dashboard_path})
 
-    print(f"[Guardian] No redirection rules matched for {current_path}. Allowing access.")
+
+    print(f"✅ [Guardian Decision] ALLOW: No hay reglas de redirección para '{current_path}'.")
     # Si ninguna regla de redirección se aplicó, se permite el acceso.
 
 APP_DIR_FOR_STATIC = Path(__file__).resolve().parent.parent.parent.parent
@@ -90,8 +110,36 @@ async def serve_onboarding_page(request: Request, current_user: User = Depends(g
     return templates.TemplateResponse("dashboard_onboarding.html", {"request": request, "current_user": current_user, "settings": settings})
 
 @router.get("/dashboard/client", response_class=HTMLResponse, name="client_dashboard_page", dependencies=[Depends(require_login_for_pages), Depends(user_flow_guardian)])
-async def serve_client_dashboard_page(request: Request, current_user: User = Depends(get_current_user_from_cookie)):
-    return templates.TemplateResponse("dashboard_client.html", {"request": request, "current_user": current_user, "settings": settings})
+async def serve_client_dashboard_page(
+    request: Request, 
+    current_user: User = Depends(get_current_user_from_cookie),
+    db: Session = Depends(get_db)  # Asegura que la sesión de DB esté inyectada
+):
+    """
+    Renderiza el dashboard del cliente, obteniendo primero los perfiles
+    de cliente (RUCs) a los que el usuario tiene acceso.
+    """
+    
+    # --- LÓGICA CLAVE PARA OBTENER LOS RUCs ---
+    client_profiles = (
+        db.query(ClientProfile)
+        .join(UserClientAccess, UserClientAccess.client_profile_id == ClientProfile.id)
+        .filter(UserClientAccess.user_id == current_user.id)
+        .order_by(ClientProfile.business_name)
+        .all()
+    )
+    
+    # (Opcional pero recomendado) Imprime para verificar en la consola del servidor
+    print(f"--- DEBUG: Perfiles para {current_user.email}: {[p.ruc for p in client_profiles]} ---")
+
+    context = {
+        "request": request, 
+        "current_user": current_user, 
+        "settings": settings,
+        "client_profiles": client_profiles # Pasamos la lista a la plantilla
+    }
+    
+    return templates.TemplateResponse("dashboard_client.html", context)
 
 @router.get("/dashboard/staff", response_class=HTMLResponse, name="staff_dashboard_page", dependencies=[Depends(require_login_for_pages), Depends(user_flow_guardian)])
 async def serve_staff_dashboard_page(request: Request, current_user: User = Depends(get_current_user_from_cookie)):
@@ -142,3 +190,25 @@ async def test_modal_content(request: Request):
     Ruta que devuelve el contenido del modal (el mensaje de éxito).
     """
     return templates.TemplateResponse("partials/_test_success.html", {"request": request})
+
+
+"""
+#NUEVA RUTA PARA EL MODAL LIBERADO DE REGISTRAR RUC (PIMERO O OTROS)
+"""
+@router.get("/onboarding/get-register-form", response_class=HTMLResponse, name="onboarding_get_form")
+async def get_register_ruc_form(request: Request):
+    """Devuelve el contenido del formulario para registrar un RUC."""
+    return templates.get_template("onboarding/partials/_register_ruc_form_content.html").render({"request": request})
+
+# Necesitaremos una nueva ruta para el envío con HTMX
+# Asumimos que la lógica es similar a 'onboarding_finalize', pero devuelve HTML
+@router.post("/onboarding/finalize-htmx", response_class=HTMLResponse, name="onboarding_finalize_htmx")
+async def onboarding_finalize_htmx(request: Request):
+    # TODO: Aquí va la lógica para procesar el formulario de registro de RUC.
+    # Por ahora, devolvemos un mensaje de éxito para HTMX.
+    return HTMLResponse("""
+        <div class="text-center p-4">
+            <h3 class="font-bold text-lg text-green-300">¡Solicitud Recibida!</h3>
+            <p class="text-gray-300">Verificaremos los datos de tu nuevo RUC y te notificaremos. Puedes cerrar esta ventana.</p>
+        </div>
+    """)
