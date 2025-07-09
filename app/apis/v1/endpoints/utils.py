@@ -111,29 +111,72 @@ router = APIRouter(prefix="/utils", tags=["Utilities"])
 
 # --- Endpoints de la API (Sin cambios, usan la lógica de arriba) ---
 
+### INICIO DEL BLOQUE PARA REEMPLAZAR ###
+
 @router.get("/sunat-info/{ruc}", summary="Get RUC information from external API")
 async def get_sunat_info(ruc: str):
+
+    # --- Print de depuración inicial ---
+    print("\n" + "="*50)
+    print(f"===> [API RUC] Endpoint /sunat-info/{ruc} ha sido llamado.")
+    print(f"===> [API RUC] RUC recibido: {ruc}")
+    print("="*50 + "\n")
+
+    # --- 1. Validación del formato del RUC ---
     if not (ruc.isdigit() and len(ruc) == 11 and (ruc.startswith('10') or ruc.startswith('20'))):
+        print(f"!!! [API RUC] Error: Formato de RUC inválido. RUC: '{ruc}'")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid RUC format.")
     
-    # Esta llamada activará toda la lógica de depuración en el método _get
-    company_data = api_client.get_company(ruc=ruc)
-    
-    if not company_data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="RUC not found or external service failed.")
-    
-    nombre_o_razon_social = company_data.get("nombre") or company_data.get("razonSocial")
-    direccion = company_data.get("direccion")
-    
-    if not direccion or direccion.strip() == "-":
-        direccion_final = "Dirección no disponible"
-    else:
-        direccion_final = direccion
+    print("===> [API RUC] Formato de RUC es válido.")
 
-    return {
-        "razonSocial": nombre_o_razon_social,
-        "direccion": direccion_final,
-    }
+    try:
+        # --- 2. Llamada al cliente de la API externa ---
+        # La clase ApisNetPe ya tiene sus propios prints de depuración, así que veremos los detalles de la llamada.
+        print("===> [API RUC] Intentando llamar a api_client.get_company(ruc=ruc)...")
+        company_data = api_client.get_company(ruc=ruc)
+        print(f"===> [API RUC] Datos recibidos de api_client: {company_data}")
+        
+        # --- 3. Validación de la respuesta de la API externa ---
+        if not company_data:
+            print("!!! [API RUC] Error: No se recibieron datos de la API externa (respuesta vacía).")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="RUC not found or external service failed.")
+        
+        print("===> [API RUC] La respuesta de la API externa no está vacía.")
+        
+        # --- 4. Procesamiento de los datos recibidos ---
+        nombre_o_razon_social = company_data.get("nombre") or company_data.get("razonSocial")
+        direccion = company_data.get("direccion")
+        
+        print(f"===> [API RUC] Nombre extraído: '{nombre_o_razon_social}'")
+        print(f"===> [API RUC] Dirección extraída: '{direccion}'")
+
+        if not direccion or direccion.strip() == "-":
+            direccion_final = "Dirección no disponible"
+        else:
+            direccion_final = direccion
+        
+        print(f"===> [API RUC] Dirección final a devolver: '{direccion_final}'")
+        
+        response_data = {
+            "razonSocial": nombre_o_razon_social,
+            "direccion": direccion_final,
+        }
+
+        print(f"===> [API RUC] Devolviendo respuesta exitosa al frontend: {response_data}")
+        return response_data
+
+    except HTTPException as http_exc:
+        # Si la excepción ya es una HTTPException (lanzada desde el cliente de la API),
+        # simplemente la registramos y la volvemos a lanzar.
+        print(f"!!! [API RUC] Se capturó una HTTPException: Status={http_exc.status_code}, Detail='{http_exc.detail}'")
+        raise http_exc
+        
+    except Exception as e:
+        # Para cualquier otra excepción inesperada durante el proceso.
+        print(f"!!! [API RUC] EXCEPCIÓN INESPERADA en get_sunat_info: {type(e).__name__} - {e}")
+        raise HTTPException(status_code=500, detail="Ocurrió un error interno al procesar la solicitud.")
+
+### FIN DEL BLOQUE PARA REEMPLAZAR ###
 
 @router.get("/next-freemium-periods/{ruc}", summary="Get the next 2 tax periods for a RUC")
 async def get_next_freemium_periods(ruc: str, db: Session = Depends(get_db)):
