@@ -30,6 +30,13 @@ class YapePlinTransaction(Base):
     image_storage_path = Column(String(512), nullable=False)
     provider = Column(PGEnum(DigitalWalletProvider, name="digitalwalletprovider"), nullable=True)
     user_declared_amount = Column(DECIMAL(10, 2), nullable=True)
+
+    # === INICIO DEL CAMBIO ===
+    client_profile_id = Column(Integer, ForeignKey('client_profiles.id'), nullable=True)
+    # Lo hacemos nullable=True por si tienes transacciones antiguas sin cliente asociado,
+    # o para casos futuros donde una transacción no se asigne de inmediato.
+    # Para nuestro flujo del formulario, SIEMPRE tendrá un valor.
+    # === FIN DEL CAMBIO ===
     
     extracted_amount = Column(DECIMAL(10, 2), nullable=True)
     extracted_currency = Column(String(3), nullable=True)
@@ -50,5 +57,12 @@ class YapePlinTransaction(Base):
     uploader_user = relationship("User", back_populates="uploaded_yape_plin_transactions")
     fee_payment = relationship("FeePayment")
 
+    # === AÑADIR LA RELACIÓN (OPCIONAL PERO RECOMENDADO) ===
+    client_profile = relationship("ClientProfile")
+    # ======================================================
+
     def __repr__(self):
         return f"<YapePlinTransaction(id={self.id}, status='{self.extraction_status.value}')>"
+    
+    # Al final del archivo YapePlinTransaction, dentro de la clase, añade:
+    declaration_requests = relationship("DeclarationRequest", back_populates="yape_plin_transaction")

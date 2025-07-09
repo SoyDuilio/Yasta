@@ -27,3 +27,6 @@ class ClientProfile(Base):
 
     def __repr__(self):
         return f"<ClientProfile(id={self.id}, ruc='{self.ruc}', business_name='{self.business_name}')>"
+    
+    # Al final del archivo ClientProfile, dentro de la clase, añade:
+    declaration_requests = relationship("DeclarationRequest", back_populates="client_profile", cascade="all, delete-orphan")

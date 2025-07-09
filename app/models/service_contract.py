@@ -55,3 +55,6 @@ class ServiceContract(Base):
 
     def __repr__(self):
         return f"<ServiceContract(id={self.id}, client_id={self.client_id}, status='{self.status.value}')>"
+    
+    # Al final del archivo ServiceContract, dentro de la clase, añade:
+    fulfills_declaration_request = relationship("DeclarationRequest", back_populates="service_contract")
