@@ -9,12 +9,14 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development" # Valor por defecto
 
     # --- Variables de Entorno (Pydantic las leerá del .env) ---
-    DATABASE_URL: str = ""
-    SECRET_KEY: str = ""
-    DATA_ENCRYPTION_KEY: str = ""
+    DATABASE_URL: str
+    SECRET_KEY: str
+    DATA_ENCRYPTION_KEY: str
     
+    OPENAI_API_KEY: str
+
     # <-- LA NUEVA LÍNEA, CON SU TIPO CORRECTO -->
-    APIS_NET_PE_TOKEN: str = "" 
+    APIS_NET_PE_TOKEN: str 
 
     # --- Variables de Google OAuth ---
     GOOGLE_CLIENT_ID: Optional[str] = None
