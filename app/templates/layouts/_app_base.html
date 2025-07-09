@@ -5,36 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}YASTA Dashboard{% endblock %}</title>
     
-     <!-- === FUENTES (NUEVO) === -->
+    <!-- === FUENTES === -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-    <!-- ======================= -->
 
+    <!-- === ESTILOS === -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/components.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/forms.css') }}">
-
-    <!-- NUESTRA HOJA DE ESTILOS, CARGADA AL FINAL PARA TENER PRIORIDAD -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/modal_universal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/payment_flow.css') }}">
-
-
-
-    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
-
-    <script src="{{ url_for('static', path='js/main.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/declaration_rows.css') }}">
+    
     {% block page_css %}{% endblock %}
-</head>
-<body class="bg-gray-900 text-gray-100" hx-ext="head-support">
-    <!-- ***** INICIO DE LA REESTRUCTURACIÓN ***** -->
-    <!-- Este div se convierte en el contenedor flex principal, liberando al body -->
-    <div class="flex flex-col min-h-screen">
 
-        <!-- HEADER UNIVERSAL DE LA APLICACIÓN -->
+    <!-- === SCRIPTS DE LIBRERÍAS === -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    
+    <!-- === SCRIPTS DE LA APLICACIÓN === -->
+    <script src="{{ url_for('static', path='js/modal_universal.js') }}" defer></script>
+    <script src="{{ url_for('static', path='js/main.js') }}" defer></script>
+</head>
+
+<body class="bg-gray-900 text-gray-100" hx-ext="head-support">
+    <div class="flex flex-col min-h-screen">
         {% include 'partials/_app_header.html' %}
 
-        <!-- BARRA DE SUB-NAVEGACIÓN CONTEXTUAL -->
         {% if self.sub_nav_content() and self.sub_nav_content().strip() %}
             <nav id="sub-nav" class="bg-gray-800/80 backdrop-blur-sm border-b border-gray-700/50 sticky top-16 z-50">
                 <div class="container mx-auto px-4 h-12 flex items-center">
@@ -43,38 +42,89 @@
             </nav>
         {% endif %}
 
-        <!-- CONTENIDO PRINCIPAL -->
         <main class="relative z-0 flex-grow {% if self.sub_nav_content() and self.sub_nav_content().strip() %}pt-28{% else %}pt-16{% endif %}">
             {% block main_content %}{% endblock %}
         </main>
         
-        <!-- SCRIPTS ESPECÍFICOS DE LA PÁGINA -->
+        <!-- Scripts específicos de la página se cargarán aquí -->
         {% block page_scripts %}{% endblock %}
     </div>
 
-    <!-- ***** FIN DE LA REESTRUCTURACIÓN ***** -->
-    <!-- Este bloque ahora está fuera del contenedor flex, anclado directamente al body -->
+    <!-- Contenedor para los Modales que se cargarán dinámicamente -->
+    <div id="modal-container-placeholder"></div>
+
+    <!-- El bloque body_end_scripts ahora se usa para los scripts que DEBEN ejecutarse al final -->
     {% block body_end_scripts %}{% endblock %}
 
-<!-- ===== SCRIPT DE INICIALIZACIÓN DEFINITIVO ===== -->
-<script>
-    // Función para inicializar Hyperscript en todo el contenido existente
-    function initializeHyperscriptOnBody() {
-        _hyperscript.processNode(document.body);
-        console.log("Hyperscript inicializado en el body del DASHBOARD.");
-    }
+    <!-- ===== SCRIPTS GLOBALES DE INICIALIZACIÓN Y FUNCIONES UNIVERSALES ===== -->
+    <script>
+        // --- FUNCIONES UNIVERSALES DISPONIBLES EN TODA LA APP ---
+        function initializeOnboardingForm(containerElement) {
+            if (!containerElement) return;
+            const form = containerElement.querySelector('form');
+            if (!form) return;
+            console.log("[Global Logic] Inicializando formulario en:", containerElement);
+            
+            const rucInput = form.querySelector('#client_ruc_modal');
+            const rucDetailsContainer = form.querySelector('#ruc-details');
+            const businessNameInput = form.querySelector('#business_name');
+            const businessAddressInput = form.querySelector('#business_address');
+            const rucSpinner = form.querySelector('#ruc-spinner');
+            const passInput = form.querySelector('#sol_password_modal');
+            const passConfirmInput = form.querySelector('#sol_password_confirm_modal');
 
-    // Se ejecuta una vez que todo el HTML inicial está listo
-    document.addEventListener('DOMContentLoaded', initializeHyperscriptOnBody);
-
-    // Se queda escuchando por cualquier contenido nuevo que HTMX traiga
-    htmx.on("htmx:afterSwap", function(evt) {
-        if (evt.detail.elt) {
-            console.log("HTMX afterSwap (Dashboard). Procesando nuevo nodo:", evt.detail.elt);
-            _hyperscript.processNode(evt.detail.elt);
+            const handleRucValidation = async () => {
+                if (!rucInput) return;
+                const ruc = rucInput.value.trim();
+                if (rucDetailsContainer) rucDetailsContainer.classList.add('hidden');
+                if (ruc.length !== 11 || !/^(10|20)\d{9}$/.test(ruc)) return;
+                if (rucSpinner) rucSpinner.classList.remove('hidden');
+                rucInput.readOnly = true;
+                try {
+                    const response = await fetch(`/api/v1/utils/sunat-info/${ruc}`);
+                    if (!response.ok) throw new Error('No se pudo validar el RUC.');
+                    const data = await response.json();
+                    if (businessNameInput) businessNameInput.value = data.razonSocial;
+                    if (businessAddressInput) businessAddressInput.value = data.direccion;
+                    if (rucDetailsContainer) rucDetailsContainer.classList.remove('hidden');
+                } catch (error) { alert(`Error: ${error.message}`);
+                } finally {
+                    if (rucSpinner) rucSpinner.classList.add('hidden');
+                    rucInput.readOnly = false;
+                }
+            };
+            const handleFormSubmit = (event) => {
+                if (!passInput || !passConfirmInput) return;
+                if (passInput.value !== passConfirmInput.value) {
+                    event.preventDefault();
+                    alert('Las Claves SOL no coinciden.');
+                }
+            };
+            if (rucInput) rucInput.addEventListener('blur', handleRucValidation);
+            form.addEventListener('submit', handleFormSubmit);
         }
-    });
-</script>
-<!-- ============================================== -->
+
+        function resetOnboardingForm() {
+            const modal = document.querySelector('#modalOnboardingRUC, #modalRegistrarRuc');
+            if (!modal) return;
+            const form = modal.querySelector('form');
+            if (form) form.reset();
+            const rucDetails = modal.querySelector('#ruc-details');
+            if (rucDetails) rucDetails.classList.add('hidden');
+        }
+
+        // --- INICIALIZACIÓN DE HYPERSCRIPT ---
+        function initializeHyperscript() {
+            _hyperscript.processNode(document.body);
+            console.log("Hyperscript inicializado en el body.");
+        }
+        document.addEventListener('DOMContentLoaded', initializeHyperscript);
+        htmx.on("htmx:afterSwap", (evt) => {
+            if (evt.detail.elt) {
+                console.log("HTMX afterSwap. Procesando nuevo nodo con Hyperscript:", evt.detail.elt);
+                _hyperscript.processNode(evt.detail.elt);
+            }
+        });
+    </script>
 </body>
 </html>
