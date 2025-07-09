@@ -25,4 +25,86 @@ document.addEventListener('DOMContentLoaded', function () {
     //        // player.setAttribute('loaded', 'true');
     //     }
     // });
+
+
+
+    // --- LÓGICA PARA EL PANEL DE VIDEOS SECUENCIALES ---
+    const videoGrid = document.getElementById('video-story-grid');
+    if (videoGrid) {
+        // Elementos del DOM
+        const videos = Array.from(videoGrid.querySelectorAll('.story-video'));
+        const wrappers = Array.from(videoGrid.querySelectorAll('.video-wrapper'));
+        const audioBtn = document.getElementById('toggle-audio-btn');
+        const iconSoundOn = document.getElementById('icon-sound-on');
+        const iconSoundOff = document.getElementById('icon-sound-off');
+
+        // Estado
+        let currentVideoIndex = 0;
+        let hasPlayedOnce = false;
+        let isSequenceMuted = true; // El estado de audio para toda la secuencia
+
+        if (videos.length > 0 && audioBtn) {
+            
+            // Función para reproducir el siguiente video
+            const playNextVideo = () => {
+                if (hasPlayedOnce) return;
+                
+                if (currentVideoIndex >= videos.length) {
+                    hasPlayedOnce = true;
+                    console.log("Secuencia de video completada.");
+                    audioBtn.style.display = 'none'; // Oculta el botón al final
+                    return;
+                }
+
+                wrappers.forEach(w => w.classList.remove('is-playing'));
+
+                const currentVideo = videos[currentVideoIndex];
+                const currentWrapper = wrappers[currentVideoIndex];
+                
+                // Aplicar el estado de silencio actual al video ANTES de reproducirlo
+                currentVideo.muted = isSequenceMuted;
+
+                currentWrapper.classList.add('is-playing');
+                currentVideo.currentTime = 0;
+                
+                const playPromise = currentVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.error("Error al reproducir video:", error);
+                        hasPlayedOnce = true;
+                    });
+                }
+                
+                currentVideoIndex++;
+            };
+
+            // Evento para cambiar de video al terminar el actual
+            videos.forEach(video => {
+                video.addEventListener('ended', playNextVideo);
+            });
+
+            // Evento para el botón de audio
+            audioBtn.addEventListener('click', () => {
+                // Invertir el estado de silencio
+                isSequenceMuted = !isSequenceMuted;
+
+                // Aplicar el nuevo estado a TODOS los videos
+                videos.forEach(video => {
+                    video.muted = isSequenceMuted;
+                });
+
+                // Actualizar los iconos
+                if (isSequenceMuted) {
+                    iconSoundOn.classList.add('hidden');
+                    iconSoundOff.classList.remove('hidden');
+                } else {
+                    iconSoundOn.classList.remove('hidden');
+                    iconSoundOff.classList.add('hidden');
+                }
+            });
+            
+            // Iniciar la secuencia
+            setTimeout(playNextVideo, 500);
+        }
+    }
 });
