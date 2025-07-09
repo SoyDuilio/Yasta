@@ -27,6 +27,8 @@ from app.routes import pages as pages_router
 from app.routes import payments as web_payments_router
 from app.routes import dev_tools as dev_tools_router
 
+from app.routes import declarations as web_declarations_router
+
 # --- 3. Inicialización de la Aplicación FastAPI ---
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -68,7 +70,7 @@ mount_static_files(app)
 app.include_router(pages_router.router, tags=["Web App - Pages"])
 app.include_router(web_payments_router.router, prefix="/app", tags=["Web App - Payments"])
 app.include_router(dev_tools_router.router, prefix="/dev", tags=["Developer Tools"])
-
+app.include_router(web_declarations_router.router, prefix="/app/declarations", tags=["Web App - Declarations"])
 # b) Rutas de la API (Sirven principalmente JSON)
 app.include_router(v1_api_router, prefix=settings.API_V1_STR)
 
