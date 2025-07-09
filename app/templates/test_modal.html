@@ -1,64 +1,98 @@
-<!-- app/templates/test_modal.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Test de Aislamiento del Modal</title>
-    <!-- Librerías directamente de CDN, sin nada local -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Modal Universal</title>
+    
+    <!-- Enlazamos nuestro nuevo CSS del modal -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/modal_universal.css') }}">
+
+    <!-- Estilos básicos solo para esta página de prueba -->
     <style>
-        /* Estilos mínimos para que el modal se vea */
-        .modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
-            width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
-            align-items: center; justify-content: center;
+        body {
+            font-family: sans-serif;
+            background-color: #f0f2f5;
+            color: #1a202c;
+            margin: 0;
+            padding: 2rem;
         }
-        .modal.active { display: flex; }
-        .modal-content {
-            background-color: #333; color: white; padding: 40px;
-            position: relative; border: 1px solid #888; border-radius: 8px;
-            min-width: 400px; text-align: center;
+        .test-page-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .close-button {
-            position: absolute; top: 10px; right: 10px; font-size: 24px;
-            cursor: pointer; background: none; border: none; color: white;
+        .test-button {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #4a90e2;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .test-button:hover {
+            background-color: #357abd;
         }
     </style>
 </head>
 <body>
 
-    <h1>Página de Prueba</h1>
-    <p>Esta página aísla el problema. No carga tu CSS ni tu JS.</p>
-
-    <!-- El botón que dispara todo -->
-    <button 
-        hx-get="/test-modal/content" 
-        hx-target="#modal-container" 
-        hx-swap="innerHTML"
-        _="on htmx:afterRequest add .active to #modal-wrapper"
-    >
-        Cargar Contenido y Mostrar Modal
-    </button>
-
-    <!-- El contenedor del Modal -->
-    <div id="modal-wrapper" class="modal">
-        <div id="modal-container">
-            <!-- El contenido de _test_success.html se cargará aquí -->
-        </div>
+    <div class="test-page-container">
+        <h1>Página de Prueba para el Modal</h1>
+        <p>Esta página está aislada del resto de la aplicación para construir y probar nuestro nuevo componente de modal.</p>
+        <p>Haz clic en el botón de abajo para abrir el modal.</p>
+        <button id="openModalBtn" class="test-button">Abrir Modal de Prueba</button>
     </div>
 
+    <!-- ======================================= -->
+    <!-- INICIO DE LA ESTRUCTURA DEL MODAL UNIVERSAL -->
+    <!-- ======================================= -->
+    <div id="miModalUniversal" class="modal-container">
+        <!-- El overlay semitransparente -->
+        <div class="modal-overlay" data-modal-close></div>
 
-    <!-- El Script Inicializador -->
-    <script>
-        htmx.on("htmx:afterSwap", function(evt) {
-            if (evt.detail.elt) {
-                console.log("TEST PAGE: HTMX afterSwap. Processing node:", evt.detail.elt);
-                _hyperscript.processNode(evt.detail.elt);
-            }
-        });
-        console.log("TEST PAGE: Initializer script loaded.");
-    </script>
+        <!-- El panel de contenido del modal -->
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            
+            <!-- Cabecera del Modal -->
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title">Título del Modal</h2>
+                <button class="modal-close-btn" data-modal-close aria-label="Cerrar modal">×</button>
+            </div>
+
+            <!-- Cuerpo del Modal (con scroll interno) -->
+            <div class="modal-body">
+                <p>Este es el cuerpo del modal. Si el contenido es más largo que el espacio disponible, aparecerá una barra de desplazamiento <strong>solo aquí</strong>.</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.</p>
+                <p>Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat.</p>
+                <p>Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor.</p>
+                <p>Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales.</p>
+                <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum.</p>
+                <p>Maecenas adipiscing ante non diam. Sorbi ris. Proin consectetuer, risus et perpet, tortor est frin dolor, vitae rerit magna semut lorem. Sed com modo, magna eget suscipit egestas, leo sapien feugiat quam, quis consectetuer felis ornare enim.</p>
+                <p><strong>El scroll funciona perfectamente.</strong></p>
+            </div>
+
+            <!-- Pie del Modal (botones siempre visibles) -->
+            <div class="modal-footer">
+                <button class="modal-button-secondary" data-modal-close>Cancelar</button>
+                <button class="modal-button-primary">Aceptar</button>
+            </div>
+
+        </div>
+    </div>
+    <!-- ======================================= -->
+    <!-- FIN DE LA ESTRUCTURA DEL MODAL UNIVERSAL  -->
+    <!-- ======================================= -->
+
+    <!-- Enlazamos nuestro nuevo JS del modal -->
+    <script src="{{ url_for('static', path='js/modal_universal.js') }}" defer></script>
 
 </body>
 </html>

@@ -17,6 +17,7 @@
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     
     <script src="{{ url_for('static', path='js/main.js') }}" defer></script>
+
     {% block page_scripts_head %}{% endblock %}
 </head>
 <body class="bg-gray-900 text-gray-100 transition-colors duration-300 flex flex-col min-h-screen">
@@ -24,9 +25,11 @@
     <header id="main-header" class="flex-shrink-0"> {# Añadido flex-shrink-0 para evitar que se encoja #}
         <div class="container header-container">
             <a href="{{ url_for('home_page') }}" class="logo-area">
+            <!--    
                 <img src="{{ url_for('static', path='img/logo_light.png') }}" alt="YASTA Logo" id="logo-light" class="actual-logo">
                 <img src="{{ url_for('static', path='img/logo_dark.png') }}" alt="YASTA Logo" id="logo-dark" class="actual-logo hidden">
-                <span class="sr-only">YASTA</span>
+            -->
+                <span style="font-size: 2.25rem!important; color: #fff; font-weight: 700;">YASTA</span>
             </a>
 
             <nav id="desktop-nav">

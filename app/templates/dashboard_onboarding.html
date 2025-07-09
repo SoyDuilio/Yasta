@@ -3,6 +3,7 @@
 {% block title %}Bienvenido a YASTA - Activa tu Prueba Gratuita{% endblock %}
 
 {% block page_css %}
+    {# El CSS del modal universal se carga desde _app_base.html #}
     <style>
         .onboarding-container { max-width: 1120px; margin-left: auto; margin-right: auto; padding: 1.5rem; }
         .teaser-header { text-align: center; margin-bottom: 3rem; }
@@ -23,14 +24,69 @@
         .btn-light:hover { transform: scale(1.05); }
         .calendar-item { display: flex; justify-content: space-between; align-items: center; background-color: rgba(17, 24, 39, 0.5); padding: 0.75rem; border-radius: 0.5rem; }
         .calendar-item span:first-child { color: #d1d5db; }
-        .calendar-item .due-text { font-weight: 600; color: #fbbf24; } /* Estilo para vencimiento */
+        .calendar-item .due-text { font-weight: 600; color: #fbbf24; }
         .chart-container { position: relative; height: 220px; width: 100%; }
-        #custom-toast { position: fixed; top: 20px; left: 50%; transform: translate(-50%, -150%); background-color: #2d3748; color: #e2e8f0; padding: 1rem 1.5rem; border-radius: 0.5rem; border: 1px solid #4a5568; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); z-index: 10000; transition: transform 0.4s ease-in-out; display: flex; align-items: center; gap: 0.75rem; }
-        #custom-toast.show { transform: translate(-50%, 0); }
-        #custom-toast.error { background-color: #c53030; border-color: #9b2c2c; }
-        .btn-modal-submit { display: flex; justify-content: center; align-items: center; width: 100%; background-color: #4f46e5; color: white; font-size: 1rem; font-weight: 600; padding: 0.625rem 1rem; margin-top: 1rem; border: none; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s; }
-        .btn-modal-submit:hover { background-color: #4338ca; }
-        .btn-modal-submit:disabled { background-color: #6b7280; cursor: not-allowed; }
+        
+        /* Estilos para los campos del formulario dentro del nuevo modal */
+        .modal-body .form-group { margin-bottom: 1rem; }
+        .modal-body .form-label { display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #d1d5db; }
+        .modal-body .form-input {
+            width: 100%; background-color: #374151; color: #f9fafb; border: 1px solid #4b5563; border-radius: 0.375rem;
+            padding: 0.6rem 0.75rem; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .modal-body .form-input:focus { outline: none; border-color: #818cf8; box-shadow: 0 0 0 2px #6366f1; }
+        .modal-body .form-input[readonly] { background-color: #1f2937; cursor: not-allowed; }
+        .modal-body .form-checkbox { height: 1rem; width: 1rem; border-radius: 0.25rem; border-color: #4b5563; background-color: #374151; color: #6366f1; }
+        .modal-body .form-checkbox:focus { ring: #6366f1; }
+        .modal-body .form-label-checkbox { margin-left: 0.5rem; font-size: 0.875rem; color: #d1d5db; }
+        .modal-body .form-label-checkbox a { font-weight: 500; color: #818cf8; text-decoration: underline; }
+        .relative { position: relative; }
+        .hidden { display: none; }
+
+        #modalOnboardingRUC form {
+            display: flex;
+            flex-direction: column;
+            min-height: 0; 
+            flex-grow: 1;
+        }
+        #modalOnboardingRUC .modal-header .modal-title {
+            font-size: 1.5rem;
+        }
+        #modalOnboardingRUC .modal-body > p:first-of-type {
+            font-size: 0.9rem;
+            color: #cbd5e0;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+        .modal-body .form-input[readonly] {
+            background-color: #1f2937;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .modal-body .form-input {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .modal-footer button {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .modal-footer button:hover {
+            transform: scale(1.05);
+        }
+        #ruc-details {
+            transition: all 0.4s ease-in-out;
+        }
+        #ruc-details.hidden {
+            opacity: 0;
+            transform: translateY(-15px);
+            max-height: 0;
+            overflow: hidden;
+            margin-bottom: 0 !important;
+        }
+        #ruc-details {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 500px;
+        }
     </style>
 {% endblock %}
 
@@ -39,24 +95,15 @@
         {% if current_user.sol_validation_status.value in ['pending', 'invalid'] %}
             <span class="text-gray-400">Datos - SOL:</span>
             {% if current_user.sol_validation_status.value == 'pending' %}
-                <span class="font-semibold px-2 py-0.5 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-md">
-                    Pendiente de verificar
-                </span>
+                <span class="font-semibold px-2 py-0.5 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-md">Pendiente de verificar</span>
             {% elif current_user.sol_validation_status.value == 'invalid' %}
-                <span class="font-semibold px-2 py-0.5 bg-red-500/20 text-red-300 border border-red-500/30 rounded-md">
-                    No son válidos
-                </span>
+                <span class="font-semibold px-2 py-0.5 bg-red-500/20 text-red-300 border border-red-500/30 rounded-md">No son válidos</span>
             {% endif %}
         {% endif %}
     </div>
 {% endblock %}
 
 {% block main_content %}
-    <div id="custom-toast">
-        <span id="toast-icon"></span>
-        <span id="toast-message"></span>
-    </div>
-
     <div class="onboarding-container">
         <header class="teaser-header">
             <h1 class="teaser-title">Tu tranquilidad fiscal <span class="highlight">comienza aquí.</span></h1>
@@ -67,60 +114,55 @@
                 <div class="teaser-card cta-card">
                     <h2>2 Meses GRATIS</h2>
                     <p>Sin compromisos ni tarjeta de crédito. Activa tu prueba con tu RUC y Clave SOL.</p>
-                    <button data-modal-target="freemium-register-modal" class="btn-light">¡Quiero mi prueba GRATIS!</button>
+                    <button _="on click call resetOnboardingForm() then toggle .is-open on #modalOnboardingRUC then add .modal-is-open to body" class="btn-light">¡Quiero mi prueba GRATIS!</button>
                 </div>
                 <div class="teaser-card">
                     <h3 class="card-title"><svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>Próximas Declaraciones</h3>
                     <div id="next-periods-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <!-- El contenido se llenará con JavaScript -->
                         <div class="calendar-item"><span>Declaración IGV-Renta (Ejemplo)</span><span class="due-text">Vence pronto</span></div>
                     </div>
                 </div>
             </div>
             <div class="grid-column grid-col-span-3">
-                <div class="teaser-card">
-                    <h3 class="card-title"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>Impuestos Pagados<span class="demo-badge">Así verás tus datos</span></h3>
-                    <div class="chart-container"><canvas id="lineChart"></canvas></div>
-                </div>
-                <div class="teaser-card">
-                    <h3 class="card-title"><svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>Distribución de Gastos<span class="demo-badge">Así verás tus datos</span></h3>
-                    <div class="chart-container"><canvas id="pieChart"></canvas></div>
-                </div>
+                <div class="teaser-card"><h3 class="card-title"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>Impuestos Pagados<span class="demo-badge">Así verás tus datos</span></h3><div class="chart-container"><canvas id="lineChart"></canvas></div></div>
+                <div class="teaser-card"><h3 class="card-title"><svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>Distribución de Gastos<span class="demo-badge">Así verás tus datos</span></h3><div class="chart-container"><canvas id="pieChart"></canvas></div></div>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="freemium-register-modal" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="modal-content max-w-2xl">
-            <button type="button" class="modal-close" data-modal-close="freemium-register-modal">×</button>
-            <h3 id="modal-title" class="section-title !text-2xl !mb-6">¡Estás a un paso!</h3>
-            <p class="text-center text-gray-400 mb-8">Completa tus datos para activar tus 2 meses gratis.</p>
-            <form id="freemium-form" action="{{ url_for('onboarding_finalize') }}" method="POST">
-                <div class="space-y-6">
-                    <div class="form-group">
-                        <label for="client_ruc_modal" class="form-label">Tu RUC</label>
-                        <div class="relative">
-                            <input type="text" id="client_ruc_modal" name="client_ruc" class="form-input" required placeholder="Ingresa tu RUC y presiona Tab" autocomplete="off" maxlength="11">
-                            <div id="ruc-spinner" class="absolute inset-y-0 right-0 flex items-center pr-3 hidden">
-                                <svg class="animate-spin h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+    <!-- MODAL UNIVERSAL PARA REGISTRO DE RUC (ONBOARDING) -->
+    <div id="modalOnboardingRUC" class="modal-container">
+        <div class="modal-overlay" data-modal-close></div>
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-onboarding-title">
+            <form action="{{ url_for('onboarding_finalize') }}" method="POST">
+                <div class="modal-header">
+                    <h2 id="modal-onboarding-title" class="modal-title">¡Estás a un paso! Activa tu prueba</h2>
+                    <button type="button" class="modal-close-btn" data-modal-close aria-label="Cerrar modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1.5rem;">Necesitamos tu Clave SOL para automatizar tus declaraciones. Tu información está segura y encriptada.</p>
+                    <div class="space-y-4">
+                        <div class="form-group">
+                            <label for="client_ruc_modal" class="form-label">Tu RUC</label>
+                            <div class="relative">
+                                <input type="text" id="client_ruc_modal" name="client_ruc" class="form-input" required placeholder="Ingresa tu RUC y presiona Tab" autocomplete="off" maxlength="11">
+                                <div id="ruc-spinner" class="absolute top-1/2 right-3 -translate-y-1/2 hidden"><svg class="animate-spin h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
                             </div>
                         </div>
-                    </div>
-                    <div id="ruc-details" class="hidden space-y-4">
-                        <div class="form-group">
-                            <label class="form-label">Razón Social / Nombres</label>
-                            <input type="text" id="business_name" name="business_name" class="form-input bg-gray-700" readonly>
+                        <div id="ruc-details" class="hidden">
+                            <div class="form-group"><label for="business_name" class="form-label">Razón Social / Nombres</label><input type="text" id="business_name" name="business_name" class="form-input" readonly></div>
+                            <div class="form-group"><label for="business_address" class="form-label">Dirección Fiscal</label><input type="text" id="business_address" name="business_address" class="form-input" readonly></div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Dirección Fiscal</label>
-                            <input type="text" id="business_address" name="business_address" class="form-input bg-gray-700" readonly>
-                        </div>
+                        <div class="form-group"><label for="sol_username_modal" class="form-label">Usuario SOL</label><input type="text" id="sol_username_modal" name="sol_username" class="form-input" required></div>
+                        <div class="form-group"><label for="sol_password_modal" class="form-label">Clave SOL</label><input type="password" id="sol_password_modal" name="sol_password" class="form-input" required autocomplete="new-password"></div>
+                        <div class="form-group"><label for="sol_password_confirm_modal" class="form-label">Confirmar Clave SOL</label><input type="password" id="sol_password_confirm_modal" name="sol_password_confirm" class="form-input" required autocomplete="new-password"></div>
+                        <div class="form-group"><label for="contact_phone_modal" class="form-label">N° de WhatsApp</label><input type="tel" id="contact_phone_modal" name="contact_phone" class="form-input" placeholder="Ej: 987654321"></div>
+                        <div class="flex items-center"><input id="terms_modal" name="terms" type="checkbox" class="form-checkbox" required><label for="terms_modal" class="form-label-checkbox">Acepto los <a href="{{ url_for('terms_page') }}" target="_blank">Términos</a> y autorizo a YASTA a usar mi Clave SOL.</label></div>
                     </div>
-                    <div class="form-group"><label for="sol_username_modal" class="form-label">Usuario SOL</label><input type="text" id="sol_username_modal" name="sol_username" class="form-input" required autocomplete="username"></div><div class="form-group"><label for="sol_password_modal" class="form-label">Clave SOL</label><input type="password" id="sol_password_modal" name="sol_password" class="form-input" required autocomplete="new-password"></div><div class="form-group"><label for="sol_password_confirm_modal" class="form-label">Confirmar Clave SOL</label><input type="password" id="sol_password_confirm_modal" name="sol_password_confirm" class="form-input" required autocomplete="new-password"></div><div class="form-group"><label for="contact_phone_modal" class="form-label">N° de WhatsApp</label><input type="tel" id="contact_phone_modal" name="contact_phone" class="form-input" placeholder="Ej: 987654321" autocomplete="tel"></div><div class="form-group-checkbox"><input type="checkbox" id="terms_modal" name="terms" required class="form-checkbox"><label for="terms_modal" class="form-label-checkbox">Acepto los <a href="{{ url_for('terms_page') }}" target="_blank" class="text-primary-400 hover:underline">Términos</a> y autorizo a YASTA a usar mi Clave SOL.</label></div>
-                    <button type="submit" id="freemium-submit-btn" class="btn-modal-submit">
-                        <span>Validar y Activar Prueba</span>
-                        <span class="submit-spinner hidden"><svg class="animate-spin ml-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></span>
-                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-button-secondary" data-modal-close>Cancelar</button>
+                    <button type="submit" class="modal-button-primary">Validar y Activar Prueba</button>
                 </div>
             </form>
         </div>
@@ -129,5 +171,24 @@
 
 {% block page_scripts %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{ url_for('static', path='js/dashboard_onboarding.js') }}"></script>
+    
+    <!-- ✅ LÍNEA PROBLEMÁTICA ELIMINADA: <script src="{{ url_for('static', path='js/onboarding_form_logic.js') }}"></script> -->
+    
+    <script>
+        // ✅ SCRIPT DE ACTIVACIÓN AÑADIDO
+        document.addEventListener('DOMContentLoaded', function () {
+            // Este código asegura que la lógica del formulario se active en esta página específica.
+            const modal = document.getElementById('modalOnboardingRUC');
+            if (modal) {
+                // La función initializeOnboardingForm ya existe globalmente gracias a _app_base.html
+                initializeOnboardingForm(modal);
+            }
+
+            // Lógica de los gráficos (sin cambios)
+            const lineCtx = document.getElementById('lineChart');
+            if(lineCtx) new Chart(lineCtx, { type: 'line', data: { labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'], datasets: [{ label: 'Impuestos', data: [650, 590, 800, 810, 560, 1250], borderColor: '#818cf8', tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } } } });
+            const pieCtx = document.getElementById('pieChart');
+            if(pieCtx) new Chart(pieCtx, { type: 'doughnut', data: { labels: ['Planillas', 'Servicios', 'Compras', 'Otros'], datasets: [{ data: [300, 150, 200, 50], backgroundColor: ['#c084fc', '#f87171', '#fbbf24', '#60a5fa'], borderColor: '#1f2937', borderWidth: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#d1d5db', padding: 10 } } } } });
+        });
+    </script>
 {% endblock %}

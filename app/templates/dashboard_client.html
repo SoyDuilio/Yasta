@@ -3,77 +3,140 @@
 {% block title %}Mi Dashboard - YASTA{% endblock %}
 
 {% block page_css %}
-    <!-- Los estilos del dashboard se quedan igual -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/dashboard_declarations.css') }}">
     <style>
-        .dashboard-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; }
-        @media (min-width: 768px) { .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-        @media (min-width: 1280px) { .dashboard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-        .dashboard-widget { background-color: #1f2937; border-radius: 0.75rem; padding: 1.5rem; border: 1px solid #374151; }
-        /* ...etc... */
+        .dashboard-actions { display: flex; gap: 1rem; align-items: center; padding: 1rem; background-color: #1f2937; border-radius: 0.75rem; margin-bottom: 2rem; width: 100%; }
+        .action-btn { background-color: #4b5563; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 500; border: none; cursor: pointer; }
+        .action-btn.primary { background-color: #4f46e5; }
+        .chat-input { flex-grow: 1; background-color: #374151; border: 1px solid #4b5563; border-radius: 0.5rem; padding: 0.5rem 1rem; text-align: center; }
+        
+        /* Estilos para las pestañas (tabs) */
+        .tabs-nav { display: flex; gap: 1rem; border-bottom: 1px solid #374151; padding: 0 1rem; margin-bottom: -1px; }
+        .tab-link { padding: 0.75rem 0.25rem; border-bottom: 2px solid transparent; color: #9ca3af; transition: all 0.2s; white-space: nowrap; }
+        .tab-link:hover { color: #fff; }
+        .tab-link.active { color: #fff; border-bottom-color: #6366f1; font-weight: 600; }
     </style>
 {% endblock %}
 
-
-{% block sub_nav_content %}
-    {% if current_user.sol_validation_status.value == 'valid' %}
-        <div class="flex items-center space-x-4">
-            <a href="#" class="px-1 py-2 text-sm font-semibold text-white border-b-2 border-indigo-500">Resumen</a>
-        </div>
-    {% endif %}
-{% endblock %}
-
-
 {% block main_content %}
 <div class="container mx-auto px-4">
-    {% if current_user.sol_validation_status.value != 'valid' %}
-        <!-- Vista de Onboarding -->
-    {% else %}
-        <!-- DASHBOARD COMPLETO -->
-        <div>
-            <header class="mb-8 flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold text-white">Resumen del Periodo</h1>
-                    <p class="text-gray-400 mt-1">Hola {{ current_user.contact_name }}, aquí tienes un vistazo rápido.</p>
+    <!-- BARRA DE ACCIONES (SIN CAMBIOS) -->
+    <div class="dashboard-actions">
+        <button class="action-btn" data-modal-open="modalRegistrarRuc">Registrar otro RUC</button>
+        <input type="text" class="chat-input" placeholder="Chat (Próximamente)">
+        <button class="action-btn primary" data-modal-open="modalRegistrarPago">Registrar Pago</button>
+    </div>
+
+    <!-- SECCIÓN DE DECLARACIONES RECONSTRUIDA -->
+    <div class="mt-8">
+        <h2 class="text-2xl font-bold text-white mb-4">Mis Declaraciones</h2>
+        <div class="dashboard-widget p-0 overflow-hidden">
+            {% if client_profiles %}
+                {# --- CASO: Múltiples RUCs (> 1) --- #}
+                {% if client_profiles|length > 1 %}
+                    <div x-data="{ activeTab: {{ client_profiles[0].id }} }" class="p-4 pb-0">
+                        <nav class="tabs-nav">
+                            {% for profile in client_profiles %}
+                                <a href="#"
+                                   @click.prevent="activeTab = {{ profile.id }}"
+                                   :class="{ 'active': activeTab === {{ profile.id }} }"
+                                   class="tab-link"
+                                   hx-get="/app/declarations/table?client_profile_id={{ profile.id }}"
+                                   hx-target="#declarations-content-area"
+                                   hx-indicator="#declarations-spinner">
+                                   RUC: {{ profile.ruc }}
+                                </a>
+                            {% endfor %}
+                        </nav>
+                    </div>
+                {% endif %}
+                {# --- FIN CASO Múltiples RUCs --- #}
+
+                <!-- Contenedor Universal para la Tabla -->
+                <div class="p-4 relative">
+                    <div id="declarations-content-area" 
+                         hx-get="/app/declarations/table?client_profile_id={{ client_profiles[0].id }}" 
+                         hx-trigger="load, paymentSuccess from:body"
+                         hx-swap="innerHTML">
+                        <!-- Indicador de carga inicial -->
+                        <div class="htmx-indicator w-full text-center p-8 text-gray-400">Cargando declaraciones...</div>
+                    </div>
+                    <!-- Spinner para cargas de pestañas -->
+                    <div id="declarations-spinner" class="htmx-indicator absolute inset-0 bg-gray-800/50 flex items-center justify-center">
+                        <p class="text-white">Cargando...</p>
+                    </div>
                 </div>
-                <div>
-                    <!-- Este botón activa el flujo de pago y carga el formulario inicial -->
-                    <button 
-                        hx-get="/app/payments/new?cache_bust={{ now() | int }}" 
-                        hx-target=".payment-flow__content"
-                        hx-swap="innerHTML"
-                        _="on htmx:afterRequest add .is-active to .payment-flow"
-                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                        Registrar un Pago
-                    </button>
+
+            {% else %}
+                {# --- CASO: Sin RUCs --- #}
+                <div class="dashboard-widget">
+                    <p class="text-center text-gray-400 p-8">Aún no tienes un RUC asociado. ¡Registra uno para empezar!</p>
                 </div>
-            </header>
-            <div class="dashboard-grid">
-                <div class="dashboard-widget"><h3 class="widget-title">Impuesto por Pagar (Junio)</h3><p class="kpi-value">S/ 1,250.00</p><p class="kpi-label">IGV + Renta</p></div>
-                <div class="dashboard-widget"><h3 class="widget-title">Próximo Vencimiento</h3><p class="kpi-value text-yellow-400">En 5 días</p><p class="kpi-label">Declaración PLAME</p></div>
-                <div class="dashboard-widget"><h3 class="widget-title">Alertas Activas</h3><p class="kpi-value text-red-500">1</p><p class="kpi-label">Orden de Pago pendiente</p></div>
-                <div class="dashboard-widget xl:col-span-2"><h3 class="widget-title">Historial de Impuestos Pagados</h3><div class="chart-container-widget"><canvas id="clientLineChart"></canvas></div></div>
-                <div class="dashboard-widget"><h3 class="widget-title">Distribución de Gastos</h3><div class="chart-container-widget"><canvas id="clientPieChart"></canvas></div></div>
-            </div>
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
 </div>
 {% endblock %}
 
 
 {% block body_end_scripts %}
-    <!-- EL NUEVO ESQUELETO DEL FLUJO DE PAGO -->
-    <div class="payment-flow">
-        <div class="payment-flow__overlay" _="on click remove .is-active from me.parentElement"></div>
-        
-        <div class="payment-flow__panel">
-            <button class="payment-flow__close-btn" _="on click remove .is-active from closest .payment-flow">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-            
-            <!-- Contenedor donde HTMX inyectará el contenido -->
-            <div class="payment-flow__content">
-                <div class="htmx-indicator text-white text-center"><p>Cargando...</p></div>
-            </div>
-        </div>
+    <!-- Estructura permanente de los contenedores de modales -->
+    <div id="modalRegistrarRuc" class="modal-container">
+        <div class="modal-overlay" data-modal-close></div>
+        <div class="modal-panel"></div>
     </div>
+    <div id="modalRegistrarPago" class="modal-container">
+        <div class="modal-overlay" data-modal-close></div>
+        <div class="modal-panel"></div>
+    </div>
+    <div id="modalDeclarationDetails" class="modal-container"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const setupModalButton = (buttonSelector, modalId, url) => {
+            const button = document.querySelector(buttonSelector);
+            if (!button) return;
+
+            button.addEventListener('click', () => {
+                const modal = document.getElementById(modalId);
+                const panel = modal.querySelector('.modal-panel');
+                if (!modal || !panel) return;
+                
+                panel.innerHTML = '<p class="p-8 text-center">Cargando...</p>';
+                modal.classList.add('is-open');
+                document.body.classList.add('modal-is-open');
+
+                htmx.ajax('GET', url, { target: panel, swap: 'innerHTML' });
+            });
+        };
+
+        setupModalButton('[data-modal-open="modalRegistrarRuc"]', 'modalRegistrarRuc', '{{ url_for("onboarding_get_form") }}');
+        setupModalButton('[data-modal-open="modalRegistrarPago"]', 'modalRegistrarPago', '{{ url_for("get_payment_instructions") }}');
+    });
+
+    // Listener para activar JS DESPUÉS de cualquier cambio de contenido por HTMX
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        // Vincula los botones de cierre del nuevo contenido
+        if (window.bindModalCloseEvents) {
+            window.bindModalCloseEvents(evt.detail.elt);
+        }
+        
+        // Inicializa el JS del formulario de RUC si se ha cargado
+        const formWrapperRuc = evt.detail.elt.querySelector('#register-ruc-form-wrapper');
+        if (formWrapperRuc && typeof initializeOnboardingForm === 'function') {
+            initializeOnboardingForm(formWrapperRuc);
+        }
+    });
+
+    // Listener para el modal de detalles de la tabla
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.elt.closest('#declarations-content-area')) {
+            const modal = document.getElementById('modalDeclarationDetails');
+            modal.innerHTML = `<div class="modal-overlay" data-modal-close></div><div class="modal-panel">${evt.detail.xhr.responseText}</div>`;
+            //window.bindModalCloseEvents(modal);
+            //modal.classList.add('is-open');
+            //document.body.classList.add('modal-is-open');
+        }
+    });
+    </script>
 {% endblock %}
