@@ -1,0 +1,144 @@
+/* Estilos para la tabla de declaraciones */
+.declarations-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.declarations-table th, .declarations-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #374151; /* gray-700 */
+}
+
+.declarations-table th {
+    background-color: #1f2937; /* gray-800 */
+    color: #9ca3af; /* gray-400 */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.declarations-table tbody tr:hover {
+    background-color: #2d3748; /* Un poco más claro que el fondo */
+}
+
+.declarations-table tbody tr.placeholder-row {
+    color: #6b7280; /* gray-500 */
+    font-style: italic;
+}
+
+.declarations-table tbody tr.placeholder-row:hover {
+    background-color: transparent;
+    cursor: default;
+}
+
+/* Estilos para los Badges de Estado */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.badge-green { background-color: #10B981; color: #ffffff; }
+.badge-blue { background-color: #3B82F6; color: #ffffff; }
+.badge-yellow { background-color: #F59E0B; color: #1f2937; }
+.badge-red { background-color: #EF4444; color: #ffffff; }
+.badge-gray { background-color: #6B7280; color: #ffffff; }
+.status-not-requested { color: #6b7280; }
+
+
+/* ================================================== */
+/* === ESTILOS PARA LA TABLA DE DECLARACIONES === */
+/* ================================================== */
+
+.declarations-table {
+    width: 100%;
+    border-collapse: collapse; /* Une los bordes de las celdas */
+    table-layout: fixed; /* Algoritmo de tabla que respeta los anchos definidos */
+    color: #d1d5db; /* Color de texto base para la tabla */
+}
+
+.declarations-table th,
+.declarations-table td {
+    padding: 0.75rem 1rem; /* 12px vertical, 16px horizontal */
+    text-align: left;
+    border-bottom: 1px solid #374151; /* Línea separadora entre filas */
+    white-space: nowrap; /* Evita que el texto se rompa por defecto */
+}
+
+.declarations-table th {
+    font-weight: 600;
+    font-size: 0.75rem; /* Letra más pequeña para las cabeceras */
+    text-transform: uppercase;
+    color: #9ca3af;
+    letter-spacing: 0.05em;
+}
+
+.declarations-table tbody tr:hover {
+    background-color: #2c344b; /* Color de fondo al pasar el mouse */
+}
+
+/* --- AJUSTES DE ANCHO Y RESPONSIVIDAD --- */
+
+/* La columna 'Periodo' puede ser más flexible */
+.declarations-table th:nth-child(1),
+.declarations-table td:nth-child(1) {
+    width: 20%;
+}
+
+/* Las columnas de fecha pueden ser de ancho fijo */
+.declarations-table th:nth-child(2), .declarations-table td:nth-child(2), /* Solicitud */
+.declarations-table th:nth-child(3), .declarations-table td:nth-child(3), /* Vencimiento */
+.declarations-table th:nth-child(4), .declarations-table td:nth-child(4) { /* Declaración */
+    width: 18%;
+    text-align: center;
+}
+
+/* La columna de estado es la que más se beneficia de un ancho fijo */
+.declarations-table th:nth-child(5),
+.declarations-table td:nth-child(5) {
+    width: 15%;
+    text-align: center;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+/* -- Media Query para Móviles -- */
+@media (max-width: 768px) {
+    .declarations-table {
+        table-layout: auto; /* Dejamos que el navegador decida los anchos */
+    }
+
+    .declarations-table th,
+    .declarations-table td {
+        padding: 0.75rem 0.5rem; /* Reducimos el padding horizontal */
+        font-size: 0.8rem; /* Reducimos ligeramente el tamaño de la fuente */
+        white-space: normal; /* ¡CLAVE! Permite que el texto se rompa en varias líneas */
+        text-align: center; /* Centramos todo para un look más ordenado en móvil */
+    }
+    
+    .declarations-table th:nth-child(1),
+    .declarations-table td:nth-child(1) {
+        text-align: left; /* Mantenemos el periodo alineado a la izquierda */
+    }
+}
+
+/* Estilos de los badges de estado */
+.status-success { background-color: #166534; color: #a7f3d0; }
+.status-pending { background-color: #b45309; color: #fde68a; }
+.status-in-progress { background-color: #1d4ed8; color: #bfdbfe; }
+.status-error { background-color: #991b1b; color: #fecaca; }
+.status-not-requested { background-color: #374151; color: #9ca3af; }
+.badge-gray { background-color: #4b5563; color: #d1d5db; }
+/* ... (añade más clases si las necesitas) */

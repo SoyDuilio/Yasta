@@ -1,0 +1,52 @@
+/* ====================================================================== */
+/*            ESTILOS DEFINITIVOS PARA UNIFIED_PAYMENT_FORM               */
+/* ====================================================================== */
+
+/* === CONTENEDOR Y TÍTULO === */
+.form-title { font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 1.5rem; color: white; }
+.form-group { margin-bottom: 1.5rem; }
+.form-group-inner { margin-bottom: 1rem; }
+
+/* === ETIQUETAS Y CAMPOS DE FORMULARIO === */
+.main-label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500; color: #d1d5db; }
+input[type="text"], input[type="number"], input[type="file"], select {
+    width: 100%; background-color: #1f2937; border: 1px solid #4b5563; border-radius: 0.375rem; padding: 0.5rem 0.75rem; color: white; transition: border-color 0.2s, box-shadow 0.2s;
+}
+input[type="file"] { padding: 0; }
+input[type="file"]::file-selector-button { margin-right: 1rem; padding: 0.5rem 1rem; border-radius: 9999px; border: 0; font-size: 0.875rem; font-weight: 600; background-color: #eef2ff; color: #4338ca; cursor: pointer; }
+input[type="file"]::file-selector-button:hover { background-color: #e0e7ff; }
+input[type="text"]:focus, input[type="number"]:focus, select:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px #4f46e5; }
+
+/* === BOTONES === */
+button[type="submit"], #add-row-btn { width: 100%; display: flex; justify-content: center; align-items: center; padding: 0.75rem 1rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; color: white; cursor: pointer; transition: background-color 0.2s; }
+button[type="submit"] { background-color: #4f46e5; border: 1px solid transparent; }
+button[type="submit"]:hover { background-color: #4338ca; }
+#add-row-btn { margin-top: 0.5rem; border: 1px dashed #6b7280; color: #d1d5db; background-color: transparent; }
+#add-row-btn:hover { background-color: #374151; }
+#add-row-btn svg { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; }
+
+/* === PESTAÑAS === */
+.tabs-nav { display: flex; gap: 1rem; border-bottom: 1px solid #4a5568; margin-bottom: 1.5rem; }
+.tab-link { cursor: pointer; padding-bottom: 0.5rem; border-bottom: 2px solid transparent; color: #a0aec0; font-weight: 500; transition: all 0.2s ease-in-out; }
+.tab-link:hover { color: #e2e8f0; }
+.tab-link.active { color: #a78bfa; border-bottom-color: #818cf8; }
+.tab-content-container { min-height: 150px; }
+
+/* === FILAS DE PERIODO (SOLUCIÓN FINAL) === */
+.declaration-header {
+    display: flex; gap: 0.75rem; padding-right: 44px; /* Ancho del botón X + gap */ margin-bottom: 0.25rem;
+}
+.header-item { flex: 1; color: #9ca3af; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; }
+
+.declaration-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.declaration-row .row-inputs { flex-grow: 1; display: flex; gap: 0.75rem; }
+.declaration-row .row-inputs > * { flex: 1; } /* Fuerza a que los inputs sean del mismo tamaño */
+.declaration-row .row-action { flex-shrink: 0; }
+
+.remove-row-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: none; border: none; color: #ef4444; font-size: 1.5rem; font-weight: bold; cursor: pointer; border-radius: 50%; transition: all 0.2s; }
+.remove-row-btn:hover { color: white; background-color: #ef4444; transform: scale(1.1); }
+
+/* === ANIMACIONES === */
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.declaration-row.animate-fadeInDown { animation: fadeInDown 0.4s ease-in-out; }
+.declaration-row.is-hiding { transition: all 0.3s ease; opacity: 0; transform: scaleY(0); max-height: 0 !important; margin-bottom: 0 !important; padding: 0 !important; border: 0 !important; }

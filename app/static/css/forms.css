@@ -51,3 +51,11 @@ html.dark .alert-danger { background-color: #2c1214; border-color: #842029; colo
     color: var(--text-muted-color); cursor: pointer; margin-bottom: 1rem;
 }
 .auth-back-button:hover { color: var(--primary-color); }
+
+
+#ruc-spinner {
+    position: absolute; /* Saca al spinner del flujo del layout */
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%); /* Lo centra verticalmente */
+}

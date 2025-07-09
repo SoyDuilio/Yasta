@@ -1,0 +1,93 @@
+/* app/static/css/modals.css - VERSIÓN ÚNICA Y DEFINITIVA */
+
+/* --- Estilo Base para el Contenedor/Overlay del Modal --- */
+/* Contenedor principal del modal */
+.modal-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 9999;
+    
+    /* Centra el .modal-panel en la pantalla */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Control de visibilidad */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+/* Clase que activa el modal */
+.modal-container.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease;
+}
+
+/* El fondo oscuro semitransparente */
+.modal-overlay {
+    position: absolute; /* Ocupa todo el espacio del .modal-container */
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(17, 24, 39, 0.8);
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+}
+
+/* El panel que contiene el formulario */
+.modal-panel {
+    position: relative; /* Para que el botón de cerrar se posicione relativo a él */
+    z-index: 10000; /* Siempre por encima del overlay */
+    background-color: #1f2937;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 520px;
+
+    /* Para el scroll interno */
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh; /* Altura máxima del panel */
+}
+
+/* El área de contenido con el scroll */
+.modal-content {
+    padding: 2.5rem;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* Botón de cierre */
+.modal-close-btn {
+    position: absolute;
+    top: 0.75rem; right: 0.75rem;
+    /* ... el resto de tus estilos para el botón ... */
+}
+.modal-close-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Animación para el contenedor de detalles del RUC */
+#ruc-details {
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    max-height: 0;
+}
+#ruc-details.visible {
+    max-height: 15rem; /* Altura suficiente para los 2 campos y sus márgenes */
+}
+
+/* Estilos de Formulario Compacto */
+#freemium-form .form-group, #register-ruc-form .form-group {
+    margin-bottom: 0.75rem;
+}
+#freemium-form .form-label, #register-ruc-form .form-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+#freemium-form .form-input, #register-ruc-form .form-input {
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+}

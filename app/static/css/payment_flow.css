@@ -23,10 +23,12 @@
     justify-content: center;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease-in-out;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease;
 }
 .payment-flow.is-active {
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
 }
 
@@ -54,6 +56,12 @@
     
     transform: scale(0.95);
     transition: transform 0.3s ease-in-out;
+
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow: hidden; /* Evita que el contenido se desborde */
+
 }
 .payment-flow.is-active .payment-flow__panel {
     transform: scale(1);
@@ -89,11 +97,15 @@
 
 /* 5. Contenido Interno (NUEVA TIPOGRAFÍA) */
 .payment-flow__content {
+    padding: 1.5rem;
+    overflow-y: auto; /* Permite desplazamiento si el contenido es largo */
+    flex-grow: 1; /* Permite que el contenido ocupe el espacio restante */
     width: 100%;
     display: flex;
     flex-direction: column;
     min-height: 500px;
     font-family: 'Inter', sans-serif; /* Fuente nítida para todo el contenido */
+    padding: 1.5rem 2rem;
 }
 
 /* 6. Estilos específicos para los textos del formulario */
@@ -111,6 +123,18 @@
     font-family: 'Poppins', sans-serif; /* Fuente de alto impacto para el título */
 }
 
+/* Arreglo para el RUC Spinner */
+.form-group .relative {
+    position: relative; /* El contenedor debe tener posición relativa */
+}
+
+#ruc-spinner {
+    position: absolute; /* Posición absoluta para no afectar el layout */
+    top: 50%;
+    right: 0.75rem; /* 12px */
+    transform: translateY(-50%); /* Centrado vertical perfecto */
+}
+
 
 /* 7. Diseño Responsive (sin cambios) */
 @media (max-width: 640px) {
@@ -125,4 +149,318 @@
     }
     .payment-flow.is-active .payment-flow__panel { transform: translateY(0); }
     .payment-flow__close-btn { top: 1rem; right: 1rem; }
+}
+
+
+/* app/static/css/payment_flow.css */
+
+/* Estilos para el contenedor de las pestañas */
+.tabs-nav {
+    display: flex;
+    gap: 2rem; /* Espacio entre pestañas */
+    border-bottom: 1px solid #4a5568; /* Línea divisoria */
+    margin-bottom: 1.5rem;
+}
+
+/* Estilo para cada enlace de pestaña */
+.tab-link {
+    cursor: pointer;
+    padding: 1rem 0.25rem;
+    border-bottom: 2px solid transparent;
+    color: #a0aec0; /* Color de pestaña inactiva */
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.tab-link:hover {
+    color: #e2e8f0; /* Color al pasar el ratón */
+    border-bottom-color: #6366f1; /* Borde al pasar el ratón */
+}
+
+/* Estilo para la pestaña ACTIVA (usaremos Alpine.js para aplicar la clase 'active') */
+.tab-link.active {
+    color: #a78bfa; /* Color de la pestaña activa (morado claro) */
+    border-bottom-color: #818cf8; /* Borde de la pestaña activa */
+}
+
+
+/* === NUEVOS ESTILOS PARA INPUTS Y SELECTS === */
+#unified-payment-form-container input[type="text"],
+#unified-payment-form-container input[type="number"],
+#unified-payment-form-container input[type="file"],
+#unified-payment-form-container select {
+    width: 100%;
+    background-color: #1f2937; /* bg-gray-800 */
+    border: 1px solid #4b5563; /* border-gray-600 */
+    border-radius: 0.375rem; /* rounded-md */
+    padding: 0.5rem 0.75rem; /* px-3 py-2 */
+    color: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#unified-payment-form-container input[type="file"] {
+    padding: 0; /* El input file es especial */
+}
+
+/* Estilos para el botón del input file */
+#unified-payment-form-container input[type="file"]::file-selector-button {
+    margin-right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px; /* rounded-full */
+    border: 0;
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 600; /* font-semibold */
+    background-color: #eef2ff; /* bg-indigo-50 */
+    color: #4338ca; /* text-indigo-700 */
+    cursor: pointer;
+}
+#unified-payment-form-container input[type="file"]::file-selector-button:hover {
+    background-color: #e0e7ff; /* hover:bg-indigo-100 */
+}
+
+/* Efecto Focus para los inputs */
+#unified-payment-form-container input[type="text"]:focus,
+#unified-payment-form-container input[type="number"]:focus,
+#unified-payment-form-container select:focus {
+    outline: none;
+    border-color: #6366f1; /* focus:border-indigo-500 */
+    box-shadow: 0 0 0 2px #4f46e5; /* Simula un ring */
+}
+
+/* === NUEVOS ESTILOS PARA LOS BOTONES === */
+#unified-payment-form-container button[type="submit"],
+#unified-payment-form-container #add-row-btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.75rem 1rem; /* py-3 px-4 */
+    border-radius: 0.375rem; /* rounded-md */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 500; /* font-medium */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#unified-payment-form-container button[type="submit"] {
+    background-color: #4f46e5; /* bg-indigo-600 */
+    border: 1px solid transparent;
+}
+#unified-payment-form-container button[type="submit"]:hover {
+    background-color: #4338ca; /* hover:bg-indigo-700 */
+}
+
+#unified-payment-form-container #add-row-btn {
+    margin-top: 0.5rem; /* mt-2 */
+    border: 1px dashed #6b7280; /* border-dashed border-gray-500 */
+    color: #d1d5db; /* text-gray-300 */
+    background-color: transparent;
+}
+
+/* === REGLA NUEVA PARA EL ICONO '+' === */
+#unified-payment-form-container #add-row-btn svg {
+    width: 1.25rem;  /* Equivalente a w-5 de Tailwind */
+    height: 1.25rem; /* Equivalente a h-5 de Tailwind */
+    margin-right: 0.5rem; /* Equivalente a mr-2 de Tailwind */
+}
+
+#unified-payment-form-container #add-row-btn:hover {
+    background-color: #374151; /* hover:bg-gray-700 */
+}
+
+
+/* === REGLA NUEVA PARA LAS ETIQUETAS === */
+#unified-payment-form-container label {
+    display: block; /* Equivalente a 'block' de Tailwind */
+    margin-bottom: 0.5rem; /* Equivalente a 'mb-2' de Tailwind */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 500; /* font-medium */
+    color: #d1d5db; /* text-gray-300 */
+}
+
+
+/* === ESTILOS PARA LAS FILAS DE DECLARACIÓN === */
+
+
+/* La etiqueta principal de la sección */
+.main-label {
+    display: block;
+    margin-bottom: 1rem; /* Más espacio para separar del grupo de filas */
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #d1d5db;
+}
+
+
+.tab-content-container {
+    position: relative;
+    min-height: 220px; /* Ajusta este valor según sea necesario */
+    transition: min-height 0.3s ease-in-out;
+}
+
+/* Animación para la aparición de una nueva fila */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 100px; /* Un valor suficientemente grande */
+    }
+}
+
+.declaration-row.animate-fadeInDown {
+    animation: fadeInDown 0.4s ease-in-out forwards;
+    overflow: hidden;
+}
+
+/* Clase para la desaparición de una fila */
+.declaration-row.is-hiding {
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+    max-height: 0 !important;
+    padding: 0;
+    margin: 0;
+    border: none;
+    transform: scaleY(0);
+}
+
+
+/* NUEVOS ESTILOS PARA EL FORMULARIO REDISEÑADO */
+
+/* Botón compacto para añadir periodo */
+.add-row-btn-compact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    border: 1px dashed #4b5563; /* gray-600 */
+    border-radius: 0.375rem;
+    color: #9ca3af; /* gray-400 */
+    font-size: 0.875rem;
+    transition: all 0.2s ease-in-out;
+}
+.add-row-btn-compact:hover {
+    background-color: #374151; /* gray-700 */
+    color: #d1d5db; /* gray-300 */
+    border-color: #6b7280; /* gray-500 */
+}
+
+/* Contenedor para los botones Yape/Plin */
+.provider-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* Estilo de los botones Yape/Plin */
+.provider-buttons button {
+    padding: 0.75rem;
+    border: 1px solid #4b5563; /* gray-600 */
+    border-radius: 0.375rem;
+    background-color: transparent;
+    color: #d1d5db; /* gray-300 */
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.provider-buttons button:hover {
+    background-color: #374151; /* gray-700 */
+    border-color: #6b7280; /* gray-500 */
+}
+
+/* Estado activo para los botones Yape/Plin */
+.provider-buttons button.active {
+    background-color: #4f46e5; /* indigo-600 */
+    border-color: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 0 0 2px #1e293b, 0 0 0 4px #4f46e5; /* Anillo de foco */
+}
+
+/* Utilidad para la rejilla (opcional si ya la tienes de Tailwind) */
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gap-4 { gap: 1rem; }
+.mt-4 { margin-top: 1rem; }
+
+
+
+/* Arreglo para el botón de submit */
+.btn-modal-submit {
+    /* Aseguramos que sea visible y tenga espacio */
+    margin-top: 1.5rem; /* Un margen superior más generoso */
+    width: 80%;
+    /* El resto de tus estilos para el botón están bien */
+}
+
+/* Nuevo estilo para el botón de 'Continuar' */
+.btn-like-submit {
+    display: inline-block; /* Permite padding y centrado */
+    width: 100%;
+    background-color: #4f46e5;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.8rem 1rem; /* Más padding vertical */
+    margin-top: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.btn-like-submit:hover {
+    background-color: #4338ca;
+}
+
+/* Nuevo estilo para el enlace de descarga de QR */
+.download-qr-link {
+    font-size: 0.875rem; /* 14px */
+    color: #818cf8; /* indigo-400 */
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+    margin-top: 0.25rem;
+}
+
+.download-qr-link:hover {
+    color: #a78bfa; /* violet-400 */
+}
+
+/* Rediseño del botón de cerrar modal */
+.modal-close, .payment-flow__close-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2.25rem; /* 36px */
+    height: 2.25rem; /* 36px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: rgba(49, 46, 62, 0.7); /* Fondo oscuro semitransparente */
+    color: #d1d5db; /* gris-300 */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.modal-close:hover, .payment-flow__close-btn:hover {
+    background-color: rgba(75, 85, 99, 0.8); /* Un poco más claro */
+    transform: scale(1.1);
+}
+
+.modal-close svg, .payment-flow__close-btn svg {
+    width: 1.25rem; /* 20px */
+    height: 1.25rem; /* 20px */
 }
