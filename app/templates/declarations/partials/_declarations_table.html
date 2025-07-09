@@ -1,0 +1,44 @@
+<!-- app/templates/declarations/partials/_declarations_table.html -->
+
+<table class="declarations-table">
+    <thead>
+        <tr>
+            <th>PERIODO</th>
+            <th class="column-details">FECHA DE SOLICITUD</th>
+            <th class="column-details">VENCIMIENTO</th>
+            <th class="column-details">PRESENTADO EL</th>
+            <th>ESTADO</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr 
+            {% if not item.is_placeholder %}
+                class="clickable-row"
+                hx-get="/app/declarations/details/{{ item.id }}"
+                hx-target="#modalDeclarationDetails"
+                hx-swap="innerHTML"
+                
+                _="on htmx:afterOnLoad 
+                      call window.bindModalCloseEvents(the #modalDeclarationDetails)
+                   then add .is-open to #modalDeclarationDetails 
+                   then add .modal-is-open to body"
+
+            {% endif %}
+        >
+            <td>{{ item.period_display }}</td>
+            
+            {% if not item.is_placeholder %}
+                <td class="column-details">{{ item.request_date }}</td>
+                <td class="column-details">{{ item.due_date }}</td>
+                <td class="column-details">{{ item.filed_at }}</td>
+                <td>
+                    <span class="badge {{ item.status_class }}">{{ item.status_text }}</span>
+                </td>
+            {% else %}
+                <td colspan="4" class="text-gray-500 text-center">{{ item.status_text }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

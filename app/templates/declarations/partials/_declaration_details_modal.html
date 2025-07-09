@@ -1,0 +1,67 @@
+<!-- app/templates/declarations/partials/_declaration_details_modal.html -->
+
+<div class="modal-overlay" data-modal-close></div>
+<div class="modal-panel">
+    <div class="modal-header">
+        <h3 class="modal-title">Detalles de Declaración: {{ declaration.period_display }}</h3>
+        <button class="modal-close-btn" data-modal-close>×</button>
+    </div>
+    <div class="modal-body">
+        
+        <div class="details-section">
+            <h4 class="section-title">Datos del Cliente y Periodo</h4>
+            <div class="details-grid">
+                <p><strong>RUC:</strong> {{ declaration.ruc }}</p>
+                <p><strong>Razón Social:</strong> {{ declaration.razon_social }}</p>
+                <p><strong>ID Solicitud:</strong> #{{ declaration.id }}</p>
+                <p><strong>Estado:</strong> 
+                    <span class="badge {{ declaration.status_info.class }}">{{ declaration.status_info.text }}</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="details-section">
+            <h4 class="section-title">Datos del Servicio YASTA</h4>
+            <div class="details-grid">
+                <p><strong>Fecha Solicitud:</strong> {{ declaration.request_date }}</p>
+                <p><strong>Vencimiento SUNAT:</strong> {{ declaration.due_date }}</p>
+                <p><strong>Contador Asignado:</strong> {{ declaration.accountant_name }}</p>
+            </div>
+        </div>
+
+        <div class="details-section">
+            <h4 class="section-title">Resultados de la Declaración</h4>
+            <div class="details-grid">
+                <p><strong>Fecha Presentación:</strong> {{ declaration.filed_at }}</p>
+                <p><strong>Monto Declarado:</strong> {{ declaration.amount_declared }}</p>
+                <p><strong>Impuesto a Pagar:</strong> {{ declaration.amount_paid_sunat }}</p>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button class="modal-button-secondary" data-modal-close>Cerrar</button>
+    </div>
+</div>
+
+<!-- Pequeño bloque de estilo para los detalles, puedes moverlo a un .css si prefieres -->
+<style>
+    .details-section { margin-bottom: 1.5rem; }
+    .details-section:last-child { margin-bottom: 0; }
+    .section-title {
+        font-weight: 600; color: #e5e7eb; border-bottom: 1px solid #4b5563;
+        padding-bottom: 0.5rem; margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .details-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 0.75rem 1.5rem;
+    }
+    .details-grid p { margin: 0; color: #d1d5db; font-size: 0.95rem; }
+    .details-grid p strong { font-weight: 500; color: #9ca3af; }
+    .badge { padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
+    .badge-green { background-color: #10b981; color: #fff; }
+    .badge-blue { background-color: #3b82f6; color: #fff; }
+    .badge-yellow { background-color: #f59e0b; color: #1f2937; }
+    .badge-red { background-color: #ef4444; color: #fff; }
+    .badge-gray { background-color: #6b7280; color: #fff; }
+</style>

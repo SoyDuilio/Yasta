@@ -1,0 +1,51 @@
+<!-- app/templates/onboarding/partials/_register_ruc_form.html -->
+<div id="register-ruc-form-wrapper">
+    <!-- Botón de cierre simple y robusto -->
+    <button type="button" class="payment-flow__close-btn" 
+            onclick="this.closest('.payment-flow').classList.remove('is-active'); document.body.style.overflow = '';">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+    </button>
+    <h3 class="section-title !text-2xl !mb-6">Asocia un nuevo RUC a tu cuenta</h3>
+    <p class="text-center text-gray-400 mb-8">Completa los datos de tu empresa. Usaremos la Clave SOL para automatizar tus declaraciones.</p>
+    
+    <form id="register-ruc-form" 
+          hx-post="{{ url_for('onboarding_finalize_htmx') }}"
+          hx-target="#register-ruc-form-wrapper"
+          hx-swap="innerHTML">
+        
+        <div class="space-y-4"> <!-- Espaciado reducido -->
+            <!-- ... (Tu HTML para los inputs: RUC, Usuario SOL, etc. va aquí) ... -->
+            <div class="form-group">
+                <label for="client_ruc_modal" class="form-label">Tu RUC</label>
+                <div class="relative">
+                    <input type="text" id="client_ruc_modal" name="client_ruc" class="form-input" required placeholder="Ingresa tu RUC y presiona Tab" autocomplete="off" maxlength="11">
+                    <div id="ruc-spinner" class="absolute inset-y-0 right-0 flex items-center pr-3 hidden">
+                        <svg class="animate-spin h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </div>
+                </div>
+            </div>
+             <div id="ruc-details" class="hidden space-y-4"> ... </div>
+             <!-- ... otros form-groups ... -->
+        </div>
+        <div class="mt-8">
+            <button type="submit" class="btn-modal-submit">
+                <span>Asociar RUC</span>
+                <!-- ... spinner ... -->
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Script auto-ejecutable para este fragmento -->
+<script>
+    (function() {
+        // Asegura que el script principal esté cargado
+        if (typeof initializeOnboardingForm === 'function') {
+            const formContainer = document.getElementById('register-ruc-form-wrapper');
+            if (formContainer) {
+                console.log("Inicializando JS para el formulario de RUC cargado dinámicamente.");
+                initializeOnboardingForm(formContainer);
+            }
+        }
+    })();
+</script>

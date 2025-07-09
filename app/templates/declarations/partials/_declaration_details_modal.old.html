@@ -1,0 +1,24 @@
+<div class="modal-container is-open" id="modalDeclarationDetails">
+    <div class="modal-overlay" data-modal-close></div>
+    <div class="modal-panel">
+        <div class="modal-header">
+            <h2 class="modal-title">Detalles de Declaración: {{ declaration.period }}</h2>
+            <button class="modal-close-btn" data-modal-close>×</button>
+        </div>
+        <div class="modal-body">
+            <p><strong>ID de Declaración:</strong> {{ declaration.id }}</p>
+            <p><strong>Monto:</strong> S/ {{ "%.2f"|format(declaration.amount) }}</p>
+            <p>Más detalles de la declaración irán aquí...</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-button-secondary" data-modal-close>Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Script para asegurar que los botones de cierre funcionen -->
+<script>
+    if (window.bindModalCloseEvents) {
+        window.bindModalCloseEvents(document.getElementById('modalDeclarationDetails'));
+    }
+</script>
