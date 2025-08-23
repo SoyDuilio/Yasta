@@ -12,6 +12,7 @@ from app.core.config import settings
 
 from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 
+
 # --- 2. Importaciones del Proyecto (Organizadas por Módulo) ---
 from app.core.config import settings
 from app.core.templating import mount_static_files
@@ -26,8 +27,13 @@ from app.apis.v1.api import api_router as v1_api_router
 from app.routes import pages as pages_router
 from app.routes import payments as web_payments_router
 from app.routes import dev_tools as dev_tools_router
-
 from app.routes import declarations as web_declarations_router
+
+# ¡NUEVOS ROUTERS DE DASHBOARDS!
+from app.routes.dashboards import supervisor as supervisor_dashboard_router
+# Aquí agregarás los otros routers de dashboard (client, staff, ceo) en el futuro
+
+from app.routes.dashboards import staff as staff_dashboard_router
 
 # --- 3. Inicialización de la Aplicación FastAPI ---
 app = FastAPI(
@@ -71,8 +77,18 @@ app.include_router(pages_router.router, tags=["Web App - Pages"])
 app.include_router(web_payments_router.router, prefix="/app", tags=["Web App - Payments"])
 app.include_router(dev_tools_router.router, prefix="/dev", tags=["Developer Tools"])
 app.include_router(web_declarations_router.router, prefix="/app/declarations", tags=["Web App - Declarations"])
-# b) Rutas de la API (Sirven principalmente JSON)
+
+# b) Rutas de Dashboards por Rol
+# Por ahora solo el de supervisor, el de cliente se moverá aquí en una futura refactorización
+app.include_router(supervisor_dashboard_router.router, prefix="/dashboard/super", tags=["Dashboard - Supervisor"])
+
+# c) Rutas de la API (Sirven principalmente JSON)
 app.include_router(v1_api_router, prefix=settings.API_V1_STR)
+
+# ¡AÑADE ESTA LÍNEA PARA REGISTRAR EL ROUTER!
+app.include_router(staff_dashboard_router.router, prefix="/dashboard/staff", tags=["Dashboard - Staff"])
+
+
 
 # --- 7. Endpoints de Utilidad (directamente en la raíz) ---
 @app.get("/health", tags=["Utilities"])
