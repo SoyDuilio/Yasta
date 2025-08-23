@@ -1,44 +1,55 @@
-# app/routers/dev_tools.py
+# app/routes/dev_tools.py
 
-from fastapi import APIRouter, Request, Depends
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import APIRouter, Depends, HTTPException, Request, Query, status
+from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 
-# --- CORRECCIONES DE IMPORTACIÓN (VERSIÓN FINAL) ---
-# 1. Apuntamos a tu archivo de sesión real. ¡Esto ya está correcto!
-from app.db.session import get_db 
+from app.db.session import get_db
+from app.models.user import User, UserRole
+from app.core.security import create_access_token
+from app.core.config import settings
+# --- ¡LA IMPORTACIÓN CLAVE QUE FALTABA! ---
+from app.core.templating import templates
 
-# 2. Apuntamos a los modelos correctos según tu estructura de archivos.
-from app.models.user import User
-from app.models.fee_payment import FeePayment
-from app.models.client_profile import ClientProfile # CORRECCIÓN: Usamos ClientProfile
+router = APIRouter()
 
-# --- FIN DE CORRECCIONES ---
+# En app/routes/dev_tools.py
 
-router = APIRouter(
-    prefix="/dev",
-    tags=["Developer Tools"],
-    include_in_schema=False
-)
+@router.get("/login-as/{user_id}", name="dev_login_as_user")
+async def dev_login_as_user(request: Request, user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail=f"Usuario con ID {user_id} no encontrado.")
 
-templates = Jinja2Templates(directory="app/templates")
+    # --- ¡LÓGICA MEJORADA DE REDIRECCIÓN! ---
+    redirect_url = ""
+    if user.role == UserRole.STAFF_COLLABORATOR:
+        redirect_url = request.url_for("staff_dashboard_page")
+    elif user.role in [UserRole.STAFF_MANAGER, UserRole.STAFF_CEO, UserRole.ADMIN]:
+        redirect_url = request.url_for("supervisor_dashboard_page")
+    elif user.role in [UserRole.CLIENT_FREEMIUM, UserRole.CLIENT_PAID]:
+        redirect_url = request.url_for("client_dashboard_page")
+    else:
+        redirect_url = request.url_for("home_page")
 
-@router.get("/dashboard", response_class=HTMLResponse)
-async def get_dev_dashboard(request: Request, db: Session = Depends(get_db)):
+    access_token = create_access_token(subject=user.id)
+    response = RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    response.set_cookie(key=settings.ACCESS_TOKEN_COOKIE_NAME, value=access_token, httponly=True)
+    return response
+
+
+# --- ENDPOINT PARA EL MODAL DE ALERTA GENÉRICO ---
+@router.get("/alert-modal", response_class=HTMLResponse, name="get_alert_modal")
+async def get_alert_modal(
+    request: Request,
+    title: str = Query("Atención"),
+    message: str = Query("Ha ocurrido un error inesperado.")
+):
     """
-    Muestra un dashboard provisional con datos clave de la aplicación.
+    Genera el contenido HTML para un modal de alerta genérico.
     """
-    all_payments = db.query(FeePayment).order_by(FeePayment.created_at.desc()).all()
-    all_users = db.query(User).all()
-    # CORRECCIÓN: Consultamos el modelo ClientProfile
-    all_client_profiles = db.query(ClientProfile).all()
-
-    context = {
+    return templates.TemplateResponse("partials/_alert_modal.html", {
         "request": request,
-        "payments": all_payments,
-        "users": all_users,
-        # CORRECCIÓN: Pasamos los perfiles de cliente al template
-        "clients": all_client_profiles 
-    }
-    return templates.TemplateResponse("dev/dashboard.html", context)
+        "title": title,
+        "message": message
+    })
