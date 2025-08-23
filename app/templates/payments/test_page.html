@@ -1,0 +1,12 @@
+<!-- app/templates/payments/test_page.html -->
+
+{% extends "layouts/_app_base.html" %}
+
+{% block title %}Página de Prueba - Nuevo Formulario{% endblock %}
+
+{% block main_content %}
+<div class="container mx-auto p-8">
+    <!-- Aquí incluimos nuestro formulario parcial -->
+    {% include 'payments/partials/_unified_payment_form.html' %}
+</div>
+{% endblock main_content %}
