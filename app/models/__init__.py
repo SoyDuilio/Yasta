@@ -22,6 +22,7 @@ from .service_contract import ServiceContract, ServiceContractStatus
 # 5. Modelos específicos de cada tipo de servicio.
 from .monthly_declaration import MonthlyDeclaration, DeclarationType, SunatPaymentStatus
 from .payroll_receipt import PayrollReceipt, PaymentMethodRxh
+from .declaration_request import DeclarationRequest, DeclarationRequestStatus 
 
 # 6. Modelos de soporte (Pagos, Documentos, Comunicaciones).
 from .fee_payment import FeePayment, PaymentMethodPlatform, FeePaymentStatus
