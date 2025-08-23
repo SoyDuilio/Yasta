@@ -1,0 +1,9 @@
+{% extends 'layouts/_console_base.html' %}
+{% block title %}Mi Dashboard - YASTA Staff{% endblock %}
+{% block console_title %}Mis Tareas Asignadas{% endblock %}
+
+{% block console_menu %}
+    <button id="btn-tasks" class="menu-btn active" hx-get="{{ url_for('staff_tasks_view') }}">Mis Tareas</button>
+    <button class="menu-btn" disabled>Completadas</button>
+    <button class="menu-btn" disabled>Comunicaciones</button>
+{% endblock %}
