@@ -1,0 +1,50 @@
+<!-- app/templates/partials/_console_scripts.html -->
+<script>
+    // --- LÓGICA PARA EL MENÚ ACTIVO ---
+    const consoleMenu = document.querySelector('.console-menu');
+    const contentArea = document.getElementById('console-content-area');
+    
+    function setActiveButton(buttonId) {
+        if (!consoleMenu) return;
+        consoleMenu.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+        const activeButton = document.getElementById(buttonId);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+    }
+
+    if (consoleMenu) {
+        consoleMenu.addEventListener('click', function(event) {
+            const clickedButton = event.target.closest('.menu-btn');
+            if (clickedButton && !clickedButton.disabled) {
+                setActiveButton(clickedButton.id);
+            }
+        });
+    }
+    
+    // --- LÓGICA PARA LOS TOASTS Y ACCIONES ---
+    function showToast(message) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast-success';
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
+    document.body.addEventListener('copyToClipboardAndNotify', function(evt) {
+        const data = evt.detail;
+        if (data.password) {
+            navigator.clipboard.writeText(data.password).then(() => {
+                showToast(data.message || '¡Copiado!');
+            }).catch(err => {
+                console.error('Error al copiar: ', err);
+                showToast('Error al copiar la clave.');
+            });
+        }
+    });
+</script>
