@@ -1,4 +1,6 @@
-// app/static/js/main.js
+// =========================================================================
+// === ARCHIVO main.js COMPLETO Y CORREGIDO - VERSIÓN FINAL ===
+// =========================================================================
 
 document.addEventListener('DOMContentLoaded', function () {
     
@@ -55,41 +57,69 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- Menú de Usuario Desplegable (Desktop) ---
-    const userMenuButton = document.getElementById('user-menu-button');
-    const userDropdown = document.getElementById('user-dropdown');
-    if (userMenuButton && userDropdown) {
-        userMenuButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const isHidden = userDropdown.classList.toggle('hidden');
-            userMenuButton.setAttribute('aria-expanded', String(!isHidden));
-            const arrow = userMenuButton.querySelector('.dropdown-arrow');
-            if (arrow) arrow.classList.toggle('rotate-180', !isHidden);
-        });
+    // ========================================================================
+    // === INICIO DE LA SECCIÓN CORREGIDA PARA EL MENÚ DE USUARIO (HTMX) ===
+    // ========================================================================
+    
+    // Se usa delegación de eventos en 'body' para que funcione incluso
+    // si HTMX reemplaza el contenido del header.
+    document.body.addEventListener('click', function(event) {
+        const target = event.target;
+        
+        // El método .closest() busca el elemento clickeado o su padre más cercano que coincida.
+        // Es la clave para que esto funcione.
+        const userMenuButton = target.closest('#user-menu-button');
+        const userDropdown = document.getElementById('user-dropdown');
 
-        document.addEventListener('click', (event) => {
-            if (userDropdown && !userDropdown.classList.contains('hidden')) {
-                if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
-                    userDropdown.classList.add('hidden');
-                    userMenuButton.setAttribute('aria-expanded', 'false');
-                    const arrow = userMenuButton.querySelector('.dropdown-arrow');
-                    if (arrow) arrow.classList.remove('rotate-180');
+        // Si el menú no existe en la página, no hacemos nada.
+        if (!userDropdown) return;
+
+        // CASO 1: Se hizo clic EN o DENTRO del botón principal para abrir/cerrar.
+        if (userMenuButton) {
+            userDropdown.classList.toggle('hidden');
+            const arrow = userMenuButton.querySelector('.dropdown-arrow');
+            if (arrow) {
+                arrow.classList.toggle('rotate-180', !userDropdown.classList.contains('hidden'));
+            }
+            return; // Salimos para no ejecutar el resto de la lógica.
+        }
+
+        // CASO 2: Se hizo clic DENTRO del menú desplegable que ya está abierto.
+        if (target.closest('#user-dropdown')) {
+            // No hacemos nada. Dejamos que el navegador maneje el clic.
+            // Si es un enlace <a>, el navegador lo seguirá.
+            // El menú se "cerrará" solo porque la página cambiará.
+            return;
+        }
+
+        // CASO 3: El clic fue en cualquier otra parte de la página (fuera del botón y del menú).
+        // Si el menú está abierto, lo cerramos.
+        if (!userDropdown.classList.contains('hidden')) {
+            userDropdown.classList.add('hidden');
+            const mainButton = document.getElementById('user-menu-button'); // Buscamos el botón de nuevo
+            if (mainButton) {
+                const arrow = mainButton.querySelector('.dropdown-arrow');
+                if (arrow) {
+                    arrow.classList.remove('rotate-180');
                 }
             }
-        });
-    }
+        }
+    });
+
+    // ======================================================================
+    // === FIN DE LA SECCIÓN CORREGIDA ===
+    // ======================================================================
     
     // --- Lógica de Modales (Mejorada y Unificada) ---
     const openModalButtons = document.querySelectorAll('[data-modal-target]');
     const closeModalButtons = document.querySelectorAll('[data-modal-close]');
-    const authModal = document.getElementById('auth-modal'); // Referencia específica al modal de auth
+    const authModal = document.getElementById('auth-modal');
 
     const openModal = (modal) => {
         if (!modal) return;
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
         
-        // Si el modal que se abre es el de autenticación, lo reiniciamos a su vista inicial.
         if (modal.id === 'auth-modal') {
             const initialView = modal.querySelector('#auth-initial-view');
             const otherViews = modal.querySelectorAll('#auth-login-view, #auth-register-view');
@@ -114,13 +144,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     closeModalButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // El botón de cierre puede estar dentro del modal o ser el modal mismo (si se hace clic en el fondo)
             const modal = button.closest('.modal');
             closeModal(modal);
         });
     });
 
-    // Cerrar al hacer clic en el fondo oscuro
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (event) => {
             if (event.target === modal) {
@@ -147,7 +175,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
         
-        // Añadir listener para el botón de "Volver" si existe en las vistas de login/registro
         const backButtons = authModal.querySelectorAll('[data-auth-view-target="auth-initial-view"]');
         backButtons.forEach(button => {
             button.addEventListener('click', () => showAuthView('auth-initial-view'));
@@ -159,9 +186,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const hash = window.location.hash;
         if (hash === '#auth-login' || hash === '#auth-register' || hash === '#auth-google-error' || hash === '#auth-login-error' || hash === '#auth-register-error-email') {
             if (authModal) {
-                openModal(authModal); // Usamos nuestra función para abrirlo
+                openModal(authModal);
                 
-                // Muestra la vista correcta dentro del modal
                 const initialView = document.getElementById('auth-initial-view');
                 const loginView = document.getElementById('auth-login-view');
                 const registerView = document.getElementById('auth-register-view');
@@ -170,20 +196,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (hash === '#auth-login' || hash === '#auth-login-error') {
                     loginView.classList.remove('hidden');
                     registerView.classList.add('hidden');
-                } else { // Para #auth-register y #auth-register-error-email
+                } else {
                     registerView.classList.remove('hidden');
                     loginView.classList.add('hidden');
                 }
 
-                // Limpia el hash de la URL para que no se quede ahí al recargar
-                // Usamos un pequeño delay para que cualquier framework tenga tiempo de procesar
                 setTimeout(() => {
                     history.replaceState(null, null, ' ');
                 }, 100);
             }
         }
     };
-    handleUrlHash(); // Ejecutar al cargar la página
+    handleUrlHash();
 
     // --- Lazy Loading de Secciones ---
     const lazySections = document.querySelectorAll('.lazy-section');
