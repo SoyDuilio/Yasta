@@ -20,6 +20,14 @@ class CRUDClientProfile:
             client_type=client_type
         )
         db.add(new_profile)
+
+        # --- INICIO DE LA CORRECCIÓN ---
+        # "Flusheamos" la sesión para enviar el INSERT a la DB y obtener el ID
+        db.flush() 
+        # Refrescamos el objeto para que el atributo .id se popule con el valor de la DB
+        db.refresh(new_profile) 
+        # --- FIN DE LA CORRECCIÓN ---
+
         # Dejamos que el endpoint haga el commit
         return new_profile
 
