@@ -16,6 +16,7 @@
     /* Oculto por defecto */
     visibility: hidden;
     opacity: 0;
+    pointer-events: none; /* <<< AÑADE ESTA LÍNEA */
 
     /* Transición suave para aparecer */
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -25,6 +26,7 @@
 .modal-container.is-open {
     visibility: visible;
     opacity: 1;
+    pointer-events: auto; /* <<< AÑADE ESTA LÍNEA */
 }
 
 /* El fondo oscuro semitransparente */
