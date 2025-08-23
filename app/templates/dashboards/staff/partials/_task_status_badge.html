@@ -1,0 +1,14 @@
+<!-- app/templates/dashboards/staff/partials/_task_status_badge.html -->
+
+{% set status_class = 'status-badge-assigned' %}
+{% if contract.status.value == 'in_progress' %}
+    {% set status_class = 'status-badge-in-progress' %}
+{% elif contract.status.value == 'pending_client_action' %}
+    {% set status_class = 'status-badge-pending-client' %}
+{% elif contract.status.value.startswith('failed') %}
+    {% set status_class = 'status-badge-failed' %}
+{% endif %}
+
+<span class="status-badge {{ status_class }}">
+    {{ contract.status.name.replace('_', ' ')|title }}
+</span>

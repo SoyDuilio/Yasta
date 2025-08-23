@@ -1,0 +1,55 @@
+<!-- app/templates/dashboards/supervisor/_confirmation_modal.html -->
+
+<div class="modal-container is-open">
+    <div class="modal-overlay" onclick="this.closest('.modal-container').remove()"></div>
+    <div class="modal-panel" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Confirmar Asignación</h3>
+            <button class="modal-close-btn" onclick="this.closest('.modal-container').remove()">
+                <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="text-center mb-6">
+                <p class="text-gray-400">¿Estás seguro de que deseas asignar la empresa:</p>
+                <!-- Corrección menor: class en lugar de class. -->
+                <p class="font-bold text-white text-lg mt-1 uppercase">{{ profile.business_name }} - {{ profile.ruc }}</p>
+            </div>
+            
+            <hr class="border-gray-700 mb-6">
+
+            <div class="text-center">
+                <p class="text-gray-400 mb-3">al siguiente contador/a:</p>
+                
+                <div class="h-24 w-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-600 mx-auto">
+                    <img class="h-full w-full object-cover"
+                         src="{{ accountant.profile_image_url or url_for('static', path='img/default_avatar.png') }}"
+                         alt="Foto de perfil de {{ accountant.contact_name }}">
+                </div>
+
+                <p class="font-bold text-white text-xl uppercase mt-3" style="color: #60a5fa;">{{ accountant.contact_name }}</p>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="action-btn" onclick="this.closest('.modal-container').remove()">
+                Cancelar
+            </button>
+            
+            <!-- ¡FORMULARIO CON EL hx-target CORREGIDO! -->
+            <form hx-post="{{ url_for('supervisor_assign_contract') }}"
+
+                  hx-target="#task-card-{{ contract.id }}"
+                  hx-swap="outerHTML">
+                  
+                <input type="hidden" name="contract_id" value="{{ contract.id }}">
+                <input type="hidden" name="staff_id" value="{{ accountant.id }}">
+                
+                <button type="submit" class="action-btn primary">
+                    Sí, Asignar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

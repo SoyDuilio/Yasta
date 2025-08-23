@@ -1,0 +1,64 @@
+<!-- app/templates/dashboards/staff/partials/_staff_task_card.html -->
+<form id="task-form-{{ task.contract.id }}"
+      hx-get="{{ url_for('staff_confirm_update_status') }}"
+      hx-target="#modal-container"
+      hx-swap="innerHTML"
+      hx-include="[name='new_status']:checked"
+      class="task-card">
+    
+    <input type="hidden" name="contract_id" value="{{ task.contract.id }}">
+
+    <!-- Fila 1: RUC y Razón Social -->
+    <div class="task-card-row">
+        <div class="client-info">
+            <span class="ruc-text">{{ task.profile.ruc }}</span>
+            <h4 class="business-name">{{ task.profile.business_name }}</h4>
+        </div>
+    </div>
+    
+    <!-- Fila 2: Detalles en Grid de 2 Filas -->
+    <div class="task-card-details-grid">
+        <div class="detail-header">Tipo DJ</div>
+        <div class="detail-header">Asignada</div>
+        <div class="detail-header">Vencimiento</div>
+        <div class="detail-header">Periodo</div>
+
+        <div class="detail-value font-semibold text-white">{{ task.declaration_request.declaration_type.name|replace('_', ' ')|title }}</div>
+        <div class="detail-value">{{ task.contract.assigned_at.strftime('%d %b %Y') if task.contract.assigned_at else 'N/A' }}</div>
+        <div class="detail-value font-semibold {% if task.due_date and (task.due_date - today).days < 7 %}text-red-400{% else %}text-orange-300{% endif %}">
+            {{ task.due_date.strftime('%d %b %Y') if task.due_date else 'N/A' }}
+        </div>
+        <div class="detail-value">{{ task.contract.tax_period }}</div>
+    </div>
+
+    <!-- Fila 3: Radio Buttons para el Estado -->
+    <div class="task-card-row">
+        <div class="status-radio-group">
+            {% for status in available_statuses %}
+            <label>
+                <input type="radio" name="new_status" value="{{ status.value }}" required>
+                <span>{{ status_map.get(status, status.name|replace('_', ' ')|title) }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Fila 4: Acciones -->
+    <div class="task-card-row task-card-actions">
+        <div id="sol-button-area-{{ task.contract.id }}" class="sol-button-container">
+            <button type="button" id="btn-copy-sol-{{ task.contract.id }}" class="btn-action"
+                    hx-post="{{ url_for('staff_copy_sol_password', contract_id=task.contract.id) }}"
+                    hx-target="closest .sol-button-container" hx-swap="outerHTML">
+                Copiar Clave SOL
+            </button>
+        </div>
+        
+        <div class="status-and-update">
+            <div id="status-badge-wrapper-{{ task.contract.id }}">
+                {% set contract = task.contract %}
+                {% include 'dashboards/staff/partials/_task_status_badge.html' %}
+            </div>
+            <button type="submit" class="btn-action primary">Actualizar Estado</button>
+        </div>
+    </div>
+</form>

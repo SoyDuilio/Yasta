@@ -1,0 +1,48 @@
+<!-- app/templates/dashboards/supervisor/_validation_view.html -->
+<h3 class="text-xl mb-4 console-title-active">Validar Solicitudes Pendientes</h3>
+<div class="task-card-container">
+    {% for data in pending_requests_data %}
+    {% set req = data.request %}
+    {% set due_date = data.due_date %}
+    <div class="task-card" id="request-card-{{ req.id }}">
+        <div class="task-card-row">
+            <div class="client-info">
+                <span class="ruc-chip">{{ req.client_profile.ruc }}</span>
+                <h4 class="business-name">{{ req.client_profile.business_name }}</h4>
+            </div>
+        </div>
+        
+        <div class="task-card-row task-card-details">
+            <div class="detail-item">
+                <span class="detail-header">Tipo DJ</span>
+                <span class="detail-value font-semibold text-white">{{ req.declaration_type.name|replace('_', ' ')|title }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-header">Solicitud</span>
+                <span class="detail-value">{{ req.created_at.strftime('%d %b %Y') }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-header">Vencimiento</span>
+                <span class="detail-value {% if due_date and (due_date - today).days < 7 %}text-red-400{% else %}text-orange-300{% endif %}">
+                    {{ due_date.strftime('%d %b %Y') if due_date else 'N/A' }}
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-header">Periodo</span>
+                <span class="detail-value">{{ req.tax_period }}</span>
+            </div>
+        </div>
+        
+        <div class="task-card-row" style="justify-content: flex-end;">
+             <button type="button" class="btn-validate"
+                     hx-get="/dashboard/super/confirm-validation?request_id={{ req.id }}"
+                     hx-target="#modal-container" hx-swap="innerHTML">
+                 {% if req.client_role == 'client_freemium' %} VALIDAR CREDENCIALES
+                 {% else %} VALIDAR PAGO {% endif %}
+             </button>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center text-gray-400 p-8">¡Todo validado! No hay solicitudes nuevas.</div>
+    {% endfor %}
+</div>

@@ -1,0 +1,51 @@
+<!-- app/templates/dashboards/supervisor/_validation_view.html -->
+
+<h3 class="text-xl mb-4 console-title-active">Validar Solicitudes Pendientes</h3>
+
+<div class="overflow-x-auto">
+    <table class="declarations-table w-full">
+        <thead>
+            <tr>
+                <th>RUC</th>
+                <th>Razón Social</th>
+                <th>Periodo</th>
+                <th>Tipo Cliente</th>
+                <th>Fecha Solicitud</th>
+                <th class="text-center">Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in pending_requests %}
+            <tr id="request-row-{{ req.id }}">
+                <td>{{ req.client_profile.ruc }}</td>
+                <td>{{ req.client_profile.business_name }}</td>
+                <td>{{ req.tax_period }}</td>
+                <td>
+                    {% if req.client_role == 'client_freemium' %}
+                        <span class="badge badge-blue">FREEMIUM</span>
+                    {% elif req.client_role == 'client_paid' %}
+                        <span class="badge badge-green">PAGO</span>
+                    {% else %}
+                        <span class="badge badge-gray">{{ req.client_role }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ req.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                <td class="text-center">
+                    <button class="btn-assign"
+                            hx-post="{{ url_for('supervisor_validate_request', request_id=req.id) }}"
+                            hx-target="closest tr"
+                            hx-swap="outerHTML">
+                        Validar
+                    </button>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-gray-400 p-8">
+                    ¡Todo validado! No hay solicitudes nuevas.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

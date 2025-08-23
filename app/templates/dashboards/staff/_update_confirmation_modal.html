@@ -1,0 +1,31 @@
+<!-- app/templates/dashboards/staff/_update_confirmation_modal.html -->
+<div class="modal-container is-open">
+    <div class="modal-overlay" onclick="this.closest('.modal-container').remove()"></div>
+    <div class="modal-panel" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Confirmar Cambio de Estado</h3>
+            <button class="modal-close-btn" onclick="this.closest('.modal-container').remove()">
+                <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="modal-body text-center">
+            <p class="text-lg">¿Estás seguro de que deseas cambiar el estado a:</p>
+            <p class="font-bold text-white text-xl my-3">{{ new_status_display }}?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="action-btn" onclick="this.closest('.modal-container').remove()">
+                Cancelar
+            </button>
+            
+            <form hx-post="{{ url_for('staff_update_task_status') }}"
+                  hx-target="#task-card-{{ contract_id }}"
+                  hx-swap="outerHTML">
+                
+                <input type="hidden" name="contract_id" value="{{ contract_id }}">
+                <input type="hidden" name="new_status" value="{{ new_status.value }}">
+                
+                <button type="submit" class="btn-action primary">Sí, Actualizar</button>
+            </form>
+        </div>
+    </div>
+</div>

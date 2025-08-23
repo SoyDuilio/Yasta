@@ -1,0 +1,9 @@
+<!-- app/templates/dashboards/staff/_staff_tasks_view.html -->
+<div class="task-card-container">
+    {% for task in assigned_tasks %}
+        <!-- Simplemente incluimos la tarjeta. La variable 'task' estará disponible por contexto. -->
+        {% include 'dashboards/staff/partials/_staff_task_card.html' %}
+    {% else %}
+    <div class="text-center text-gray-400 p-8">¡Felicidades! No tienes tareas activas.</div>
+    {% endfor %}
+</div>

@@ -1,0 +1,14 @@
+<!-- app/templates/dashboards/staff/partials/_sol_button_updated.html -->
+
+<!-- 
+    Este es el nuevo estado del componente después de que el usuario ha hecho clic.
+    Reemplaza al botón original.
+-->
+<div id="sol-button-area-{{ contract_id }}" class="sol-button-container">
+    <button id="btn-copy-sol-{{ contract_id }}" class="btn-action" disabled>
+        ¡Copiada!
+    </button>
+    <span class="sol-request-counter">
+        (Solicitada {{ request_count }} veces)
+    </span>
+</div>

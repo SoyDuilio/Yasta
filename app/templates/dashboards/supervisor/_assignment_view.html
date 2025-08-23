@@ -1,0 +1,51 @@
+<!-- app/templates/dashboards/supervisor/_assignment_view.html -->
+
+<h3 class="text-xl mb-4 console-title-active">Asignar Tareas Pendientes</h3>
+
+<div class="task-card-container">
+    {% for item in pending_assignments %}
+    <div class="task-card" id="task-card-{{ item.contract.id }}">
+        
+        <div class="task-card-row">
+            <div class="client-info">
+                <span class="ruc-chip">{{ item.profile.ruc }}</span>
+                <h4 class="business-name">{{ item.profile.business_name }}</h4>
+            </div>
+        </div>
+
+        <div class="task-card-row task-card-details">
+            <div><span>Solicitud:</span> {{ item.contract.requested_at.strftime('%d %b %Y') if item.contract.requested_at else 'N/A' }}</div>
+            <div class="{% if item.due_date and (item.due_date - today).days < 7 %}text-red-400{% elif item.due_date %}text-orange-300{% else %}text-gray-500{% endif %}">
+                <span>Vencimiento:</span> {{ item.due_date.strftime('%d %b %Y') if item.due_date else 'No Encontrada' }}
+            </div>
+            <div><span>Periodo:</span> {{ item.contract.tax_period }}</div>
+        </div>
+
+        <div class="task-card-row task-card-actions">
+            <div class="accountant-gallery">
+                {% for accountant in accountants %}
+                <label class="accountant-photo-label" title="{{ accountant.contact_name }}">
+                    <input type="radio" name="staff_id_{{ item.contract.id }}" value="{{ accountant.id }}">
+                    <img class="accountant-photo"
+                         src="{{ accountant.profile_image_url or url_for('static', path='img/default_avatar.png') }}"
+                         alt="{{ accountant.contact_name }}">
+                    <div class="check-overlay">✓</div>
+                </label>
+                {% endfor %}
+            </div>
+
+            <div class="assign-button-wrapper">
+                <!-- ¡LÓGICA HYPERSCRIPT ELIMINADA! -->
+                <button type="button" class="btn-assign js-assign-btn"
+                        data-contract-id="{{ item.contract.id }}">
+                    ASIGNAR
+                </button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center text-gray-400 p-8">
+        ¡Excelente trabajo! No hay tareas pendientes de asignar.
+    </div>
+    {% endfor %}
+</div>
