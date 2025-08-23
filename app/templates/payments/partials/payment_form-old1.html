@@ -1,0 +1,96 @@
+<!-- CORREGIDO: Este es el contenido INTERNO del modal, no el modal en sí -->
+<div class="relative w-full bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-2xl py-10 min-h-[680px]">
+    
+    <!-- BOTÓN DE CIERRE (Versión V3 Profesional) -->
+    <button 
+        _="on click remove .active from #payment-modal"
+        type="button" 
+        aria-label="Cerrar modal"
+        class="group flex h-10 w-10 items-center justify-center rounded-full bg-black/30 transition-all duration-300 ease-in-out hover:bg-black/50"
+        style="position: absolute; top: 1rem; right: 1rem; z-index: 50;"
+    >
+        <svg 
+            class="h-6 w-6 text-gray-400 transition-all duration-300 group-hover:text-white group-hover:scale-110"
+            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+
+    <!-- Contenido del formulario -->
+    <div id="payment-form-wrapper" class="flex flex-col h-full px-8">
+        <h2 class="text-3xl font-bold mb-8 text-center text-gray-100" style="font-family: 'Poppins', sans-serif;">Selecciona tu método</h2>
+
+        <form 
+          hx-post="/app/payments/manual-entry" hx-target="#payment-modal-content" hx-swap="innerHTML"
+          class="flex flex-col flex-grow"
+          style="--border-color: var(--color-yape); --focus-ring-color: rgba(128, 0, 128, 0.4); --brand-shadow-color: rgba(128, 0, 128, 0.5);"
+        >
+            <input type="hidden" name="origen_app" id="origen_app_hidden_input" value="yape">
+
+            <div class="flex justify-center items-center gap-8 mb-8">
+                <!-- Botón Yape -->
+                <button type="button" id="btn-yape"
+                        class="payment-method-btn btn-yape is-active grow"
+                        _="on click
+                            add .is-active to me then remove .is-active from #btn-plin
+                            set value of #origen_app_hidden_input to 'yape'
+                            set #submit-btn.style.backgroundColor to 'var(--color-yape)'
+                            set the style of the closest <form/> to {
+                              borderColor: 'var(--color-yape)',
+                              focusRingColor: 'rgba(128, 0, 128, 0.4)',
+                              brandShadowColor: 'rgba(128, 0, 128, 0.5)'
+                            }
+                            remove .is-collapsed from #security-code-wrapper
+                        "
+                >
+                    <img src="/static/img/yape-logo.png" alt="Yape">
+                </button>
+                
+                <!-- Botón Plin -->
+                <button type="button" id="btn-plin"
+                    class="payment-method-btn btn-plin grow"
+                    _="on click
+                        add .is-active to me then remove .is-active from #btn-yape
+                        set value of #origen_app_hidden_input to 'plin'
+                        set #submit-btn.style.backgroundColor to 'var(--color-plin)'
+                        set the style of the closest <form/> to {
+                          borderColor: 'var(--color-plin)',
+                          focusRingColor: 'rgba(45, 212, 191, 0.4)',
+                          brandShadowColor: 'rgba(45, 212, 191, 0.5)'
+                        }
+                        add .is-collapsed to #security-code-wrapper
+                    "
+                >
+                  <img src="/static/img/plin-logo.jpg" alt="Plin">
+              </button>
+            </div>
+          
+            <div class="space-y-4">
+                <div class="form-group">
+                    <label for="numero_operacion" class="form-label !text-gray-400 !mb-1">Número de Operación</label>
+                    <input type="text" name="numero_operacion" id="numero_operacion" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="monto_pagado" class="form-label !text-gray-400 !mb-1">Monto Pagado (S/.)</label>
+                    <input type="number" step="0.01" name="monto_pagado" id="monto_pagado" required class="form-input">
+                </div>
+
+                <div id="security-code-wrapper" class="form-field-wrapper">
+                    <div class="form-group">
+                        <label for="codigo_seguridad" class="form-label !text-gray-400 !mb-1">Código de Seguridad (Opcional)</label>
+                        <input type="text" name="codigo_seguridad" id="codigo_seguridad" maxlength="3" pattern="[0-9]{3}" placeholder="Ej: 837" class="form-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-8">
+                <button id="submit-btn" type="submit" 
+                        class="btn w-full btn-lg !text-white font-bold transition-all duration-300 !rounded-xl"
+                        style="background-color: var(--color-yape); font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; color: white;">
+                    Registrar Pago
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
