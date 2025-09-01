@@ -122,3 +122,9 @@ async def ideas1(request: Request):
 @app.get("/ideas2", response_class=HTMLResponse)
 async def ideas2(request: Request):
     return templates.TemplateResponse("ideas2.html", {"request": request})
+
+
+@app.get("/ideas3", response_class=HTMLResponse)
+async def ideas3(request: Request):
+    return templates.TemplateResponse("ideas3.html", {"request": request})
+
