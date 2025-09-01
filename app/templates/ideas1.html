@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Captación para Yasta.cloud - Iquitos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 25px 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        h1 span {
+            color: #2980b9;
+        }
+
+        .intro {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tab-button::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #3498db;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+        }
+
+        .tab-button.active::after {
+            transform: scaleX(1);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        h2 {
+            color: #2980b9;
+            border-left: 4px solid #f39c12;
+            padding-left: 10px;
+            margin-top: 0;
+        }
+
+        .idea-clave {
+            background-color: #eaf5fc;
+            border-left: 5px solid #3498db;
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+            font-size: 1.05em;
+            font-style: italic;
+        }
+
+        .idea-clave strong {
+            font-style: normal;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        li {
+            background: url('https://img.icons8.com/color/16/000000/checked-2.png') no-repeat left center;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Pata, aquí está tu Plan Maestro para <span>Yasta.cloud</span> en Iquitos</h1>
+        <p class="intro">Checa estas ideas para que consigas tus primeros clientes. ¡Vamos a romperla en la ciudad!</p>
+
+        <div class="tabs-container">
+            <button class="tab-button active" onclick="openTab(event, 'distribuidores')">Plan Distribuidores 2.0</button>
+            <button class="tab-button" onclick="openTab(event, 'alianzas')">Otras Alianzas Power</button>
+            <button class="tab-button" onclick="openTab(event, 'calle')">Marketing "a lo Charapa"</button>
+        </div>
+
+        <!-- Pestaña 1: Distribuidores -->
+        <div id="distribuidores" class="tab-content active">
+            <h2>Tu Plan con los Distribuidores (¡Repotenciado!)</h2>
+            <p>Tu idea de usar a los distribuidores de abarrotes y ferreteros es un golazo. Pero al distribuidor no le importa la contabilidad, le importa <strong>vender más y que le paguen</strong>. Así que, cuando hables con ellos, este debe ser tu "floro":</p>
+            
+            <h3>1. El Gancho: Fidelización Extrema</h3>
+            <p>No les digas "les ayudo con sus clientes". Diles esto:</p>
+            <div class="idea-clave">
+                💡 "Brother, con esto, tu cliente no se va a ir con la competencia por unos céntimos. Lo estás 'amarrando' con un servicio que vale oro. <strong>Si se va, pierde su contador barato. ¡Jaque mate!</strong>"
+            </div>
+
+            <h3>2. El Nocaut: Cliente Ordenado, Compra Más</h3>
+            <p>Esta es la parte que más les va a gustar. Conecta tu servicio con SU bolsillo.</p>
+            <div class="idea-clave">
+                💰 "Un bodeguero que se ordena y no paga multas, ¿qué crees que hace con esa platita extra? <strong>¡Te compra más mercadería a ti!</strong> Le estás dando más poder de compra."
+            </div>
+
+            <h3>3. El Seguro: ¡Adiós a los 'Mala Paga'!</h3>
+            <p>Muchos distribuidores dan crédito. Ataca ese dolor:</p>
+            <div class="idea-clave">
+                🛡️ "Un negocio con sus cuentas claras es un negocio que te paga a tiempo. <strong>Les ayudas a ellos a ser formales, y te ayudas a ti a reducir tus cuentas por cobrar.</strong> ¡Todos ganan!"
+            </div>
+
+            <h4>Ofréceles opciones, no una sola cosa:</h4>
+            <ul>
+                <li><strong>El Patrocinador:</strong> El distribuidor paga la diferencia (S/. 30.01). Ideal para sus clientes TOP.</li>
+                <li><strong>El Premio:</strong> "Si me compran más de X soles, les regalo el servicio de Yasta.cloud". ¡Así los motivas a comprarte más!</li>
+                <li><strong>El Pana:</strong> El distribuidor solo pasa la voz. No le cuesta nada y queda como un rey con sus clientes. ¡La más fácil para empezar!</li>
+            </ul>
+        </div>
+
+        <!-- Pestaña 2: Alianzas -->
+        <div id="alianzas" class="tab-content">
+            <h2>Otras Alianzas Power en Iquitos</h2>
+            <p>Además de abarrotes y ferreteros, en Iquitos la economía se mueve diferente. Piensa local, ¡piensa charapa!</p>
+
+            <h3>🚤 Transporte Fluvial y Terrestre (Motocarristas)</h3>
+            <p>Los dueños de botes, lanchas, rápidos y hasta los motocarristas son pequeños empresarios. Mueven gente, mercadería, turistas. ¡Son un montón y todos necesitan declarar!</p>
+            <div class="idea-clave">
+                🤝 <strong>Tu Alianza:</strong> Habla con las asociaciones de motocarristas o los pequeños puertos. Ofréceles un paquete grupal. ¡Imagina tener a 50 motocarristas de una!
+            </div>
+            
+            <h3>🌴 Pequeños Operadores Turísticos y Hospedajes</h3>
+            <p>Desde el que alquila un cuarto en su casa hasta el que hace tours al lago Zungarococha. Todos generan ingresos y la SUNAT los está mirando.</p>
+            <div class="idea-clave">
+                🤝 <strong>Tu Alianza:</strong> Date una vuelta por el Boulevard o la zona de la Plaza de Armas. Ofréceles un precio especial para que puedan competir tranquilos y en regla.
+            </div>
+
+            <h3>🐟 Comerciantes de los Mercados (¡El Corazón de Iquitos!)</h3>
+            <p>Piensa en la gente del Mercado de Belén, el Mercado Modelo, Productores. Cientos de puestos, cientos de potenciales clientes en un solo lugar.</p>
+            <div class="idea-clave">
+                🤝 <strong>Tu Alianza:</strong> Identifica a un líder o dirigente en el mercado. Si lo convences a él, te puede abrir las puertas de decenas de comerciantes que confían en su palabra.
+            </div>
+        </div>
+        
+        <!-- Pestaña 3: Marketing -->
+        <div id="calle" class="tab-content">
+            <h2>Marketing "a lo Charapa" (Directo y sin rodeos)</h2>
+            <p>Aquí la gente valora el trato directo. Hay que "patear la calle" pero con estrategia.</p>
+
+            <h3>🚶‍♂️ La Caminata Estratégica</h3>
+            <p>Agarra tu mochila y anda a caminar por las zonas que hierven de negocios: <strong>Jr. Próspero, Jr. Aguirre, Av. 28 de Julio, Jr. 9 de Diciembre, la zona de Sachachorro.</strong> No vayas a vender, ve a conversar.</p>
+            
+            <h4>Tu "floro" de 15 segundos:</h4>
+            <div class="idea-clave">
+                💬 "Hola jefe, ¿qué tal? Una pregunta rápida. ¿Cansado de pagarle un dineral al contador? <strong>Estamos haciendo las declaraciones mensuales por S/. 19.99. La primera es GRATIS para que pruebes.</strong> ¿Te animas?"
+            </div>
+            <p>El "GRATIS" es mágico. Les quita el miedo a probar. Si haces un buen trabajo en la primera, se quedan.</p>
+
+            <h3>📣 Grupos de Facebook y WhatsApp</h3>
+            <p>Esto es el boca a boca digital. Entra a grupos como "Ventas Iquitos", "Mercado Libre Nauta", etc. Pero no hagas spam.</p>
+            <ul>
+                <li><strong>Paso 1:</strong> Publica algo útil. Ejemplo: "¡Atención bodegueros! 3 errores comunes que la SUNAT multa. El #2 te sorprenderá".</li>
+                <li><strong>Paso 2:</strong> En los comentarios, cuando la gente pregunte, ofreces tu solución: "Si no quieres preocuparte por esto, en Yasta.cloud lo hacemos por ti a S/. 19.99".</li>
+            </ul>
+            <div class="idea-clave">
+                🚀 <strong>Tu verdadera arma es tu precio.</strong> S/. 19.99 es un costo tan bajo que para el empresario es como invitar una gaseosa, pero le soluciona un dolor de cabeza gigante. <strong>¡Anda con todo, futuro magnate!</strong>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabbuttons;
+            
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].className = tabbuttons[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
+
+</body>
+</html>

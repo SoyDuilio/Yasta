@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yasta.cloud - Inteligencia Financiera para Mypes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #28a745;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .hero {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 15px auto 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            background-color: #e9ecef;
+            color: #495057;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 5px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .objection {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .objection strong { color: #856404; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-item {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        
+        .feature-item .icon { font-size: 2.5em; color: var(--secondary-color); }
+        .feature-item h3 { margin-top: 10px; font-size: 1.1em; }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .cta-button:hover { background-color: #218838; }
+
+        /* Estilos para la Guía Interna */
+        .guide-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .guide-table th, .guide-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        .guide-table th { background-color: #f2f2f2; font-weight: 600; }
+        .guide-table code { background-color: #e9ecef; padding: 2px 5px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <h1>Yasta.cloud</h1>
+        <p>Transformamos la contabilidad en una herramienta de crecimiento. Hacemos que los pequeños negocios de Iquitos sean más fuertes, rentables y listos para el crédito.</p>
+    </div>
+
+    <div class="container">
+        <div class="tabs-container">
+            <button class="tab-button active" onclick="openTab(event, 'cliente')">Para Ti, Emprendedor</button>
+            <button class="tab-button" onclick="openTab(event, 'distribuidor')">Para Ti, Distribuidor</button>
+            <button class="tab-button" onclick="openTab(event, 'financiera')">Para Ti, Financiera</button>
+            <button class="tab-button" onclick="openTab(event, 'guia')">Mi Guía Interna (Plan de Acción)</button>
+        </div>
+
+        <!-- VISTA 1: PARA EL CLIENTE (BODEGA, FERRETERÍA) -->
+        <div id="cliente" class="tab-content active">
+            <h2>Tu Negocio en Números, ¡Fácil de Entender!</h2>
+            <p>Sabemos que te esfuerzas cada día. Pero, ¿estás seguro de cuánto ganas realmente? ¿Te da miedo pedir un crédito porque no sabes qué papeles presentar? <strong>Yasta.cloud es más que tu contador, es tu copiloto.</strong></p>
+            <p>Por solo S/. 19.99 al mes, no solo declaramos tus impuestos, te entregamos tu <strong>"Reporte de Salud Financiera"</strong>.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="icon">📈</div>
+                    <h3>Conoce tu Ganancia Real</h3>
+                    <p>Te mostramos, en simple, cuánto te queda en el bolsillo después de pagar mercadería y gastos.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">🔑</div>
+                    <h3>Tu Llave para el Crédito</h3>
+                    <p>Generamos los reportes que los distribuidores y las Cajas quieren ver. ¡Llega a pedir crédito con confianza!</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">💡</div>
+                    <h3>Toma Mejores Decisiones</h3>
+                    <p>¿Qué producto te conviene comprar más? ¿Te alcanza para un ayudante? Tus números te darán la respuesta.</p>
+                </div>
+            </div>
+            <center><a href="#" class="cta-button">¡Quiero mi Reporte de Salud Financiera!</a></center>
+        </div>
+
+        <!-- VISTA 2: PARA EL DISTRIBUIDOR MAYORISTA -->
+        <div id="distribuidor" class="tab-content">
+            <h2>Clientes más Sanos, Ventas más Seguras y Constantes</h2>
+            <p>Dar crédito en mercadería es clave para crecer, pero el riesgo de no cobrar siempre está presente. Te proponemos una alianza para minimizar ese riesgo y potenciar tus ventas.</p>
+
+            <div class="objection">
+                <strong>La pregunta clave: "¿Acaso no tenemos ya nuestros propios analistas de crédito?"</strong><br>
+                ¡Por supuesto! Y son expertos. Pero ellos evalúan el pasado del cliente (su historial de pagos). <strong>Nosotros les ayudamos a construir un futuro financiero saludable.</strong> Un cliente ordenado por Yasta.cloud es un cliente que entiende el valor de pagar a tiempo y tiene mayor capacidad de compra. Somos su filtro de calidad previo.
+            </div>
+
+            <h3>¿Cómo te beneficias al aliarte con Yasta.cloud?</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="icon">📉</div>
+                    <h3>Reduce tu Morosidad</h3>
+                    <p>Un cliente que ve sus números claros entiende que pagar a tiempo no es una opción, es una necesidad para su propio crecimiento.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">🚀</div>
+                    <h3>Aumenta el Ticket de Compra</h3>
+                    <p>Clientes financieramente ordenados son más propensos a reinvertir y comprarte más, porque saben que pueden pagarlo.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">🛡️</div>
+                    <h3>Fidelización Real</h3>
+                    <p>Ofréceles nuestro servicio subsidiado. Será un beneficio de alto valor que tu competencia no puede igualar, anclando a tus mejores clientes.</p>
+                </div>
+            </div>
+            <center><a href="#" class="cta-button">Convierte el Riesgo en una Oportunidad. Hablemos.</a></center>
+        </div>
+
+        <!-- VISTA 3: PARA LA FINANCIERA / CAJA MUNICIPAL -->
+        <div id="financiera" class="tab-content">
+            <h2>Acceso a Mejores Clientes MYPE, Pre-Calificados y Listos</h2>
+            <p>El segmento MYPE es el motor de la economía, pero evaluar su riesgo crediticio consume tiempo y recursos. Yasta.cloud actúa como un preparador, un formalizador. Te entregamos postulantes a crédito de mayor calidad.</p>
+
+            <div class="objection">
+                <strong>La pregunta clave: "¿Por qué necesitaríamos esto si tenemos un proceso de evaluación robusto?"</strong><br>
+                Precisamente por eso. Su proceso es robusto, pero ¿cuántos expedientes incompletos o postulantes desinformados ralentizan a sus analistas? <strong>Nosotros hacemos el trabajo previo.</strong> Un cliente nuestro llega con un "Mini-Expediente" que incluye su capacidad de pago calculada y su capital de trabajo claro. Optimizamos el recurso más valioso de sus analistas: el tiempo.
+            </div>
+
+            <h3>Nuestra Alianza Estratégica te permite:</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="icon">⏱️</div>
+                    <h3>Acelerar la Colocación</h3>
+                    <p>Menos idas y vueltas. Analistas se enfocan en la decisión, no en la recolección de datos básicos. El desembolso es más rápido.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">✅</div>
+                    <h3>Disminuir el Riesgo</h3>
+                    <p>Un cliente que invierte (aunque sea S/. 19.99) en su orden financiero, demuestra un compromiso y entendimiento que reduce el riesgo de default.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">👥</div>
+                    <h3>Mejorar la Experiencia MYPE</h3>
+                    <p>El cliente se siente preparado y el proceso es más fluido, mejorando la percepción de su institución financiera en el competitivo mercado MYPE.</p>
+                </div>
+            </div>
+            <center><a href="#" class="cta-button">Optimicemos Juntos el Crédito MYPE. Contáctanos.</a></center>
+        </div>
+
+        <!-- VISTA 4: MI GUÍA INTERNA DE ACCIÓN -->
+        <div id="guia" class="tab-content">
+            <h2>Mi Guía de Acción: De los Datos al Valor</h2>
+            <p>Este es el paso a paso para transformar la información en los reportes que generarán valor para todos.</p>
+
+            <table class="guide-table">
+                <thead>
+                    <tr>
+                        <th>Paso</th>
+                        <th>Qué Necesito (Insumo)</th>
+                        <th>De Dónde lo Obtengo</th>
+                        <th>Qué Construyo (Producto)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1. Recolección Automatizada</strong></td>
+                        <td>Clave SOL del cliente.</td>
+                        <td>Portal SUNAT (SIRE: Registros de Compras y Ventas Electrónicos), PLAME.</td>
+                        <td>
+                            - Total Ventas Mensuales (<code>Ingreso Bruto</code>)<br>
+                            - Total Compras Formales (<code>Costo/Gasto</code>)<br>
+                            - Gasto de Planilla (<code>Gasto Fijo</code>)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>2. Recolección Manual (El Toque Humano)</strong></td>
+                        <td>Conversación estructurada con el cliente (crear un checklist).</td>
+                        <td>Directamente del dueño del negocio.</td>
+                        <td>
+                            - <code>Caja y Bancos</code> (Saldo actual)<br>
+                            - <code>Inventario Valorado</code> (Conteo simple x costo)<br>
+                            - <code>Cuentas x Cobrar</code> ("Fiado")<br>
+                            - <code>Cuentas x Pagar</code> (Proveedores pendientes)<br>
+                            - <code>Gastos Informales/Familiares</code> (Retiros)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>3. Construcción de Indicadores</strong></td>
+                        <td>Datos de los pasos 1 y 2.</td>
+                        <td>Mis plantillas de cálculo (Excel/Software).</td>
+                        <td>
+                            - <strong>Capital de Trabajo:</strong> <code>(Caja+CxC+Inv.) - (CxP+Impuestos)</code><br>
+                            - <strong>Ganancia Neta:</strong> <code>Ventas - Compras - Gastos (todos)</code><br>
+                            - <strong>Capacidad de Pago:</strong> <code>Ganancia Neta - Gastos Familiares</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>4. Empaquetado y Presentación</strong></td>
+                        <td>Indicadores del paso 3.</td>
+                        <td>Mi habilidad para simplificar y diseñar.</td>
+                        <td>
+                            - <strong>Para el Cliente:</strong> "Reporte de Salud Financiera" (PDF 1 pág, visual).<br>
+                            - <strong>Para el Distribuidor:</strong> "Reporte de Salud Comercial" (enfocado en rotación y pagos).<br>
+                            - <strong>Para la Financiera:</strong> "Mini-Expediente de Pre-Calificación" (enfocado en Capacidad de Pago y Capital de Trabajo).
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // Set the first tab as active on load
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector('.tab-button').classList.add('active');
+            document.querySelector('.tab-content').classList.add('active');
+        });
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabbuttons;
+            
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
+            }
+            
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>
