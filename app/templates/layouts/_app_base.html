@@ -10,51 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
-    <!-- === INICIO: CSS CORRECCIÓN MENÚ USUARIO === -->
-    <style>
-        .user-menu-container {
-            position: relative;
-        }
-        .dropdown-menu {
-            position: absolute;
-            right: 0;
-            top: 100%;
-            margin-top: 0.5rem;
-            background-color: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.375rem;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-            width: 12rem;
-            z-index: 90; /* ¡MUY IMPORTANTE! */
-        }
-        html.dark .dropdown-menu {
-            background-color: #2d3748;
-            border-color: #4a5568;
-        }
-        .dropdown-link {
-            display: block;
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            color: #2d3748;
-            transition: background-color 0.2s, color 0.2s;
-            cursor: pointer;
-        }
-        html.dark .dropdown-link {
-            color: #e2e8f0;
-        }
-        .dropdown-link:hover {
-            background-color: #4f46e5;
-            color: #fff;
-        }
-        .dropdown-arrow {
-            transition: transform 0.2s;
-        }
-        .dropdown-arrow.rotate-180 {
-            transform: rotate(180deg);
-        }
-    </style>
-    <!-- === FIN: CSS CORRECCIÓN MENÚ USUARIO === -->
-
     <!-- === ESTILOS === -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/components.css') }}">
@@ -73,35 +28,69 @@
     <!-- === SCRIPTS DE LA APLICACIÓN === -->
     <script src="{{ url_for('static', path='js/modal_universal.js') }}" defer></script>
     <script src="{{ url_for('static', path='js/main.js') }}" defer></script>
+
+    <!-- =================================================================== -->
+    <!-- === INICIO: ESTILOS DEFINITIVOS PARA EL LAYOUT === -->
+    <!-- =================================================================== -->
+    <style>
+        /* 1. Reglas para la cabecera fija */
+        #app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        /* 2. Compensamos la altura de la cabecera en el body */
+        body {
+            padding-top: 4rem; /* 64px, asumiendo que esa es la altura del header */
+        }
+
+        /* 3. Estilos del menú de usuario (sin cambios, solo centralizados aquí) */
+        .user-menu-container { position: relative; }
+        .dropdown-menu { position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background-color: #2d3748; border: 1px solid #4a5568; border-radius: 0.375rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); width: 12rem; z-index: 90; }
+        .dropdown-link { display: block; padding: 0.5rem 1rem; font-size: 0.875rem; color: #e2e8f0; transition: background-color 0.2s, color 0.2s; cursor: pointer; }
+        .dropdown-link:hover { background-color: #4f46e5; color: #fff; }
+        .dropdown-arrow { transition: transform 0.2s; }
+        .dropdown-arrow.rotate-180 { transform: rotate(180deg); }
+    </style>
+    <!-- =================================================================== -->
+    <!-- === FIN: ESTILOS DEFINITIVOS === -->
+    <!-- =================================================================== -->
 </head>
 
+<!-- ELIMINAMOS las clases flex flex-col min-h-screen del body -->
 <body class="bg-gray-900 text-gray-100" hx-ext="head-support">
-    <div class="flex flex-col min-h-screen">
-        {% include 'partials/_app_header.html' %}
 
-        {% if self.sub_nav_content() and self.sub_nav_content().strip() %}
-            <nav id="sub-nav" class="bg-gray-800/80 backdrop-blur-sm border-b border-gray-700/50 sticky top-16 z-50">
-                <div class="container mx-auto px-4 h-12 flex items-center">
-                    {% block sub_nav_content %}{% endblock %}
-                </div>
-            </nav>
-        {% endif %}
+    <!-- La cabecera se incluye directamente. El padding del body la compensará. -->
+    {% include 'partials/_app_header.html' %}
 
-        <main class="flex-grow {% if self.sub_nav_content() and self.sub_nav_content().strip() %}pt-28{% else %}pt-16{% endif %}">
-            {% block main_content %}{% endblock %}
-        </main>
-        
-        <!-- Scripts específicos de la página se cargarán aquí -->
-        {% block page_scripts %}{% endblock %}
-    </div>
+    <!-- Sub-navegación (si existe) -->
+    {% if self.sub_nav_content() and self.sub_nav_content().strip() %}
+        <nav id="sub-nav" class="bg-gray-800/80 backdrop-blur-sm border-b border-gray-700/50">
+            <div class="container mx-auto px-4 h-12 flex items-center">
+                {% block sub_nav_content %}{% endblock %}
+            </div>
+        </nav>
+    {% endif %}
 
-    <!-- Contenedor para los Modales que se cargarán dinámicamente -->
+    <!-- El contenido principal de cada página hija se insertará aquí -->
+    <!-- ELIMINAMOS las clases flex-grow y pt-16 de main -->
+    <main>
+        {% block main_content %}{% endblock %}
+    </main>
+    
+    <!-- Scripts específicos de la página -->
+    {% block page_scripts %}{% endblock %}
+
+    <!-- Contenedor para los Modales -->
     <div id="modal-container-placeholder"></div>
 
-    <!-- El bloque body_end_scripts ahora se usa para los scripts que DEBEN ejecutarse al final -->
+    <!-- Scripts de final de body -->
     {% block body_end_scripts %}{% endblock %}
 
-    <!-- ===== SCRIPTS GLOBALES DE INICIALIZACIÓN Y FUNCIONES UNIVERSALES ===== -->
+    <!-- Scripts globales de inicialización (CON TU CÓDIGO ORIGINAL RESTAURADO) -->
     <script>
         // --- FUNCIONES UNIVERSALES DISPONIBLES EN TODA LA APP ---
         function initializeOnboardingForm(containerElement) {
