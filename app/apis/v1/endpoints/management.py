@@ -1,4 +1,4 @@
-# app/apis/v1/endpoints/clients.py
+# app/apis/v1/endpoints/management.py
 from fastapi import APIRouter, Depends
 # from app.apis import deps # Descomenta cuando necesites dependencias
 

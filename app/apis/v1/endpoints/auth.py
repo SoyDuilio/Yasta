@@ -38,32 +38,35 @@ def _set_auth_cookie_and_redirect(response: RedirectResponse, user_id: int, requ
 def get_post_auth_redirect_url(request: Request, user: User, db: Session) -> str:
     """
     Decide a dónde redirigir al usuario después de una autenticación exitosa,
-    basándose PRIMERO en su rol.
+    basándose en su rol específico.
     """
     
-    # REGLA 1: Roles de Staff y Admin -> Siempre a su dashboard específico.
-    if user.role in [UserRole.STAFF_COLLABORATOR, UserRole.STAFF_MANAGER, UserRole.STAFF_CEO, UserRole.ADMIN]:
-        # Suponiendo que tienes un dashboard para el staff. Si no, ajusta esta URL.
-        # Podrías tener diferentes dashboards por rol de staff si quisieras.
-        return str(request.url_for("staff_dashboard_page")) # O a la página que corresponda
+    # --- INICIO DE LA CORRECIÓN ---
 
-    # REGLA 2: Roles de Cliente (con plan) -> Siempre al dashboard de cliente.
-    if user.role in [UserRole.CLIENT_FREEMIUM, UserRole.CLIENT_PAID]:
+    # REGLA 1: Rol de Contador -> A su dashboard de tareas.
+    if user.role == UserRole.STAFF_COLLABORATOR:
+        return str(request.url_for("staff_dashboard_page"))
+
+    # REGLA 2: Roles de Gestión (Supervisor, CEO, Admin) -> A la consola de operaciones.
+    elif user.role in [UserRole.STAFF_MANAGER, UserRole.STAFF_CEO, UserRole.ADMIN]:
+        return str(request.url_for("supervisor_dashboard_page"))
+
+    # --- FIN DE LA CORRECIÓN ---
+
+    # REGLA 3: Roles de Cliente (con plan) -> Siempre al dashboard de cliente.
+    elif user.role in [UserRole.CLIENT_FREEMIUM, UserRole.CLIENT_PAID]:
         return str(request.url_for("client_dashboard_page"))
 
-    # REGLA 3: Rol de usuario recién autenticado -> Su destino depende del onboarding.
-    if user.role == UserRole.AUTHENTICATED:
+    # REGLA 4: Rol de usuario recién autenticado -> Su destino es el onboarding.
+    elif user.role == UserRole.AUTHENTICATED:
+        # La lógica de onboarding no cambia y es correcta.
         user_has_completed_onboarding = crud_client_profile.has_any_access(db=db, user_id=user.id)
         if user_has_completed_onboarding:
-            # Caso raro: un 'authenticated' que ya completó onboarding.
-            # Podría pasar si se le revoca el plan y vuelve a 'authenticated'.
-            # Mandarlo al dashboard de cliente tiene sentido.
             return str(request.url_for("client_dashboard_page"))
         else:
-            # Caso normal: usuario nuevo, necesita onboarding.
             return str(request.url_for("onboarding_start_page"))
             
-    # REGLA 4 (POR DEFECTO): Si hay algún otro rol no contemplado, ir a la home.
+    # REGLA 5 (POR DEFECTO): Si hay algún otro rol no contemplado, ir a la home.
     return str(request.url_for("home_page"))
 
 # --- RUTAS DE AUTENTICACIÓN ---
