@@ -12,6 +12,7 @@ from app.core.config import settings
 
 from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 
+import json
 
 # --- 2. Importaciones del Proyecto (Organizadas por Módulo) ---
 from app.core.config import settings
@@ -174,4 +175,5 @@ async def obtener_lista_empresas(request: Request, actividad: str, direccion: st
         "template_name": "lista_empresas",
         "empresas": empresas
     })
+
 
