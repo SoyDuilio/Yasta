@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YASTA | Activa tu Prueba Gratuita</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/capture_page.css') }}">
+    <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body class="theme-formal">
+
+    <div class="main-container">
+        <!-- Contenedor principal que será reemplazado -->
+        <div id="capture-form-wrapper">
+            <!-- LAYOUT DE BIENVENIDA CON IMAGEN -->
+            <div class="welcome-grid">
+                <div class="welcome-text">
+                    <div class="header">
+                        <img src="{{ url_for('static', path='img/yasta_logo_amarillo.png') }}" alt="YASTA Logo">
+                        <h2>¡Bienvenido! Activa tus 2 Meses Gratis</h2>
+                    </div>
+                    <div class="initial-choice-container">
+                        <p>¿Tienes tu Usuario y Clave SOL a la mano?</p>
+                        <div class="choice-buttons">
+                            <button class="cta"
+                                    hx-get="{{ url_for('get_capture_full_form') }}"
+                                    hx-target="#capture-form-wrapper"
+                                    hx-swap="innerHTML">
+                                Sí, los tengo
+                            </button>
+                            <button class="cta-secondary"
+                                    hx-get="{{ url_for('get_capture_contact_form') }}"
+                                    hx-target="#capture-form-wrapper"
+                                    hx-swap="innerHTML">
+                                No, necesito ayuda
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="welcome-image-container">
+                    <img src="{{ url_for('static', path='img/asesora_yasta1.png') }}" alt="Asesora de YASTA" class="welcome-image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

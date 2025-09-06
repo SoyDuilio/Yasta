@@ -1,0 +1,31 @@
+<div class="thank-you-page">
+    <h1 id="welcome-message">¡Bienvenido a YASTA!</h1>
+    <p>Tu prueba de 2 meses ha sido activada. Nuestro equipo ya está preparando tu <strong>Reporte Situacional de Negocio</strong>, que estará listo en un máximo de 48 horas.</p>
+    
+    <div id="whatsapp-capture-section">
+        <h2>Recíbelo directamente en tu WhatsApp</h2>
+        <form hx-post="{{ url_for('save_whatsapp_number') }}" hx-target="#whatsapp-capture-section" hx-swap="innerHTML">
+            <input type="hidden" name="user_id" value="{{ user.id }}"> <!-- Asume que el backend pasa el 'user' -->
+            <div class="form-group">
+                <label for="whatsapp_number">Tu N° de WhatsApp</label>
+                <input type="tel" name="whatsapp_number" id="whatsapp_number" placeholder="987654321" required maxlength="9" pattern="[0-9]{9}">
+            </div>
+            <button type="submit" class="cta">Confirmar mi Número</button>
+        </form>
+    </div>
+</div><div class="thank-you-page">
+    <h1 id="welcome-message">¡Bienvenido a YASTA!</h1>
+    <p>Tu prueba de 2 meses ha sido activada. Nuestro equipo ya está preparando tu <strong>Reporte Situacional de Negocio</strong>, que estará listo en un máximo de 48 horas.</p>
+    
+    <div id="whatsapp-capture-section">
+        <h2>Recíbelo directamente en tu WhatsApp</h2>
+        <form hx-post="{{ url_for('save_whatsapp_number') }}" hx-target="#whatsapp-capture-section" hx-swap="innerHTML">
+            <input type="hidden" name="user_id" value="{{ user.id }}"> <!-- Asume que el backend pasa el 'user' -->
+            <div class="form-group">
+                <label for="whatsapp_number">Tu N° de WhatsApp</label>
+                <input type="tel" name="whatsapp_number" id="whatsapp_number" placeholder="987654321" required maxlength="9" pattern="[0-9]{9}">
+            </div>
+            <button type="submit" class="cta">Confirmar mi Número</button>
+        </form>
+    </div>
+</div>

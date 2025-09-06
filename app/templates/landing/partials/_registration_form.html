@@ -1,0 +1,234 @@
+<div class="registration-form">
+    
+    <!-- Icono Principal -->
+    <svg class="big-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+    
+    <!-- Prueba Social -->
+    <div class="social-proof-bar">
+        <img src="{{ url_for('static', path='img/emprendedor_1.jpg') }}" alt="Dueña de Boutique">
+        <img src="{{ url_for('static', path='img/emprendedor_2.jpg') }}" alt="Chef Emprendedor">
+        <img src="{{ url_for('static', path='img/emprendedor_3.jpg') }}" alt="Dueña de Bazar">
+    </div>
+
+    <!-- FORMULARIO PRINCIPAL (FLUJO FELIZ) -->
+    <form id="main-flow-form" 
+          hx-post="{{ url_for('capture_landing_lead') }}" 
+          hx-target="body" 
+          hx-swap="innerHTML">
+        
+        <!-- PASO 1: SOLO SE MUESTRA EL RUC -->
+        <div id="step-ruc" class="form-step">
+            <h2 id="form-title">Paso 1: Valida tu Negocio</h2>
+            <div class="form-group">
+                <label for="client_ruc">RUC</label>
+                <input type="tel" id="client_ruc" name="client_ruc" placeholder="Ingresa los 11 dígitos" required maxlength="11">
+                <div id="ruc-feedback" class="ruc-feedback"></div>
+            </div>
+        </div>
+
+        <!-- Razón Social (aparece después de validar) -->
+        <div id="ruc-validated-name" class="hidden"></div>
+        <input type="hidden" id="business_name" name="business_name">
+        <input type="hidden" name="source_landing" value="{{ body_class.replace('theme-', '') }}">
+
+        <!-- PASO 2: CREDENCIALES SOL (Oculto al principio) -->
+        <div id="sol-credentials-section" class="hidden">
+            <h2 id="form-title-step2">Paso 2: Conexión Segura</h2>
+            <div class="form-group">
+                <label for="sol_username">Usuario SOL</label>
+                <input type="text" id="sol_username" name="sol_username" placeholder="Ej: TUEMPRESA" required>
+            </div>
+            <div class="form-group">
+                <label for="sol_password">Clave SOL</label>
+                <div class="password-wrapper">
+                    <input type="password" id="sol_password" name="sol_password" placeholder="••••••••" required>
+                    <span id="toggle-password" class="password-toggle-icon"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="sol_password_confirm">Repite tu Clave SOL</label>
+                 <div class="password-wrapper">
+                    <input type="password" id="sol_password_confirm" name="sol_password_confirm" placeholder="••••••••" required>
+                    <span id="toggle-password-confirm" class="password-toggle-icon"></span>
+                </div>
+                <div id="password-feedback" class="password-feedback"></div>
+            </div>
+            <p class="security-note">🔒 Tu información viaja y se almacena 100% encriptada.</p>
+            <button type="submit" id="submit-button" class="cta">Activar Prueba Gratis</button>
+            <button type="button" id="forgot-sol-btn" class="button-secondary">¿No tienes tu Clave SOL a la mano?</button>
+        </div>
+    </form>
+    
+    <!-- FORMULARIO PLAN B (OLVIDÉ MI CLAVE) -->
+    <form id="plan-b-form" class="hidden"
+          hx-post="{{ url_for('save_onboarding_progress') }}"
+          hx-target="body"
+          hx-swap="innerHTML">
+        <input type="hidden" id="plan-b-ruc" name="ruc">
+        <h2>¡No te preocupes! Guardemos tu progreso.</h2>
+        <p>Déjanos tu WhatsApp y un asesor te contactará para ayudarte a activar tu prueba.</p>
+        <div class="form-group">
+            <label for="plan-b-name">Tu Nombre</label>
+            <input type="text" id="plan-b-name" name="contact_name" required>
+        </div>
+        <div class="form-group">
+            <label for="plan-b-whatsapp">Tu N° de WhatsApp</label>
+            <input type="tel" id="plan-b-whatsapp" name="whatsapp_number" required maxlength="9" pattern="[0-9]{9}" placeholder="987654321">
+        </div>
+        <button type="submit" class="cta">Contactarme por WhatsApp</button>
+    </form>
+</div>
+
+<!-- SCRIPT DE LÓGICA INTELIGENTE -->
+<script>
+    (function() {
+        // --- SELECCIÓN DE ELEMENTOS DEL DOM ---
+        const mainForm = document.getElementById('main-flow-form');
+        const planBForm = document.getElementById('plan-b-form');
+        
+        const rucInput = document.getElementById('client_ruc');
+        const rucFeedback = document.getElementById('ruc-feedback');
+        const stepRucDiv = document.getElementById('step-ruc');
+        
+        const validatedNameDiv = document.getElementById('ruc-validated-name');
+        const businessNameInput = document.getElementById('business_name');
+        const solSection = document.getElementById('sol-credentials-section');
+        
+        const forgotSolBtn = document.getElementById('forgot-sol-btn');
+        const planBRucInput = document.getElementById('plan-b-ruc');
+        
+        const pass1Input = document.getElementById('sol_password');
+        const pass2Input = document.getElementById('sol_password_confirm');
+        const passwordFeedback = document.getElementById('password-feedback');
+        let apiCallTimer;
+
+        // --- FUNCIÓN PARA MANEJAR EL "OJO" DE LAS CONTRASEÑAS ---
+        const setupPasswordToggle = (inputId, toggleId) => {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIconContainer = document.getElementById(toggleId);
+            if (!passwordInput || !toggleIconContainer) return;
+
+            const eyeIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`;
+            const eyeSlashIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243l-4.243-4.243" /></svg>`;
+            
+            toggleIconContainer.innerHTML = eyeIconSVG;
+            toggleIconContainer.addEventListener('click', () => {
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                toggleIconContainer.innerHTML = isPassword ? eyeSlashIconSVG : eyeIconSVG;
+            });
+        };
+        
+        // Inicializar los dos "ojos"
+        setupPasswordToggle('sol_password', 'toggle-password');
+        setupPasswordToggle('sol_password_confirm', 'toggle-password-confirm');
+
+        // --- FUNCIÓN PARA REINICIAR EL FORMULARIO AL PASO 1 ---
+        function resetToStep1() {
+            solSection.classList.add('hidden');
+            validatedNameDiv.classList.add('hidden');
+            
+            stepRucDiv.style.maxHeight = '1000px';
+            stepRucDiv.style.opacity = '1';
+            stepRucDiv.style.visibility = 'visible';
+            stepRucDiv.style.padding = '';
+            stepRucDiv.style.margin = '';
+
+            rucInput.value = '';
+            rucInput.focus();
+        }
+
+        // --- FUNCIÓN DE VALIDACIÓN DE RUC ---
+        const handleRucValidation = async () => {
+            const ruc = rucInput.value;
+            mainForm.classList.add('is-loading');
+            rucFeedback.textContent = 'Validando RUC...';
+            rucInput.readOnly = true;
+
+            try {
+                const response = await fetch(`/api/v1/utils/sunat-info/${ruc}`);
+                const data = await response.json();
+
+                if (!response.ok || !data.razonSocial) {
+                    throw new Error(data.detail || 'RUC no encontrado o inválido.');
+                }
+                
+                businessNameInput.value = data.razonSocial;
+                validatedNameDiv.innerHTML = `✅ ${data.razonSocial} <button type="button" id="change-ruc-btn" class="change-ruc-btn">Cambiar</button>`;
+                
+                stepRucDiv.style.maxHeight = '0';
+                stepRucDiv.style.opacity = '0';
+                stepRucDiv.style.visibility = 'hidden';
+                stepRucDiv.style.padding = '0';
+                stepRucDiv.style.margin = '0';
+
+                validatedNameDiv.classList.remove('hidden');
+                solSection.classList.remove('hidden');
+                
+                document.getElementById('change-ruc-btn').addEventListener('click', resetToStep1);
+
+            } catch (error) {
+                rucFeedback.textContent = `Error: ${error.message}`;
+                rucInput.classList.add('input-error');
+            } finally {
+                mainForm.classList.remove('is-loading');
+                rucInput.readOnly = false;
+            }
+        };
+
+        // --- MANEJADORES DE EVENTOS ---
+
+        // 1. Input del RUC: Valida en tiempo real y dispara la API
+        rucInput.addEventListener('input', () => {
+            rucInput.value = rucInput.value.replace(/[^0-9]/g, '').slice(0, 11);
+            rucInput.classList.remove('input-error');
+            
+            const remaining = 11 - rucInput.value.length;
+            if (remaining > 0 && rucInput.value.length > 0) {
+                rucFeedback.textContent = `Faltan ${remaining} dígitos...`;
+            } else {
+                rucFeedback.textContent = '';
+            }
+            
+            clearTimeout(apiCallTimer);
+            if (rucInput.value.length === 11) {
+                apiCallTimer = setTimeout(handleRucValidation, 300);
+            }
+        });
+
+        // 2. Click en "No tienes tu Clave SOL"
+        forgotSolBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            mainForm.classList.add('hidden');
+            document.getElementById('plan-b-ruc').value = rucInput.value;
+            planBForm.classList.remove('hidden');
+        });
+
+        // 3. Envío del formulario principal: Valida contraseñas
+        mainForm.addEventListener('submit', (e) => {
+            if (pass1Input.value !== pass2Input.value) {
+                e.preventDefault();
+                alert('Las Claves SOL no coinciden. Por favor, verifícalas.');
+                pass2Input.focus();
+                pass2Input.classList.add('input-error');
+            }
+        });
+
+        // 4. Feedback de contraseñas en tiempo real
+        pass2Input.addEventListener('input', () => {
+            if (pass2Input.value.length > 0) {
+                if (pass1Input.value === pass2Input.value) {
+                    passwordFeedback.textContent = '✅ ¡Las claves coinciden!';
+                    passwordFeedback.classList.add('is-match');
+                    passwordFeedback.classList.remove('is-mismatch');
+                } else {
+                    passwordFeedback.textContent = 'Las claves no coinciden.';
+                    passwordFeedback.classList.add('is-mismatch');
+                    passwordFeedback.classList.remove('is-match');
+                }
+            } else {
+                passwordFeedback.textContent = '';
+            }
+        });
+    })();
+</script>

@@ -1,0 +1,132 @@
+<div class="capture-form-container">
+    <div class="header">
+        <img src="{{ url_for('static', path='img/yasta_logo_amarillo.png') }}" alt="YASTA Logo">
+        <h2>Activa tus 2 Meses Gratis</h2>
+        <p>Completa tus datos con la ayuda de nuestro asesor.</p>
+    </div>
+
+    <!-- FORMULARIO "PLAN B" (SIN CLAVE SOL) -->
+    <form id="plan-b-form"
+          class="form-section"
+          hx-post="{{ url_for('capture_contact_only') }}"
+          hx-target="#capture-form-wrapper"
+          hx-swap="innerHTML">
+        <h3>Opción 1: Empezar con tus datos de contacto</h3>
+        <div class="form-group">
+            <label for="plan-b-name">Tu Nombre Completo</label>
+            <input type="text" id="plan-b-name" name="contact_name" required>
+        </div>
+        <div class="form-group">
+            <label for="plan-b-whatsapp">Tu N° de WhatsApp</label>
+            <input type="tel" id="plan-b-whatsapp" name="whatsapp_number" required maxlength="9" pattern="[0-9]{9}" placeholder="987654321">
+        </div>
+        <div class="form-group">
+            <label for="plan-b-ruc">Tu RUC (Opcional)</label>
+            <input type="tel" id="plan-b-ruc" name="ruc" maxlength="11" pattern="[0-9]{11}">
+        </div>
+        <button type="submit" class="cta-secondary">Guardar y Continuar Luego</button>
+    </form>
+
+    <div class="separator">
+        <span>o si ya tienes tu Clave SOL</span>
+    </div>
+
+    <!-- FORMULARIO PRINCIPAL (CON CLAVE SOL) -->
+    <form id="main-flow-form" 
+          class="form-section"
+          hx-post="{{ url_for('capture_full_lead') }}" 
+          hx-target="#capture-form-wrapper" 
+          hx-swap="innerHTML">
+        <h3>Opción 2: Activar ahora</h3>
+        <div id="step-ruc" class="form-step">
+            <div class="form-group">
+                <label for="client_ruc">Tu RUC</label>
+                <input type="tel" id="client_ruc" name="ruc" placeholder="Ingresa los 11 dígitos" required maxlength="11">
+                <div id="ruc-feedback" class="ruc-feedback"></div>
+            </div>
+        </div>
+        <div id="ruc-validated-name" class="hidden"></div>
+        <input type="hidden" id="business_name" name="business_name">
+
+        <div id="sol-credentials-section" class="hidden">
+            <div class="form-group">
+                <label for="sol_username">Usuario SOL</label>
+                <input type="text" id="sol_username" name="sol_username" placeholder="Ej: TUEMPRESA" required>
+            </div>
+            <div class="form-group">
+                <label for="sol_password">Clave SOL</label>
+                <input type="password" id="sol_password" name="sol_password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="cta">Activar Prueba Ahora</button>
+        </div>
+    </form>
+</div>
+
+<!-- SCRIPT DE LÓGICA INTELIGENTE -->
+<script>
+    (function() {
+        // --- SELECCIÓN DE ELEMENTOS ---
+        const rucInput = document.getElementById('client_ruc');
+        const rucFeedback = document.getElementById('ruc-feedback');
+        const validatedNameDiv = document.getElementById('ruc-validated-name');
+        const businessNameInput = document.getElementById('business_name');
+        const solSection = document.getElementById('sol-credentials-section');
+        let apiCallTimer;
+
+        // --- FUNCIÓN DE VALIDACIÓN DE RUC ---
+        const handleRucValidation = async () => {
+            const ruc = rucInput.value;
+            rucFeedback.textContent = 'Validando RUC...';
+            rucInput.readOnly = true;
+
+            try {
+                const response = await fetch(`/api/v1/utils/sunat-info/${ruc}`);
+                const data = await response.json();
+
+                if (!response.ok || !data.razonSocial) {
+                    throw new Error(data.detail || 'RUC no encontrado.');
+                }
+                
+                businessNameInput.value = data.razonSocial;
+                validatedNameDiv.innerHTML = `✅ ${data.razonSocial} <button type="button" id="change-ruc-btn" class="change-ruc-btn">Cambiar</button>`;
+                
+                validatedNameDiv.classList.remove('hidden');
+                solSection.classList.remove('hidden');
+                rucInput.style.display = 'none'; // Ocultar input de RUC
+                document.querySelector('label[for="client_ruc"]').style.display = 'none'; // Ocultar label
+                
+                document.getElementById('change-ruc-btn').addEventListener('click', () => {
+                    validatedNameDiv.classList.add('hidden');
+                    solSection.classList.add('hidden');
+                    rucInput.style.display = 'block';
+                    document.querySelector('label[for="client_ruc"]').style.display = 'block';
+                    rucInput.value = '';
+                    rucInput.focus();
+                });
+
+            } catch (error) {
+                rucFeedback.textContent = `Error: ${error.message}`;
+            } finally {
+                if (!solSection.classList.contains('hidden')) {
+                    rucFeedback.textContent = '';
+                }
+                rucInput.readOnly = false;
+            }
+        };
+
+        // --- MANEJADOR DE EVENTO PARA EL INPUT DEL RUC ---
+        rucInput.addEventListener('input', () => {
+            rucInput.value = rucInput.value.replace(/[^0-9]/g, '').slice(0, 11);
+            const remaining = 11 - rucInput.value.length;
+            if (remaining > 0 && rucInput.value.length > 0) {
+                rucFeedback.textContent = `Faltan ${remaining} dígitos...`;
+            } else {
+                rucFeedback.textContent = '';
+            }
+            clearTimeout(apiCallTimer);
+            if (rucInput.value.length === 11) {
+                apiCallTimer = setTimeout(handleRucValidation, 300);
+            }
+        });
+    })();
+</script>

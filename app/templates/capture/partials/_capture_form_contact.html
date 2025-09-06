@@ -1,0 +1,53 @@
+<form id="plan-b-form" class="form-section"
+      hx-post="{{ url_for('capture_contact_only') }}"
+      hx-target="#capture-form-wrapper"
+      hx-swap="innerHTML">
+    <h3>Perfecto, te ayudaremos personalmente</h3>
+    <div class="form-group">
+        <label for="plan-b-name">Tu Nombre Completo</label>
+        <input type="text" id="plan-b-name" name="contact_name" required>
+    </div>
+    <div class="form-group">
+        <label for="plan-b-whatsapp">Tu N° de WhatsApp</label>
+        <input type="tel" id="plan-b-whatsapp" name="whatsapp_number" required maxlength="9" pattern="[0-9]{9}" placeholder="987654321">
+    </div>
+    <div class="form-group">
+        <label for="plan-b-ruc">Tu RUC (Si lo tienes a la mano)</label>
+        <input type="tel" id="plan-b-ruc" name="ruc" maxlength="11" pattern="[0-9]{11}">
+        <div id="plan-b-ruc-feedback" class="ruc-feedback"></div>
+    </div>
+    <button type="submit" class="cta">Solicitar Ayuda</button>
+</form>
+
+<script>
+    (function() {
+        const rucInput = document.getElementById('plan-b-ruc');
+        const rucFeedback = document.getElementById('plan-b-ruc-feedback');
+        let apiCallTimer;
+
+        rucInput.addEventListener('input', () => {
+            rucInput.value = rucInput.value.replace(/[^0-9]/g, '').slice(0, 11);
+            clearTimeout(apiCallTimer);
+            if (rucInput.value.length === 11) {
+                apiCallTimer = setTimeout(async () => {
+                    rucFeedback.textContent = 'Validando...';
+                    try {
+                        const response = await fetch(`/api/v1/utils/sunat-info/${rucInput.value}`);
+                        const data = await response.json();
+                        if (response.ok && data.razonSocial) {
+                            rucFeedback.textContent = `✅ ${data.razonSocial}`;
+                            rucFeedback.style.color = 'var(--success-color)';
+                        } else {
+                            throw new Error();
+                        }
+                    } catch (e) {
+                        rucFeedback.textContent = 'RUC no parece ser válido.';
+                        rucFeedback.style.color = 'var(--error-color)';
+                    }
+                }, 300);
+            } else {
+                rucFeedback.textContent = '';
+            }
+        });
+    })();
+</script>

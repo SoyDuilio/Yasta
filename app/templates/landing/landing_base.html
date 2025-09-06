@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YASTA | Tu Tranquilidad Fiscal en la Amazonía</title>
+
+    <!-- FUENTES -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- ¡LA LÍNEA MÁS IMPORTANTE! Enlace a tu hoja de estilos -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/landing_page.css') }}">
+    
+    <!-- SCRIPTS DE LIBRERÍAS -->
+    <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12" defer></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- SCRIPT DE LA LANDING PAGE -->
+    <script src="{{ url_for('static', path='js/landing.js') }}" defer></script>
+</head>
+
+<body class="{{ body_class }}">
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Menú Fijo Inferior -->
+    <nav class="fixed-bottom-menu">
+        <button id="btn-track-what-is"
+                hx-get="{{ url_for('get_what_is_content') }}"
+                hx-target="#modal-content"
+                hx-swap="innerHTML"
+                onclick="trackClick('click_what_is')">
+            ¿Qué es YASTA?
+        </button>
+        <button id="btn-track-cta" class="cta"
+                hx-get="{{ url_for('get_registration_form') }}"
+                hx-target="#modal-content"
+                hx-swap="innerHTML"
+                onclick="trackClick('click_activate_free_trial')">
+            Activa tu Prueba GRATIS
+        </button>
+        <button id="btn-track-benefits"
+                hx-get="{{ url_for('get_benefits_content') }}"
+                hx-target="#modal-content"
+                hx-swap="innerHTML"
+                onclick="trackClick('click_benefits')">
+            Beneficios
+        </button>
+    </nav>
+
+    <!-- Estructura del Modal -->
+    <div id="modal-container" class="modal-container">
+        <div class="modal-overlay" onclick="closeModal()"></div>
+        <div class="modal-content-wrapper">
+            <button class="modal-close-btn" onclick="closeModal()">×</button>
+            <div id="modal-content">
+                <!-- El contenido de HTMX se cargará aquí -->
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

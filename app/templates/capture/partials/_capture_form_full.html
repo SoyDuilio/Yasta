@@ -1,0 +1,115 @@
+<!-- Formulario para quienes SÍ tienen su Clave SOL -->
+<form id="main-flow-form" class="form-section" hx-post="{{ url_for('capture_full_lead') }}" hx-target="#capture-form-wrapper">
+    <div id="step-ruc" class="form-step">
+        <h3>Paso 1: Valida tu RUC</h3>
+        <div class="form-group">
+            <label for="client_ruc" class="sr-only">Tu RUC</label> <!-- Añadimos el label por consistencia -->
+            <input type="tel" id="client_ruc" name="ruc" placeholder="Ingresa los 11 dígitos" required maxlength="11">
+            <div id="ruc-feedback" class="ruc-feedback"></div>
+        </div>
+    </div>
+    <div id="ruc-validated-name" class="hidden"></div>
+    <input type="hidden" id="business_name" name="business_name">
+    <div id="sol-credentials-section" class="hidden">
+        <h3>Paso 2: Conexión Segura</h3>
+        <div class="form-group">
+            <label for="sol_username">Usuario SOL</label>
+            <input type="text" id="sol_username" name="sol_user" required>
+        </div>
+        <div class="form-group">
+            <label for="sol_password">Clave SOL</label>
+            <input type="password" id="sol_password" name="sol_pass" required>
+        </div>
+        <div class="form-group">
+            <label for="sol_password_confirm">Repite tu Clave SOL</label>
+            <input type="password" id="sol_password_confirm" required>
+            <div id="password-feedback" class="password-feedback"></div>
+        </div>
+        <button type="submit" class="cta">Activar Prueba Ahora</button>
+    </div>
+</form>
+
+<script>
+    (function() {
+        // --- SELECCIÓN DE ELEMENTOS ---
+        const rucInput = document.getElementById('client_ruc');
+        const rucFeedback = document.getElementById('ruc-feedback');
+        const validatedNameDiv = document.getElementById('ruc-validated-name');
+        const businessNameInput = document.getElementById('business_name');
+        const solSection = document.getElementById('sol-credentials-section');
+        const stepRucDiv = document.getElementById('step-ruc');
+        const pass1Input = document.getElementById('sol_password');
+        const pass2Input = document.getElementById('sol_password_confirm');
+        const passwordFeedback = document.getElementById('password-feedback');
+        let apiCallTimer;
+
+        // --- FUNCIÓN PARA REINICIAR ---
+        function resetToStep1() {
+            validatedNameDiv.classList.add('hidden');
+            solSection.classList.add('hidden');
+            stepRucDiv.style.display = 'block';
+            rucInput.value = '';
+            rucInput.readOnly = false;
+            rucInput.focus();
+        }
+
+        // --- FUNCIÓN DE VALIDACIÓN DE RUC ---
+        const handleRucValidation = async () => {
+            const ruc = rucInput.value;
+            rucFeedback.textContent = 'Validando RUC...';
+            rucInput.readOnly = true;
+
+            try {
+                const response = await fetch(`/api/v1/utils/sunat-info/${ruc}`);
+                const data = await response.json();
+                if (!response.ok || !data.razonSocial) throw new Error(data.detail || 'RUC no encontrado.');
+                
+                businessNameInput.value = data.razonSocial;
+                validatedNameDiv.innerHTML = `✅ ${data.razonSocial} <button type="button" id="change-ruc-btn" class="change-ruc-btn">Cambiar</button>`;
+                
+                validatedNameDiv.classList.remove('hidden');
+                solSection.classList.remove('hidden');
+                stepRucDiv.style.display = 'none';
+                
+                document.getElementById('change-ruc-btn').addEventListener('click', resetToStep1);
+            } catch (error) {
+                rucFeedback.textContent = `Error: ${error.message}`;
+            } finally {
+                if (!solSection.classList.contains('hidden')) rucFeedback.textContent = '';
+                rucInput.readOnly = false;
+            }
+        };
+
+        // --- MANEJADORES DE EVENTOS ---
+        rucInput.addEventListener('input', () => {
+            rucInput.value = rucInput.value.replace(/[^0-9]/g, '').slice(0, 11);
+            const remaining = 11 - rucInput.value.length;
+            rucFeedback.textContent = remaining > 0 && rucInput.value.length > 0 ? `Faltan ${remaining} dígitos...` : '';
+            clearTimeout(apiCallTimer);
+            if (rucInput.value.length === 11) {
+                apiCallTimer = setTimeout(handleRucValidation, 300);
+            }
+        });
+
+        pass2Input.addEventListener('input', () => {
+            if (pass2Input.value.length > 0) {
+                if (pass1Input.value === pass2Input.value) {
+                    passwordFeedback.textContent = '✅ ¡Las claves coinciden!';
+                    passwordFeedback.className = 'password-feedback is-match';
+                } else {
+                    passwordFeedback.textContent = 'Las claves no coinciden.';
+                    passwordFeedback.className = 'password-feedback is-mismatch';
+                }
+            } else {
+                passwordFeedback.textContent = '';
+            }
+        });
+
+        document.getElementById('main-flow-form').addEventListener('submit', (e) => {
+            if (pass1Input.value !== pass2Input.value) {
+                e.preventDefault();
+                alert('Las Claves SOL no coinciden. Por favor, verifícalas.');
+            }
+        });
+    })();
+</script>

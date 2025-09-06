@@ -1,0 +1,12 @@
+<div class="thank-you-page">
+    <h1>¡Excelente, <br>{{ lead.contact_name }}!</h1>
+    <p>Tu registro está completo. Ahora, déjanos tu WhatsApp para enviarte tu Reporte Situacional en 48 horas.</p>
+    <form hx-post="{{ url_for('capture_save_whatsapp') }}" hx-target="#capture-form-wrapper">
+        <input type="hidden" name="lead_id" value="{{ lead.id }}">
+        <div class="form-group">
+            <label for="whatsapp_number">Tu N° de WhatsApp</label>
+            <input type="tel" name="whatsapp_number" id="whatsapp_number" required maxlength="9" pattern="[0-9]{9}" placeholder="987654321">
+        </div>
+        <button type="submit" class="cta">Recibir mi Reporte</button>
+    </form>
+</div>

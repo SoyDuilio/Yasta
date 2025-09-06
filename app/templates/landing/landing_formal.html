@@ -1,0 +1,71 @@
+{% extends 'landing/landing_base.html' %}
+
+{% block content %}
+    <!-- 1. Hero Section -->
+    <section class="hero container">
+        <h2 class="slogan">Para el Emprendedor Amazónico que no se detiene.</h2>
+        <h1>Duerme tranquilo. Nosotros nos encargamos de la SUNAT por ti.</h1>
+        <p>Evita multas y notificaciones. Tu tranquilidad fiscal para tu negocio en Iquitos por solo S/. 19.99 al mes. Gestionado por expertos, para emprendedores loretanos como tú.</p>
+        <div class="hero-video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <!-- 2. Sección Prueba Social con Fotos -->
+    <section class="content-section social-proof-photos container">
+        <h2>Únete a cientos de emprendedores que ya confían en YASTA</h2>
+        <div class="photos-grid">
+            <div class="photo-item">
+                <img src="{{ url_for('static', path='img/emprendedor_1.jpg') }}" alt="Dueña de Boutique">
+                <span class="legend color-1">Dueña de Boutique</span>
+            </div>
+            <div class="photo-item">
+                <img src="{{ url_for('static', path='img/emprendedor_2.jpg') }}" alt="Chef Emprendedor">
+                <span class="legend color-2">Chef Emprendedor</span>
+            </div>
+            <div class="photo-item">
+                <img src="{{ url_for('static', path='img/emprendedor_3.jpg') }}" alt="Dueña de Bazar">
+                <span class="legend color-3">Dueña de Bazar</span>
+            </div>
+            <div class="photo-item">
+                <img src="{{ url_for('static', path='img/emprendedor_4.jpg') }}" alt="Dueño de Pub">
+                <span class="legend color-4">Dueño de un Pub</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Sección de Testimonios -->
+    <section class="content-section testimonials-section container">
+        <h2>Lo que dicen los emprendedores de Iquitos</h2>
+        <div class="testimonial-card">
+            <img src="{{ url_for('static', path='img/testimonio_grupal.jpg') }}" alt="Foto de cliente satisfecho">
+            <blockquote>"Desde que uso YASTA, por fin entiendo mis números y duermo sin miedo a la SUNAT. El equipo es de aquí, de Loreto, y eso me da muchísima confianza."</blockquote>
+            <cite class="author">María R., Dueña de Bodega "La Loretana"</cite>
+        </div>
+    </section>
+
+    <!-- 4. Sección de FAQs (Funcional) -->
+    <section class="content-section faq-section container">
+        <h2>Tus Dudas, Resueltas</h2>
+        <div x-data="{ open: null }">
+            <div class="faq-item">
+                <button @click="open = open === 1 ? null : 1" class="faq-question">
+                    <span>¿Es seguro entregar mi Clave SOL?</span>
+                    <span :class="{'rotate-180': open === 1}" class="transform transition-transform">↓</span>
+                </button>
+                <div x-show="open === 1" x-collapse.duration.300ms class="faq-answer">
+                    <p>Totalmente. Tu Clave SOL se encripta con seguridad de grado bancario desde el momento en que la ingresas. Nadie en nuestro equipo puede verla. Solo se usa para conectar con SUNAT y generar tus reportes.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button @click="open = open === 2 ? null : 2" class="faq-question">
+                    <span>¿Qué pasa después de los 2 meses gratis?</span>
+                    <span :class="{'rotate-180': open === 2}" class="transform transition-transform">↓</span>
+                </button>
+                <div x-show="open === 2" x-collapse.duration.300ms class="faq-answer">
+                    <p>No hay cobros automáticos ni sorpresas. Unos días antes de que termine tu prueba, nos pondremos en contacto contigo vía WhatsApp para preguntarte si deseas continuar con el plan de S/. 19.99. La decisión es 100% tuya.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
