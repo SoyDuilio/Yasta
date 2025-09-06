@@ -5,6 +5,10 @@
 {% block console_menu %}
     <button id="btn-validate" class="menu-btn" hx-get="{{ url_for('supervisor_validate_view') }}">Validar Solicitudes</button>
     <button id="btn-assign" class="menu-btn" hx-get="{{ url_for('supervisor_assignment_view') }}">Asignar Tareas</button>
-    <button class="menu-btn" disabled>Gestionar Staff</button>
+    
+    <button id="btn-manage-staff" class="menu-btn" hx-get="{{ url_for('supervisor_manage_staff_view') }}">
+        Gestionar Staff
+    </button>
+
     <button class="menu-btn" disabled>Reportes</button>
 {% endblock %}
