@@ -41,6 +41,7 @@ from app.models import credential_access_audit
 from app.models import monthly_client_summary
 from app.models import company_transaction
 from app.models import company_tax_declaration
+from app.models.landing_lead import LandingLead
 # Asegúrate de que cada archivo de modelo (ej: app/models/user.py) exista
 # y que cada modelo (ej: class User(Base):) esté definido en su respectivo archivo.
 
