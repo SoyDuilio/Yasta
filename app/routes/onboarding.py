@@ -1,4 +1,4 @@
-# app/routes/pages.py
+# app/routes/onboarding.py
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 

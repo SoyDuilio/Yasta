@@ -1,4 +1,4 @@
-# app/routers/payments.py
+# app/routes/payments.py
 import json # Para parsear el string JSON que vendrá del formulario
 from fastapi import APIRouter, Depends, Request, Form, UploadFile, File, HTTPException, status
 from fastapi.templating import Jinja2Templates

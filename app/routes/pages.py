@@ -1,4 +1,4 @@
-# app/apis/v1/endpoints/pages.py
+# app/routes/pages.py
 from fastapi import APIRouter, Request, Depends, status, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from pathlib import Path

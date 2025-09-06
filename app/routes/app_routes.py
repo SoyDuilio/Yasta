@@ -1,4 +1,4 @@
-# app/routers/payments.py
+# app/routes/app_routes.py
 from fastapi import APIRouter, Request, Depends, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
