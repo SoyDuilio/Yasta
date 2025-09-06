@@ -1,9 +1,11 @@
 # app/routes/dashboards/supervisor.py
-from fastapi import APIRouter, Depends, Request, HTTPException, Form, Query
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, Request, HTTPException, Form, Query, status
+from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime, date, timezone
 from typing import Optional
+
+from app.crud import crud_user
 
 from app.db.session import get_db
 from app.core.templating import templates
@@ -22,11 +24,18 @@ router = APIRouter(dependencies=[Depends(require_login_for_pages), Depends(user_
 
 # --- Rutas de Vistas ---
 @router.get("/", response_class=HTMLResponse, name="supervisor_dashboard_page")
-async def serve_supervisor_dashboard_shell(request: Request):
+async def serve_supervisor_dashboard_shell(
+    request: Request,
+    # 1. Añadimos la dependencia para obtener el usuario logueado
+    current_user: User = Depends(require_login_for_pages) 
+):
     initial_load_url = request.url_for('supervisor_validate_view')
+    
+    # 2. Añadimos 'current_user' al contexto que pasamos a la plantilla
     return templates.TemplateResponse("dashboard_supervisor.html", {
         "request": request,
-        "initial_load_url": initial_load_url
+        "initial_load_url": initial_load_url,
+        "current_user": current_user 
     })
 
 # --- ¡VISTA DE VALIDACIÓN ENRIQUECIDA! ---
@@ -152,3 +161,87 @@ async def assign_contract_to_accountant(request: Request, db: Session = Depends(
 async def get_alert_modal(request: Request, message: str = Query("Ocurrió un error.")):
     """Genera un modal de alerta simple con un mensaje personalizado."""
     return templates.TemplateResponse("partials/_alert_modal.html", {"request": request, "message": message, "title": "Atención"})
+
+
+
+# RUTA PARA MOSTRAR LA VISTA DE GESTIÓN DE PERSONAL
+@router.get("/manage-staff-view", response_class=HTMLResponse, name="supervisor_manage_staff_view")
+async def get_manage_staff_view(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    """
+    Muestra la vista para gestionar al personal (ver lista y formulario de creación).
+    """
+    # Consultamos solo a los usuarios que son parte del staff operativo
+    staff_members = db.query(User).filter(
+        User.role.in_([
+            UserRole.STAFF_COLLABORATOR,
+            UserRole.STAFF_MANAGER
+        ])
+    ).order_by(User.contact_name).all()
+    
+    # --- INICIO DE LA CORRECIÓN ---
+    # Definimos la lista de roles que un supervisor puede crear.
+    # Por ahora, solo puede crear contadores.
+    creatable_roles = [UserRole.STAFF_COLLABORATOR]
+    # --- FIN DE LA CORRECIÓN ---
+    
+    context = {
+        "request": request,
+        "staff_members": staff_members,
+        "creatable_roles": creatable_roles # <-- Ahora pasamos la lista a la plantilla
+    }
+    
+    return templates.TemplateResponse("dashboards/supervisor/_manage_staff_view.html", context)
+
+# RUTA PARA PROCESAR LA CREACIÓN DE UN NUEVO MIEMBRO
+# app/routes/dashboards/supervisor.py
+
+@router.post("/create-staff", response_class=HTMLResponse, name="supervisor_create_staff")
+async def create_staff_member(
+    request: Request,
+    db: Session = Depends(get_db),
+    full_name: str = Form(...),
+    dni: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    role: UserRole = Form(...)
+):
+    """
+    Recibe los datos del formulario de nuevo personal, lo crea en la BD
+    y devuelve la lista de staff actualizada para que HTMX la reemplace.
+    """
+    # 1. Validación
+    if crud_user.get_by_email(db, email=email):
+        return HTMLResponse("<div class='p-4 text-red-400 font-bold'>Error: El correo electrónico ya está en uso.</div>", status_code=400)
+    
+    # 2. Creación del usuario en la sesión de la BD
+    crud_user.create_staff_user(
+        db=db, 
+        full_name=full_name, 
+        dni=dni, 
+        email=email, 
+        password=password, 
+        role=role
+    )
+    
+    # 3. ¡CRÍTICO! Guardar los cambios en la base de datos
+    db.commit()
+
+    # 4. Preparar y devolver el fragmento HTML actualizado para HTMX
+    staff_members = db.query(User).filter(
+        User.role.in_([UserRole.STAFF_COLLABORATOR, UserRole.STAFF_MANAGER])
+    ).order_by(User.contact_name).all()
+    
+    creatable_roles = [UserRole.STAFF_COLLABORATOR]
+    
+    context = {
+        "request": request,
+        "staff_members": staff_members,
+        "creatable_roles": creatable_roles
+    }
+    
+    # La plantilla _manage_staff_view.html es la que contiene tanto el formulario
+    # como la lista, por lo que al devolverla, refrescamos todo el componente.
+    return templates.TemplateResponse("dashboards/supervisor/_manage_staff_view.html", context)
