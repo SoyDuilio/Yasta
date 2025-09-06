@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Planificación de Visitas - Loreto</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-hcAcwsjjUs7yyUiRmnVxeHXHNZYLs7zhlvKM3PNCRF/FKKTc84kFMlIGXhFKgA0" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <!-- Incluye Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+        h1 {
+            grid-column: 1 / -1;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 35px;
+            font-size: 2.5em;
+            border-bottom: 3px solid #e0e0e0;
+            padding-bottom: 20px;
+        }
+        .card {
+            background-color: #fdfdfd;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 6px solid;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-primary { border-left-color: #3498db; }
+        .card-success { border-left-color: #28a745; }
+        .card-warning { border-left-color: #e67e22; }
+        .card-info { border-left-color: #17a2b8; }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        }
+        .card h2 {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .card h2 i {
+            margin-right: 12px;
+            color: #3498db;
+        }
+        .metric {
+            font-size: 3em;
+            font-weight: bold;
+            color: #28a745;
+            text-align: center;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .description {
+            font-size: 1em;
+            color: #777;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .list-group {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+        .list-group-item {
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95em;
+        }
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        .list-group-item strong {
+            color: #2c3e50;
+        }
+        .priority-item {
+            background-color: #e8f5e9; /* Greenish background */
+            border-left: 3px solid #28a745;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .warning-message {
+            color: #e67e22;
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 5px solid #e67e22;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        .footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid #e0e0e0;
+            color: #777;
+            font-size: 0.85em;
+        }
+        .image-card {
+            grid-column: 1 / -1;
+            text-align: center;
+            background-color: #fcfcfc;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #1abc9c;
+        }
+        .image-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .expandable-content {
+            max-height: 200px;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+            margin-bottom: 10px;
+        }
+        .expandable-content.expanded {
+            max-height: 1000px; /* Suficientemente grande para mostrar todo */
+        }
+        .toggle-button {
+            display: block;
+            width: fit-content;
+            margin: 10px auto 0;
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+        .toggle-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <h1>Dashboard de Planificación de Visitas - Loreto</h1>
+
+        <div class="card card-primary">
+            <h2><i class="fas fa-chart-bar"></i>Resumen General de Empresas</h2>
+            <span class="metric" id="totalEmpresas">...</span>
+            <p class="description">Total de empresas registradas</p>
+            <ul class="list-group">
+                <li>Personas Jurídicas: <strong id="totalJuridicas">...</strong></li>
+                <li>Personas Naturales: <strong id="totalNaturales">...</strong></li>
+                <li>Empresas Activas: <strong id="totalActivos">...</strong></li>
+            </ul>
+        </div>
+
+        <div class="card card-success">
+            <h2><i class="fas fa-map-marked-alt"></i>Visitas Prioritarias: Distritos</h2>
+            <p class="description">Concentración de empresas en los distritos de fácil acceso y alta prioridad.</p>
+            <ul class="list-group" id="distritosPrioritariosList">
+                <!-- Data will be loaded here -->
+            </ul>
+        </div>
+
+        <div class="card card-info">
+            <h2><i class="fas fa-building"></i>Top Sectores (Descripción) en Distritos Prioritarios</h2>
+            <p class="description">Sectores económicos con mayor número de empresas en zonas prioritarias.</p>
+            <div class="expandable-content" id="topSectoresPrioritariosContent">
+                <ul class="list-group" id="topSectoresPrioritariosList">
+                    <!-- Data will be loaded here -->
+                </ul>
+            </div>
+            <button class="toggle-button" onclick="toggleExpandable('topSectoresPrioritariosContent')">Ver más</button>
+        </div>
+
+        <div class="card card-warning">
+            <h2><i class="fas fa-code"></i>Top Códigos CIIU (Naturales) en Distritos Prioritarios</h2>
+            <p class="description">Códigos CIIU principales de personas naturales en zonas prioritarias. Útil para entender sub-sectores.</p>
+            <div class="expandable-content" id="topCIIUCodesNaturalesContent">
+                <ul class="list-group" id="topCIIUCodesNaturalesList">
+                    <!-- Data will be loaded here -->
+                </ul>
+            </div>
+            <button class="toggle-button" onclick="toggleExpandable('topCIIUCodesNaturalesContent')">Ver más</button>
+        </div>
+
+        <div class="card card-primary">
+            <h2><i class="fas fa-chart-pie"></i>Distribución por Tipo de Persona</h2>
+            <div class="chart-container">
+                <canvas id="tipoPersonaChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card card-info">
+            <h2><i class="fas fa-chart-area"></i>Distribución General por Distrito</h2>
+            <p class="description">Visualización de la cantidad de empresas en todos los distritos.</p>
+            <div class="chart-container">
+                <canvas id="distritoGeneralChart"></canvas>
+            </div>
+        </div>
+
+        <div class="image-card">
+            <h2>Visualización: Priorización de Visitas</h2>
+            <p>Un mapa conceptual o gráfico que ilustra la estrategia de priorización de visitas basada en distritos y sectores.</p>
+            
+        </div>
+
+        <div class="image-card">
+            <h2>Visualización: Concentración de Empresas Jurídicas</h2>
+            <p>Un diagrama de barras que muestra los 5 principales sectores económicos de personas jurídicas en Iquitos y Belén, por ejemplo.</p>
+            
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2023 Dashboard de Planificación de Visitas - Loreto. Datos actualizados.</p>
+            <p>Desarrollado con HTML, CSS, JavaScript, HTMX y Hyperscript.</p>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar los datos desde el JSON (o incrustarlos directamente)
+        async function loadDashboardData() {
+            try {
+                // Si el dashboard_data.json está en la misma ubicación
+                const response = await fetch('dashboard_data.json');
+                const data = await response.json();
+
+                // 1. Resumen General
+                document.getElementById('totalEmpresas').textContent = data.resumen_general.total_empresas.toLocaleString();
+                document.getElementById('totalJuridicas').textContent = data.resumen_general.total_juridicas.toLocaleString();
+                document.getElementById('totalNaturales').textContent = data.resumen_general.total_naturales.toLocaleString();
+                document.getElementById('totalActivos').textContent = data.resumen_general.total_activos.toLocaleString();
+
+                // 2. Visitas Prioritarias: Distritos
+                const distritosPrioritariosList = document.getElementById('distritosPrioritariosList');
+                data.conteo_distritos_prioritarios.forEach(item => {
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item', 'priority-item');
+                    li.innerHTML = `<span>${item.Distrito}</span> <strong>${item.Cantidad.toLocaleString()} (${item.Porcentaje}%)</strong>`;
+                    distritosPrioritariosList.appendChild(li);
+                });
+
+                // 3. Top Sectores (Descripción) en Distritos Prioritarios
+                const topSectoresPrioritariosList = document.getElementById('topSectoresPrioritariosList');
+                data.top_sectores_prioritarios.forEach(item => {
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.innerHTML = `<span>${item.Sector_Descripcion}</span> <strong>${item.Cantidad.toLocaleString()} (${item.Porcentaje}%)</strong>`;
+                    topSectoresPrioritariosList.appendChild(li);
+                });
+
+                // 4. Top Códigos CIIU (Naturales) en Distritos Prioritarios
+                const topCIIUCodesNaturalesList = document.getElementById('topCIIUCodesNaturalesList');
+                data.top_ciiu_codes_naturales_prioritarios.forEach(item => {
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.innerHTML = `<span>CIIU ${item.CIIU_Code}</span> <strong>${item.Cantidad.toLocaleString()} (${item.Porcentaje}%)</strong>`;
+                    topCIIUCodesNaturalesList.appendChild(li);
+                });
+
+                // 5. Gráfico de Distribución por Tipo de Persona
+                const ctxTipoPersona = document.getElementById('tipoPersonaChart').getContext('2d');
+                new Chart(ctxTipoPersona, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(data.distribucion_tipo_persona),
+                        datasets: [{
+                            data: Object.values(data.distribucion_tipo_persona),
+                            backgroundColor: ['#36a2eb', '#ff6384'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Distribución por Tipo de Persona',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // 6. Gráfico de Distribución General por Distrito
+                const ctxDistritoGeneral = document.getElementById('distritoGeneralChart').getContext('2d');
+                const distritosLabels = data.distribucion_general_distritos.map(d => d.Distrito);
+                const distritosData = data.distribucion_general_distritos.map(d => d.Cantidad);
+
+                new Chart(ctxDistritoGeneral, {
+                    type: 'bar',
+                    data: {
+                        labels: distritosLabels.slice(0, 10), // Mostrar top 10 para claridad
+                        datasets: [{
+                            label: 'Cantidad de Empresas',
+                            data: distritosData.slice(0, 10),
+                            backgroundColor: '#17a2b8',
+                            borderColor: '#17a2b8',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false,
+                            },
+                            title: {
+                                display: true,
+                                text: 'Top 10 Distritos por Cantidad de Empresas',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        },
+                        scales: {

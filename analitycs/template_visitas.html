@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>RUC Fácil – Filtro de Visitas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 16px; }
+    header { display:flex; align-items:center; gap:12px; flex-wrap: wrap; }
+    .card { border:1px solid #ddd; border-radius:14px; padding:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin:12px 0; }
+    .grid { display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); }
+    input, select, button { padding:8px 10px; border-radius:10px; border:1px solid #ccc; }
+    table { width:100%; border-collapse: collapse; margin-top:10px; }
+    th, td { padding:8px; border-bottom:1px solid #eee; }
+    th { cursor:pointer; user-select:none; position:sticky; top:0; background:#fafafa; }
+    .pill { display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid #ddd; font-size:12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>RUC Fácil – Planificador de Visitas</h2>
+    <span class="pill">Carga tu CSV: visitas_recomendadas_*.csv</span>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div>
+        <label><b>Archivo CSV</b></label>
+        <input type="file" id="file" accept=".csv" />
+      </div>
+      <div>
+        <label><b>Distrito</b></label>
+        <input id="f_distrito" placeholder="Ej: IQUITOS, PUNCHANA…" />
+      </div>
+      <div>
+        <label><b>Estado</b></label>
+        <input id="f_estado" placeholder="ACTIVO, ..." />
+      </div>
+      <div>
+        <label><b>Cond. Domicilio</b></label>
+        <input id="f_cond" placeholder="HABIDO, NO HABIDO…" />
+      </div>
+      <div>
+        <label><b>Tipo</b></label>
+        <select id="f_tipo">
+          <option value="">Todos</option>
+          <option>PJ</option>
+          <option>PN</option>
+        </select>
+      </div>
+      <div>
+        <label><b>CIIU contiene</b></label>
+        <input id="f_ciiu" placeholder="5610, 47…" />
+      </div>
+      <div>
+        <label><b>SCORE mín.</b></label>
+        <input id="f_score" type="number" min="0" value="0" />
+      </div>
+      <div>
+        <label>&nbsp;</label><br/>
+        <button id="btn_export">Exportar selección CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div><b>Total registros:</b> <span id="total">0</span> | <b>Mostrando:</b> <span id="shown">0</span></div>
+    <table id="tbl">
+      <thead>
+        <tr id="thead">
+          <!-- se genera dinámicamente -->
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    let rows = [];
+    let filtered = [];
+    let sortCol = null;
+    let sortAsc = true;
+
+    const fileInput = document.getElementById('file');
+    const tbody = document.getElementById('tbody');
+    const thead = document.getElementById('thead');
+    const totalSpan = document.getElementById('total');
+    const shownSpan = document.getElementById('shown');
+
+    const f_distrito = document.getElementById('f_distrito');
+    const f_estado = document.getElementById('f_estado');
+    const f_cond = document.getElementById('f_cond');
+    const f_tipo = document.getElementById('f_tipo');
+    const f_ciiu = document.getElementById('f_ciiu');
+    const f_score = document.getElementById('f_score');
+    const btn_export = document.getElementById('btn_export');
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const text = await file.text();
+      rows = parseCSV(text);
+      totalSpan.textContent = rows.length.toString();
+      buildHeader(Object.keys(rows[0] || {}));
+      applyFilters();
+    });
+
+    [f_distrito, f_estado, f_cond, f_tipo, f_ciiu, f_score].forEach(el => {
+      el.addEventListener('input', applyFilters);
+      el.addEventListener('change', applyFilters);
+    });
+
+    btn_export.addEventListener('click', () => {
+      const csv = toCSV(filtered);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const ts = new Date().toISOString().slice(0,19).replace(/[:T]/g,'');
+      a.href = url;
+      a.download = `visitas_filtradas_${ts}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    function buildHeader(cols) {
+      thead.innerHTML = '';
+      const tr = document.createElement('tr');
+      cols.forEach(c => {
+        const th = document.createElement('th');
+        th.textContent = c;
+        th.addEventListener('click', () => sortBy(c));
+        tr.appendChild(th);
+      });
+      thead.appendChild(tr);
+    }
+
+    function applyFilters() {
+      const d = f_distrito.value.trim().toUpperCase();
+      const es = f_estado.value.trim().toUpperCase();
+      const co = f_cond.value.trim().toUpperCase();
+      const ti = f_tipo.value.trim().toUpperCase();
+      const ci = f_ciiu.value.trim().toUpperCase();
+      const sc = Number(f_score.value || 0);
+
+      filtered = rows.filter(r => {
+        const okD = !d || (r.DIST || '').toUpperCase().includes(d);
+        const okE = !es || (r.ESTADO || '').toUpperCase().includes(es);
+        const okC = !co || (r.COND_DOM || '').toUpperCase().includes(co);
+        const okT = !ti || (r.TIPO || '').toUpperCase() === ti;
+        const okI = !ci || ((r.CIIU || '').toUpperCase().includes(ci) || (r.CIIU2 || '').toUpperCase().includes(ci) || (r.CIIU3 || '').toUpperCase().includes(ci));
+        const okS = isNaN(sc) ? true : (Number(r.SCORE || 0) >= sc);
+        return okD && okE && okC && okT && okI && okS;
+      });
+
+      if (sortCol) {
+        filtered.sort((a,b) => {
+          const va = coerce(a[sortCol]);
+          const vb = coerce(b[sortCol]);
+          if (va < vb) return sortAsc ? -1 : 1;
+          if (va > vb) return sortAsc ? 1 : -1;
+          return 0;
+        });
+      }
+
+      renderTable(filtered.slice(0, 500)); // muestra hasta 500 por rendimiento
+      shownSpan.textContent = filtered.length.toString();
+    }
+
+    function renderTable(arr) {
+      tbody.innerHTML = '';
+      arr.forEach(r => {
+        const tr = document.createElement('tr');
+        Object.keys(r).forEach(k => {
+          const td = document.createElement('td');
+          td.textContent = r[k] ?? '';
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function sortBy(col) {
+      if (sortCol === col) {
+        sortAsc = !sortAsc;
+      } else {
+        sortCol = col;
+        sortAsc = true;
+      }
+      applyFilters();
+    }
+
+    function coerce(v) {
+      if (v == null) return '';
+      const n = Number(v);
+      return isNaN(n) ? String(v).toUpperCase() : n;
+    }
+
+    // --- CSV helpers ---
+    function parseCSV(text) {
+      // parseo simple, suficiente si no hay comas escapadas en campos.
+      // Si tu CSV tiene comillas/comas dentro de celdas, considera Papaparse (requiere internet).
+      const lines = text.replace(/\r/g,'').split('\n').filter(l => l.trim().length);
+      const headers = splitCSVLine(lines[0]);
+      return lines.slice(1).map(line => {
+        const cells = splitCSVLine(line);
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = (cells[i] ?? '').trim());
+        return obj;
+      });
+    }
+    function splitCSVLine(line) {
+      // Soporte básico de comillas
+      const res = [];
+      let cur = '';
+      let inQ = false;
+      for (let i=0;i<line.length;i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+          else { inQ = !inQ; }
+        } else if (ch === ',' && !inQ) {
+          res.push(cur); cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      res.push(cur);
+      return res;
+    }
+    function toCSV(arr) {
+      if (!arr.length) return '';
+      const cols = Object.keys(arr[0]);
+      const head = cols.join(',');
+      const lines = arr.map(r => cols.map(c => csvCell(r[c])).join(','));
+      return [head, ...lines].join('\n');
+    }
+    function csvCell(v) {
+      if (v == null) return '';
+      const s = String(v);
+      if (s.includes('"') || s.includes(',') || s.includes('\n')) {
+        return `"${s.replace(/"/g, '""')}"`;
+      }
+      return s;
+    }
+  </script>
+</body>
+</html>

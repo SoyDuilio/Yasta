@@ -1,0 +1,376 @@
+{
+    "resumen_general": {
+        "total_empresas": 76494,
+        "total_juridicas": 10959,
+        "total_naturales": 65535,
+        "total_activos": 76493
+    },
+    "distribucion_tipo_persona": {
+        "Natural": 85.67,
+        "Jurídica": 14.33
+    },
+    "distritos_prioritarios": [
+        "IQUITOS",
+        "BELEN",
+        "SAN JUAN BAUTISTA",
+        "PUNCHANA"
+    ],
+    "conteo_distritos_prioritarios": [
+        {
+            "Distrito": "IQUITOS",
+            "Cantidad": 39875,
+            "Porcentaje": 57.68
+        },
+        {
+            "Distrito": "SAN JUAN BAUTISTA",
+            "Cantidad": 11222,
+            "Porcentaje": 16.23
+        },
+        {
+            "Distrito": "PUNCHANA",
+            "Cantidad": 10981,
+            "Porcentaje": 15.88
+        },
+        {
+            "Distrito": "BELEN",
+            "Cantidad": 7058,
+            "Porcentaje": 10.21
+        }
+    ],
+    "top_sectores_prioritarios": [
+        {
+            "Sector_Descripcion": "OTRAS ACTIVID.DE TIPO SERVICIO NCP",
+            "Cantidad": 18291,
+            "Porcentaje": 26.46
+        },
+        {
+            "Sector_Descripcion": "OTRAS ACTIVIDADES EMPRESARIALES NCP.",
+            "Cantidad": 15425,
+            "Porcentaje": 22.31
+        },
+        {
+            "Sector_Descripcion": "CONSTRUCCION EDIFICIOS COMPLETOS.",
+            "Cantidad": 2957,
+            "Porcentaje": 4.28
+        },
+        {
+            "Sector_Descripcion": "VTA.  MIN. ALIMENTOS, BEBIDAS, TABACO.",
+            "Cantidad": 2670,
+            "Porcentaje": 3.86
+        },
+        {
+            "Sector_Descripcion": "RESTAURANTES, BARES Y CANTINAS.",
+            "Cantidad": 1743,
+            "Porcentaje": 2.52
+        },
+        {
+            "Sector_Descripcion": "OTRAS ACTIV.RELAC. CON SALUD HUMANA",
+            "Cantidad": 1433,
+            "Porcentaje": 2.07
+        },
+        {
+            "Sector_Descripcion": "OTROS TIPOS DE VENTA AL POR MENOR.",
+            "Cantidad": 1408,
+            "Porcentaje": 2.04
+        },
+        {
+            "Sector_Descripcion": "ACTIVIDADES INMOBILIARIAS",
+            "Cantidad": 1081,
+            "Porcentaje": 1.56
+        },
+        {
+            "Sector_Descripcion": "VTA. MIN. EN ALMACENES NO ESPECIALIZ.",
+            "Cantidad": 998,
+            "Porcentaje": 1.44
+        },
+        {
+            "Sector_Descripcion": "ACTIV.DE ARQUITECTURA E INGENIERIA",
+            "Cantidad": 868,
+            "Porcentaje": 1.26
+        }
+    ],
+    "top_ciiu_codes_naturales_prioritarios": [
+        {
+            "CIIU_Code": 93098,
+            "Cantidad": 18047,
+            "Porcentaje": 30.31
+        },
+        {
+            "CIIU_Code": 74996,
+            "Cantidad": 15157,
+            "Porcentaje": 25.45
+        },
+        {
+            "CIIU_Code": 52206,
+            "Cantidad": 2491,
+            "Porcentaje": 4.18
+        },
+        {
+            "CIIU_Code": 45207,
+            "Cantidad": 1962,
+            "Porcentaje": 3.29
+        },
+        {
+            "CIIU_Code": 55205,
+            "Cantidad": 1349,
+            "Porcentaje": 2.27
+        },
+        {
+            "CIIU_Code": 85193,
+            "Cantidad": 1347,
+            "Porcentaje": 2.26
+        },
+        {
+            "CIIU_Code": 52391,
+            "Cantidad": 1051,
+            "Porcentaje": 1.76
+        },
+        {
+            "CIIU_Code": 70109,
+            "Cantidad": 1033,
+            "Porcentaje": 1.73
+        },
+        {
+            "CIIU_Code": 52118,
+            "Cantidad": 929,
+            "Porcentaje": 1.56
+        },
+        {
+            "CIIU_Code": 74120,
+            "Cantidad": 740,
+            "Porcentaje": 1.24
+        }
+    ],
+    "distribucion_general_distritos": [
+        {
+            "Distrito": "IQUITOS",
+            "Cantidad": 39875,
+            "Porcentaje": 52.13
+        },
+        {
+            "Distrito": "SAN JUAN BAUTISTA",
+            "Cantidad": 11222,
+            "Porcentaje": 14.67
+        },
+        {
+            "Distrito": "PUNCHANA",
+            "Cantidad": 10981,
+            "Porcentaje": 14.36
+        },
+        {
+            "Distrito": "BELEN",
+            "Cantidad": 7058,
+            "Porcentaje": 9.23
+        },
+        {
+            "Distrito": "NAUTA",
+            "Cantidad": 1392,
+            "Porcentaje": 1.82
+        },
+        {
+            "Distrito": "REQUENA",
+            "Cantidad": 1226,
+            "Porcentaje": 1.6
+        },
+        {
+            "Distrito": "RAMON CASTILLA",
+            "Cantidad": 643,
+            "Porcentaje": 0.84
+        },
+        {
+            "Distrito": "FERNANDO LORES",
+            "Cantidad": 517,
+            "Porcentaje": 0.68
+        },
+        {
+            "Distrito": "BARRANCA",
+            "Cantidad": 487,
+            "Porcentaje": 0.64
+        },
+        {
+            "Distrito": "INDIANA",
+            "Cantidad": 308,
+            "Porcentaje": 0.4
+        },
+        {
+            "Distrito": "MANSERICHE",
+            "Cantidad": 281,
+            "Porcentaje": 0.37
+        },
+        {
+            "Distrito": "PUTUMAYO",
+            "Cantidad": 269,
+            "Porcentaje": 0.35
+        },
+        {
+            "Distrito": "MAZAN",
+            "Cantidad": 235,
+            "Porcentaje": 0.31
+        },
+        {
+            "Distrito": "LAS AMAZONAS",
+            "Cantidad": 184,
+            "Porcentaje": 0.24
+        },
+        {
+            "Distrito": "YAVARI",
+            "Cantidad": 180,
+            "Porcentaje": 0.24
+        },
+        {
+            "Distrito": "NAPO",
+            "Cantidad": 161,
+            "Porcentaje": 0.21
+        },
+        {
+            "Distrito": "PEBAS",
+            "Cantidad": 155,
+            "Porcentaje": 0.2
+        },
+        {
+            "Distrito": "LAGUNAS",
+            "Cantidad": 142,
+            "Porcentaje": 0.19
+        },
+        {
+            "Distrito": "TROMPETEROS",
+            "Cantidad": 124,
+            "Porcentaje": 0.16
+        },
+        {
+            "Distrito": "SAN PABLO",
+            "Cantidad": 102,
+            "Porcentaje": 0.13
+        },
+        {
+            "Distrito": "TIGRE",
+            "Cantidad": 88,
+            "Porcentaje": 0.12
+        },
+        {
+            "Distrito": "JENARO HERRERA",
+            "Cantidad": 87,
+            "Porcentaje": 0.11
+        },
+        {
+            "Distrito": "URARINAS",
+            "Cantidad": 80,
+            "Porcentaje": 0.1
+        },
+        {
+            "Distrito": "ALTO NANAY",
+            "Cantidad": 64,
+            "Porcentaje": 0.08
+        },
+        {
+            "Distrito": "PARINARI",
+            "Cantidad": 62,
+            "Porcentaje": 0.08
+        },
+        {
+            "Distrito": "TENIENTE CESAR LOPEZ ROJAS",
+            "Cantidad": 53,
+            "Porcentaje": 0.07
+        },
+        {
+            "Distrito": "YAQUERANA",
+            "Cantidad": 52,
+            "Porcentaje": 0.07
+        },
+        {
+            "Distrito": "MAQUIA",
+            "Cantidad": 49,
+            "Porcentaje": 0.06
+        },
+        {
+            "Distrito": "SAQUENA",
+            "Cantidad": 49,
+            "Porcentaje": 0.06
+        },
+        {
+            "Distrito": "PASTAZA",
+            "Cantidad": 44,
+            "Porcentaje": 0.06
+        },
+        {
+            "Distrito": "TORRES CAUSANA",
+            "Cantidad": 39,
+            "Porcentaje": 0.05
+        },
+        {
+            "Distrito": "CAPELO",
+            "Cantidad": 38,
+            "Porcentaje": 0.05
+        },
+        {
+            "Distrito": "PUINAHUA",
+            "Cantidad": 36,
+            "Porcentaje": 0.05
+        },
+        {
+            "Distrito": "EMILIO SAN MARTIN",
+            "Cantidad": 34,
+            "Porcentaje": 0.04
+        },
+        {
+            "Distrito": "TENIENTE MANUEL CLAVERO",
+            "Cantidad": 32,
+            "Porcentaje": 0.04
+        },
+        {
+            "Distrito": "ANDOAS",
+            "Cantidad": 31,
+            "Porcentaje": 0.04
+        },
+        {
+            "Distrito": "MORONA",
+            "Cantidad": 29,
+            "Porcentaje": 0.04
+        },
+        {
+            "Distrito": "JEBEROS",
+            "Cantidad": 17,
+            "Porcentaje": 0.02
+        },
+        {
+            "Distrito": "ALTO TAPICHE",
+            "Cantidad": 15,
+            "Porcentaje": 0.02
+        },
+        {
+            "Distrito": "TAPICHE",
+            "Cantidad": 13,
+            "Porcentaje": 0.02
+        },
+        {
+            "Distrito": "CAHUAPANAS",
+            "Cantidad": 9,
+            "Porcentaje": 0.01
+        },
+        {
+            "Distrito": "SOPLIN",
+            "Cantidad": 8,
+            "Porcentaje": 0.01
+        },
+        {
+            "Distrito": "SANTA CRUZ",
+            "Cantidad": 8,
+            "Porcentaje": 0.01
+        },
+        {
+            "Distrito": "ROSA PANDURO",
+            "Cantidad": 7,
+            "Porcentaje": 0.01
+        },
+        {
+            "Distrito": "YAGUAS",
+            "Cantidad": 4,
+            "Porcentaje": 0.01
+        },
+        {
+            "Distrito": "SAN JUAN DE LURIGANCHO",
+            "Cantidad": 1,
+            "Porcentaje": 0.0
+        }
+    ]
+}
