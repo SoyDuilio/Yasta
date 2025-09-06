@@ -8,6 +8,10 @@ from datetime import datetime
 # Definir la ruta base de la aplicación para construir las rutas a templates y static
 BASE_APP_DIR = Path(__file__).resolve().parent.parent # Sube dos niveles (core -> app)
 
+# --- INICIO DE LA LÍNEA DE DEPURACIÓN ---
+print(f"--- [YASTA DEBUG] Ruta Base de la Aplicación (BASE_APP_DIR): {BASE_APP_DIR}")
+# --- FIN DE LA LÍNEA DE DEPURACIÓN ---
+
 templates = Jinja2Templates(directory=str(BASE_APP_DIR / "templates"))
 
 # --- 2. AÑADIR LA FUNCIÓN AL CONTEXTO GLOBAL ---
@@ -15,6 +19,9 @@ templates.env.globals['now'] = datetime.now
 # -----------------------------------------------
 
 def mount_static_files(app: FastAPI):
+    static_dir = str(BASE_APP_DIR / "static")
+    # --- AÑADIMOS OTRA LÍNEA DE DEPURACIÓN ---
+    print(f"--- [YASTA DEBUG] Montando carpeta estática desde: {static_dir}")
     app.mount("/static", StaticFiles(directory=str(BASE_APP_DIR / "static")), name="static")
 
 # No necesitas instanciar `templates` en `main.py` si lo importas desde aquí.
