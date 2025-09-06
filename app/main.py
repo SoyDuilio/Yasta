@@ -128,3 +128,50 @@ async def ideas2(request: Request):
 async def ideas3(request: Request):
     return templates.TemplateResponse("ideas3.html", {"request": request})
 
+
+#DATA PARA VISITAS DE ALDO
+# Cargar los datos una sola vez al iniciar la app
+ruta_archivo = "analitycs/datos_empresas.json"
+
+with open(ruta_archivo, "r", encoding="utf-8") as f:
+    datos = json.load(f)
+
+@app.get("/data", response_class=HTMLResponse)
+async def leer_raiz(request: Request):
+    """ Sirve la página principal con el resumen inicial y el selector de actividades. """
+    return templates.TemplateResponse("aldo_index.html", {
+        "request": request,
+        "resumen": datos['resumen_distritos'],
+        "actividades": datos['actividades_economicas']
+    })
+
+@app.get("/analisis-actividad", response_class=HTMLResponse)
+async def obtener_analisis_actividad(request: Request, actividad: str):
+    """ Devuelve un fragmento HTML con el análisis de una actividad económica. """
+    analisis = datos['analisis_por_actividad'].get(actividad, {})
+    
+    # Ordenar las direcciones por cantidad de empresas (de mayor a menor)
+    concentracion_ordenada = sorted(
+        analisis.get('concentracion_direcciones', {}).items(), 
+        key=lambda item: item[1], 
+        reverse=True
+    )
+    
+    return templates.TemplateResponse("aldo_fragments.html", {
+        "request": request,
+        "template_name": "analisis_actividad",
+        "actividad_seleccionada": actividad,
+        "conteo_distritos": analisis.get('conteo_por_distrito', {}),
+        "concentracion": concentracion_ordenada
+    })
+
+@app.get("/lista-empresas", response_class=HTMLResponse)
+async def obtener_lista_empresas(request: Request, actividad: str, direccion: str):
+    """ Devuelve la lista de empresas para una actividad y dirección específica. """
+    empresas = datos['empresas_por_ubicacion'].get(actividad, {}).get(direccion, [])
+    return templates.TemplateResponse("aldo_fragments.html", {
+        "request": request,
+        "template_name": "lista_empresas",
+        "empresas": empresas
+    })
+
