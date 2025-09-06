@@ -1,0 +1,70 @@
+<!-- templates/fragments.html -->
+
+<!-- Plantilla para el análisis por actividad -->
+{% if template_name == 'analisis_actividad' %}
+    <h3>Resultados para: {{ actividad_seleccionada }}</h3>
+
+    <h4>Cantidad por Distrito</h4>
+    <table>
+        <thead>
+            <tr><th>Distrito</th><th>Cantidad</th></tr>
+        </thead>
+        <tbody>
+            {% for distrito, cantidad in conteo_distritos.items() %}
+            <tr><td>{{ distrito }}</td><td>{{ cantidad }}</td></tr>
+            {% else %}
+            <tr><td colspan="2">No hay empresas con esta actividad en los distritos seleccionados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4>Concentración por Dirección (Top 10)</h4>
+    <table>
+        <thead>
+            <tr><th>Dirección</th><th>Cantidad</th></tr>
+        </thead>
+        <tbody>
+            {% for direccion, cantidad in concentracion[:10] %}
+            <tr class="clickable" 
+                hx-get="/lista-empresas?actividad={{ actividad_seleccionada|urlencode }}&direccion={{ direccion|urlencode }}" 
+                hx-target="#lista-empresas-detalle"
+                hx-swap="innerHTML">
+                <td>{{ direccion }}</td>
+                <td>{{ cantidad }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">No se encontraron datos de concentración.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div id="lista-empresas-detalle">
+        <!-- La lista detallada de empresas aparecerá aquí al hacer clic en una dirección -->
+    </div>
+{% endif %}
+
+
+<!-- Plantilla para la lista de empresas -->
+{% if template_name == 'lista_empresas' %}
+    <h4>Detalle de Empresas</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>RUC</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Distrito</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for empresa in empresas %}
+            <tr>
+                <td>{{ empresa.ddp_numruc }}</td>
+                <td>{{ empresa.ddp_nombre }}</td>
+                <td>{{ empresa.direccion_completa }} {{ empresa.número or '' }}</td>
+                <td>{{ empresa.Distrito }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

@@ -1,0 +1,52 @@
+<!-- templates/aldo_index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumen de Empresas - Loreto</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <!-- Agrega tu CSS aquí -->
+    <style>
+        body { font-family: sans-serif; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        select, button { padding: 10px; margin: 10px 0; }
+        #resultados { margin-top: 20px; }
+        .clickable { cursor: pointer; color: blue; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Resumen de Empresas por Distrito</h1>
+    <table>
+        <thead>
+            <tr><th>Distrito</th><th>Cantidad de Empresas</th></tr>
+        </thead>
+        <tbody>
+            {% for distrito, cantidad in resumen.items() %}
+            <tr><td>{{ distrito }}</td><td>{{ cantidad }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>Análisis por Actividad Económica</h2>
+    <label for="actividad-select">Selecciona una actividad:</label>
+    <select name="actividad" id="actividad-select" 
+            hx-get="/analisis-actividad" 
+            hx-target="#resultados" 
+            hx-indicator="#loading-indicator">
+        <option value="">-- Elige una opción --</option>
+        {% for actividad in actividades %}
+        <option value="{{ actividad }}">{{ actividad }}</option>
+        {% endfor %}
+    </select>
+
+    <span id="loading-indicator" class="htmx-indicator">Cargando...</span>
+
+    <div id="resultados">
+        <!-- Los resultados del análisis aparecerán aquí -->
+    </div>
+</body>
+</html>
