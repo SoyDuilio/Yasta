@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Personal - YASTA</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', path='css/staff_login.css') }}">
+    <link rel="icon" href="{{ url_for('static', path='img/favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+
+    <div class="login-container">
+        
+        <div class="login-header">
+            <h1>YASTA | Acceso Interno</h1>
+            <p>Inicia sesión para acceder a tu panel de control.</p>
+        </div>
+        
+        <form class="login-form" action="{{ url_for('login_for_access_token') }}" method="post">
+            
+            <!-- Grupo de Input: Correo Electrónico (sin cambios) -->
+            <div>
+                <label for="username" class="sr-only">Correo Electrónico</label>
+                <input id="username" name="username" type="email" autocomplete="email" required class="form-input" placeholder="Correo Electrónico">
+            </div>
+            
+            <!-- Grupo de Input: Contraseña (¡ACTUALIZADO!) -->
+            <div>
+                <label for="password" class="sr-only">Contraseña</label>
+                <div class="password-wrapper">
+                    <input id="password" name="password" type="password" autocomplete="current-password" required class="form-input password-input" placeholder="Contraseña">
+                    <!-- El icono para mostrar/ocultar se insertará aquí con JS -->
+                    <span id="toggle-password" class="password-toggle-icon">
+                        <!-- SVG del ojo (mostrar) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </span>
+                </div>
+                
+                <!-- Enlaces de Ayuda -->
+                <div class="form-links">
+                    <a href="#" class="form-link">Olvidé mi clave</a>
+                    <a href="#" class="form-link">Cambiar mi clave</a>
+                </div>
+            </div>
+            
+            <!-- Botón de Envío -->
+            <button type="submit" class="submit-btn">
+                Ingresar
+            </button>
+        </form>
+
+    </div>
+
+    <!-- === SCRIPT PARA LA FUNCIONALIDAD DE VER/OCULTAR CONTRASEÑA === -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('password');
+            const toggleIconContainer = document.getElementById('toggle-password');
+
+            // SVGs como strings para intercambiarlos fácilmente
+            const eyeIconSVG = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>`;
+
+            const eyeSlashIconSVG = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243l-4.243-4.243" />
+                </svg>`;
+            
+            toggleIconContainer.addEventListener('click', () => {
+                // Comprueba el tipo de input actual
+                const isPassword = passwordInput.getAttribute('type') === 'password';
+                
+                if (isPassword) {
+                    // Si es contraseña, cambiar a texto y mostrar el ojo tachado
+                    passwordInput.setAttribute('type', 'text');
+                    toggleIconContainer.innerHTML = eyeSlashIconSVG;
+                } else {
+                    // Si es texto, cambiar a contraseña y mostrar el ojo normal
+                    passwordInput.setAttribute('type', 'password');
+                    toggleIconContainer.innerHTML = eyeIconSVG;
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
