@@ -90,5 +90,28 @@ class CRUDUser:
             
         return user
 
+
+    def create_staff_user(self, db: Session, *, email: str, password: str, full_name: str, dni: str, role: UserRole) -> User:
+        """
+        Crea un nuevo usuario de tipo staff con los campos requeridos.
+        """
+        # Una pequeña validación para asegurar que solo se creen roles de staff
+        if not role.value.startswith("staff_"):
+             raise ValueError("El rol asignado no es un rol de personal válido.")
+        
+        hashed_password = get_password_hash(password)
+        db_user = User(
+            email=email,
+            hashed_password=hashed_password,
+            contact_name=full_name,
+            staff_full_name=full_name,
+            staff_dni=dni,
+            role=role,
+            is_active=True # El personal se crea activo por defecto
+        )
+        db.add(db_user)
+        # El commit se hará en el endpoint para mantener la transacción atómica
+        return db_user
+    
 # Instancia para exportar
 crud_user = CRUDUser()
