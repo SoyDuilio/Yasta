@@ -1,0 +1,214 @@
+/* app/static/css/dashboard_supervisor.css */
+
+/* --- SOLUCIÓN PARA EL FORMULARIO DE GESTIONAR STAFF --- */
+
+/* Por defecto, el formulario es una cuadrícula de 2 columnas */
+.staff-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+/* El botón de envío ocupa las 2 columnas */
+.staff-form-grid .form-submit-area {
+    grid-column: span 2 / span 2;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+
+/* --- SOLUCIÓN PARA LA TABLA DE EQUIPO ACTUAL --- */
+
+/* Creamos un contenedor que PERMITA el scroll horizontal SOLO para la tabla */
+.responsive-table-wrapper {
+    overflow-x: auto; /* ¡La magia está aquí! */
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    border: 1px solid #374151; /* Un borde sutil */
+    border-radius: 0.5rem;
+}
+
+.responsive-table-wrapper table {
+    /* Nos aseguramos que la tabla no tenga bordes que interfieran */
+    border: none; 
+}
+
+
+/* --- MEDIA QUERY: Estilos para pantallas pequeñas (móviles) --- */
+/* Estos estilos se aplicarán en pantallas de 768px de ancho o menos */
+@media (max-width: 768px) {
+
+    /* El formulario ahora será de 1 sola columna */
+    .staff-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* El botón de envío ahora ocupa 1 columna */
+    .staff-form-grid .form-submit-area {
+        grid-column: span 1 / span 1;
+    }
+}
+
+
+/* --- ESTILOS PARA LAS TARJETAS DE STAFF (Añadir al final) --- */
+
+.staff-card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.staff-card {
+    background-color: #2d3748;
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+/* El header visible y clickeable */
+.staff-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.staff-card-header:hover {
+    background-color: #374151;
+}
+
+/* Avatar */
+.staff-avatar {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid #4a5568;
+    object-fit: cover;
+}
+
+/* Contenedor principal de la información */
+.staff-card-main-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.staff-card-main-info .staff-name {
+    font-size: 1.125rem; /* 18px */
+    font-weight: 700;
+    color: var(--text-white);
+}
+
+.staff-card-main-info .staff-role {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    color: var(--brand-blue);
+    line-height: 1.2;
+}
+
+/* Icono de flecha para expandir */
+.staff-card-toggle-icon {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+}
+
+.staff-card-toggle-icon.is-expanded {
+    transform: rotate(180deg);
+}
+
+/* Detalles colapsables */
+.staff-card-details {
+    padding: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #374151;
+    font-size: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.staff-card-details strong {
+    color: var(--text-muted);
+    min-width: 80px; /* Alineación */
+    display: inline-block;
+}
+
+
+/* =================================================================== */
+/* === INICIO: BLOQUE DE CORRECCIÓN PARA EL FORMULARIO DE STAFF === */
+/* (Reemplaza cualquier estilo anterior de .password-wrapper, etc. con esto) */
+/* =================================================================== */
+
+/* =================================================================== */
+/* === INICIO: BLOQUE DE CÓDIGO DEFINITIVO PARA EL FORMULARIO === */
+/* (Reemplaza los estilos del formulario y contraseña con esto) */
+/* =================================================================== */
+
+/* --- FORMULARIO --- */
+.staff-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+.staff-form-grid .form-submit-area {
+    grid-column: span 2 / span 2;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .staff-form-grid { grid-template-columns: 1fr; }
+    .staff-form-grid .form-submit-area { grid-column: span 1 / span 1; }
+}
+
+/* --- ESTILOS DE INPUT (COPIADOS DEL LOGIN QUE FUNCIONA) --- */
+/* Esta regla genérica se aplicará a todos los inputs */
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background-color: #111827; /* bg-darkest */
+    color: #FFFFFF; /* text-white */
+    border: 1px solid #374151; /* border-color */
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    height: 44px; /* Altura unificada */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2563EB; /* brand-blue */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* focus-ring-color */
+}
+
+/* --- CONTRASEÑA (LÓGICA CORRECTA Y SIMPLIFICADA) --- */
+.password-wrapper {
+    position: relative;
+}
+/* El input necesita padding a la derecha para no escribir debajo del icono */
+.password-wrapper .form-input {
+    padding-right: 3.5rem !important; 
+}
+.password-toggle-icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9CA3AF;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.password-toggle-icon:hover {
+    color: #E5E7EB;
+}
+.password-toggle-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}

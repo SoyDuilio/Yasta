@@ -1,0 +1,119 @@
+/* =================================================================== */
+/* ===         HOJA DE ESTILOS FINAL PARA LANDING Y CAPTURA        === */
+/* =================================================================== */
+
+:root {
+    --brand-yellow: #FFC700;
+    --brand-green: #1A4D2E;
+    --whatsapp-green: #25D366;
+    /* ... (resto de tus variables) ... */
+}
+/* ... (todos tus estilos anteriores de body, layout, menú, modal, etc.) ... */
+
+/* --- PÁGINA DE AGRADECIMIENTO FINAL (REDISEÑADA) --- */
+.thank-you-page.final-step {
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+}
+.success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    color: var(--success-color);
+}
+.thank-you-page h1 {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    color: var(--brand-yellow);
+    margin: 0 0 0.5rem 0;
+}
+.thank-you-page .subtitle {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+}
+
+.instruction-box {
+    background-color: var(--bg-dark-1);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+}
+.instruction-box h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    margin-top: 0;
+}
+.instruction-box p {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.whatsapp-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--whatsapp-green);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    margin-top: 2rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.whatsapp-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2);
+}
+.whatsapp-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* --- BANNER "SIGUIENTE PASO" EN PÁGINAS DEMO --- */
+.next-step-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--bg-dark-1);
+    border-top: 1px solid var(--border-dark);
+    padding: 1.5rem;
+    text-align: center;
+    z-index: 100;
+}
+.next-step-banner .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+@media (min-width: 768px) {
+    .next-step-banner .container {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+.next-step-banner h2 {
+    font-family: var(--font-display);
+    margin: 0;
+    font-size: 1.125rem;
+}
+.next-step-banner p {
+    margin: 0;
+    color: var(--text-muted);
+}
+.whatsapp-button-small {
+    display: inline-block;
+    background-color: var(--whatsapp-green);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}

@@ -1,0 +1,100 @@
+/* =================================================================== */
+/* ===         HOJA DE ESTILOS FINAL PARA PÁGINA DE CAPTURA        === */
+/* ===                      YASTA (/gratis)                        === */
+/* =================================================================== */
+
+:root {
+    --brand-yellow: #FFC700;
+    --brand-green: #1A4D2E;
+    --text-light: #F3F4F6;
+    --text-muted: #9CA3AF;
+    --bg-dark-1: #1F2937;
+    --bg-dark-2: #111827;
+    --border-dark: #374151;
+    --font-sans: "Inter", sans-serif;
+    --font-display: "Poppins", sans-serif;
+    --success-color: #3DDB85;
+    --error-color: #F77272;
+    --whatsapp-green: #25D366;
+}
+
+body.theme-formal { background-color: var(--brand-green); font-family: var(--font-sans); color: var(--text-light); }
+.main-container { max-width: 800px; margin: 3rem auto; padding: 1rem; }
+#capture-form-wrapper { background-color: var(--bg-dark-1); padding: 2.5rem; border-radius: 12px; border: 1px solid var(--border-dark); }
+.header { text-align: center; margin-bottom: 2rem; }
+.header img { width: 80px; margin: 0 auto 1rem; }
+.header h2 { font-family: var(--font-display); font-size: 1.75rem; margin: 0 0 0.5rem 0; }
+.welcome-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; }
+@media (min-width: 768px) {
+    .welcome-grid { grid-template-columns: 1fr 150px; text-align: left; }
+    .header { text-align: left; }
+    .header img { margin: 0 0 1rem; }
+}
+.welcome-image-container { display: flex; justify-content: center; }
+.welcome-image { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--brand-yellow); }
+.initial-choice-container { text-align: center; }
+@media (min-width: 768px) {
+    .initial-choice-container { text-align: left; }
+}
+.initial-choice-container p { font-size: 1.25rem; font-weight: 500; margin: 0 0 2rem 0; line-height: 1.4; }
+.choice-buttons { display: flex; flex-direction: column; gap: 1rem; }
+.form-section h3 { font-family: var(--font-display); font-size: 1.25rem; text-align: center; border-bottom: 1px solid var(--border-dark); padding-bottom: 0.75rem; margin-top: 0; margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 1.25rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500; }
+.form-group input { box-sizing: border-box; width: 100%; height: 48px; padding: 0 1rem; background: var(--bg-dark-2); border: 1px solid var(--border-dark); border-radius: 8px; color: white; font-size: 1rem; }
+.form-group input:focus { border-color: var(--brand-yellow); box-shadow: 0 0 0 3px rgba(255, 199, 0, 0.3); outline: none; }
+.cta, .cta-secondary { width: 100%; padding: 0.9rem; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; border: none; }
+.cta { background-color: var(--brand-yellow); color: var(--bg-dark-2); }
+.cta-secondary { background-color: transparent; color: #60A5FA; border: 1px solid #60A5FA; }
+.ruc-feedback { font-size: 0.8rem; height: 1.2em; margin-top: 4px; }
+#ruc-validated-name { background-color: rgba(61, 219, 133, 0.1); color: var(--success-color); padding: 0.75rem; border-radius: 8px; font-weight: 600; border: 1px solid var(--success-color); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+.change-ruc-btn { background: none; border: none; color: #60A5FA; text-decoration: underline; cursor: pointer; font-size: 0.8rem; }
+.hidden { display: none !important; }
+.loading-placeholder { text-align: center; padding: 2rem; color: var(--text-muted); }
+
+/* =================================================================== */
+/* === INICIO: NUEVOS ESTILOS Y CORRECCIONES === */
+/* =================================================================== */
+
+/* --- PÁGINA DE AGRADECIMIENTO Y DEMOS --- */
+.thank-you-page { text-align: center; }
+.thank-you-page h1 { font-family: var(--font-display); font-size: 2rem; color: var(--brand-yellow); }
+.thank-you-page .subtitle { font-size: 1.125rem; color: var(--text-muted); margin-bottom: 2.5rem; }
+.success-icon { font-size: 80px; width: 1em; height: 1em; margin: 0 auto 1.5rem; color: var(--success-color); }
+.success-icon svg { width: 100%; height: 100%; }
+
+.instruction-box { background-color: var(--bg-dark-2); border: 1px solid var(--border-dark); border-radius: 12px; padding: 2rem; text-align: center; }
+.instruction-box h2 { font-family: var(--font-display); font-size: 1.25rem; margin-top: 0; }
+.instruction-box p { color: var(--text-muted); line-height: 1.6; }
+
+/* --- BOTÓN DE WHATSAPP --- */
+.whatsapp-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--whatsapp-green);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    margin-top: 2rem;
+    border: none;
+    font-size: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.whatsapp-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2);
+}
+.whatsapp-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* --- SECCIÓN DE DEMOS (EN AGRADECIMIENTO) --- */
+.demo-reports-section { margin-top: 3rem; border-top: 1px solid var(--border-dark); padding-top: 2rem; }
+.demo-reports-section h2 { font-size: 1rem; color: var(--text-muted); }
+.demo-links { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+.demo-link { display: block; padding: 0.75rem; border: 1px solid var(--border-dark); border-radius: 8px; text-decoration: none; color: var(--text-light); transition: all 0.2s ease; }
+.demo-link:hover { background-color: var(--bg-dark-2); border-color: var(--brand-yellow); }
