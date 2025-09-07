@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>YASTA - Panel de Leads</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/leads_panel.css') }}">
+    <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+</head>
+<body hx-headers='{"X-Access-Key": "{{ access_key }}"}' 
+      hx-params='{"key": "{{ access_key }}"}'
+      hx-on:htmx:response-headers="
+        let xhr = event.detail.xhr;
+        let triggerHeader = xhr.getResponseHeader('HX-Trigger');
+        if (triggerHeader) {
+            try {
+                let data = JSON.parse(triggerHeader);
+                if (data.copytoclipboard && data.copytoclipboard.password) {
+                    let password = data.copytoclipboard.password;
+                    navigator.clipboard.writeText(password).then(() => {
+                        alert('¡Clave SOL copiada al portapapeles: ' + password + '!');
+                    }).catch(err => {
+                        console.error('Error al copiar:', err);
+                        alert('Error al copiar al portapapeles. Clave: ' + password);
+                    });
+                }
+            } catch (e) {
+                console.error('Error al procesar HX-Trigger:', e);
+            }
+        }
+      ">
+        <h1>Panel de Leads Provisional</h1>
+        
+        <section class="lead-section">
+            <h2>⚠️ Contactos por Atender <span class="count">{{ contacts_to_attend | length }}</span></h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th><th>Nombre</th><th>WhatsApp</th><th>RUC</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in contacts_to_attend %}
+                            {% include 'leads/partials/_contact_lead_row.html' %}
+                        {% else %}
+                            <tr><td colspan="5">¡Todo atendido! No hay contactos pendientes.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="lead-section">
+            <h2>✅ Nuevos Registros por Activar <span class="count">{{ registrations_to_activate | length }}</span></h2>
+            <div class="table-wrapper">
+                <table>
+                     <thead>
+                        <tr>
+                            <th>Fecha</th><th>Razón Social</th><th>RUC</th><th>Usuario SOL</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in registrations_to_activate %}
+                            {% include 'leads/partials/_registration_lead_row.html' %}
+                        {% else %}
+                            <tr><td colspan="5">No hay registros nuevos por activar.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- SCRIPT COMPLETO Y FINAL -->
+    <script>
+        // --- LÓGICA DEL PROMPT DE ACCESO ---
+        (function() {
+            const requiredKey = "{{ access_key }}";
+            const sessionKey = sessionStorage.getItem('leadsAccessKey');
+
+            if (sessionKey !== requiredKey) {
+                const enteredKey = prompt("Por favor, ingresa la clave de acceso al panel de leads:", "");
+                if (enteredKey === requiredKey) {
+                    sessionStorage.setItem('leadsAccessKey', enteredKey);
+                } else {
+                    alert("Clave incorrecta. Acceso denegado.");
+                    document.body.innerHTML = '<h1>Acceso Denegado</h1>';
+                }
+            }
+        })();
+
+        // --- LISTENER ALTERNATIVO PARA HTMX (puedes remover esto si el hx-on funciona) ---
+        document.addEventListener('htmx:afterRequest', function(event) {
+            let xhr = event.detail.xhr;
+            let triggerHeader = xhr.getResponseHeader('HX-Trigger');
+            
+            if (triggerHeader) {
+                try {
+                    let data = JSON.parse(triggerHeader);
+                    if (data.copytoclipboard && data.copytoclipboard.password) {
+                        let password = data.copytoclipboard.password;
+                        navigator.clipboard.writeText(password).then(() => {
+                            alert('¡Clave SOL copiada: ' + password + '!');
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error en listener alternativo:', e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

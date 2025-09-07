@@ -1,0 +1,15 @@
+<tr id="lead-row-{{ lead.id }}">
+    <td>{{ lead.created_at.strftime('%d %b %Y') }}</td>
+    <td>{{ lead.contact_name }}</td>
+    <td>{{ lead.whatsapp_number }}</td>
+    <td>{{ lead.ruc or 'N/A' }}</td>
+    <td>
+        <a href="https://wa.me/51{{ lead.whatsapp_number }}" target="_blank" class="btn btn-whatsapp">Contactar</a>
+        <button class="btn btn-secondary"
+                hx-post="{{ url_for('update_lead_status', lead_id=lead.id, new_status='contacted') }}"
+                hx-target="#lead-row-{{ lead.id }}"
+                hx-swap="outerHTML">
+            Atendido
+        </button>
+    </td>
+</tr>
