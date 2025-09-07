@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     # Configuración para que Pydantic lea desde el archivo .env
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    # --- NUEVA VARIABLE PARA EL PANEL DE LEADS ---
+    LEADS_ACCESS_KEY: str = "aldo2025"
+
 @lru_cache() # Cachea el resultado para no leer .env múltiples veces
 def get_settings() -> Settings:
     return Settings()
