@@ -25,6 +25,7 @@ from app.routes import staff_auth as staff_auth_router
 from app.routes import landing as landing_router
 from app.routes import capture as capture_router
 from app.routes import demos as demos_router
+from app.routes import leads as leads_router
 
 import json
 # --- 3. Inicialización de la Aplicación FastAPI ---
@@ -44,6 +45,8 @@ app.add_middleware(
     same_site="lax",
     max_age=14 * 24 * 60 * 60
 )
+
+# El bloque corregido
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
@@ -51,6 +54,8 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        # --- ¡LA LÍNEA CLAVE QUE FALTABA! ---
+        expose_headers=["HX-Trigger", "HX-Rescript"] 
     )
 
 # --- 5. Inclusión de Routers (Organizados por Tipo) ---
@@ -73,6 +78,8 @@ app.include_router(v1_api_router, prefix=settings.API_V1_STR)
 
 app.include_router(capture_router.router)
 app.include_router(demos_router.router)
+
+app.include_router(leads_router.router)
 
 # --- 6. Montaje de Archivos Estáticos (¡LA POSICIÓN CORRECTA!) ---
 # Se monta DESPUÉS de haber incluido todas las rutas de las páginas.
@@ -106,7 +113,7 @@ async def ideas2(request: Request):
     return templates.TemplateResponse("ideas2.html", {"request": request})
 
 
-
+#ESTO VA PARA el main de duilio.cloud (destinatario ==> Walter)
 @app.get("/saas", response_class=HTMLResponse)
 async def saas(request: Request):
     return templates.TemplateResponse("saas.html", {"request": request})
